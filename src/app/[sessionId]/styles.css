@@ -1,0 +1,17 @@
+.my-card {
+    perspective: 1000px;
+    transition: transform 0.6s;
+}
+
+.my-card.flip {
+    transform: rotateY(180deg);
+}
+
+/* Exemplo: se quiser uma aparência diferente no "verso" 
+     você poderia fazer um container 3D com front/back. 
+     Aqui é só demonstrativo. */
+
+.my-card.voted {
+    background-color: #ccc;
+    /* carta virada porém "marcada" */
+}

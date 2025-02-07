@@ -3,22 +3,35 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NODE_ENV=development nodemon server.js --watch server.js",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env NODE_ENV=production node server.js",
     "lint": "next lint"
   },
   "dependencies": {
+    "express": "^4.21.2",
+    "framer-motion": "^12.3.1",
+    "i18next": "latest",
+    "lucide-react": "^0.474.0",
+    "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.1.6"
+    "react-hot-toast": "^2.5.1",
+    "react-i18next": "^15.4.0",
+    "react-icons": "^5.4.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.9",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5"
   }
 }

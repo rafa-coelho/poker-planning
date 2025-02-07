@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Poker Planning App 🃏
 
-## Getting Started
+[Leia em Portguês](./LEIAME.md)
 
-First, run the development server:
+## 📌 About the Project
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The **Poker Planning App** is a collaborative tool for effort estimation in agile development teams. Supporting multiple players and featuring a dynamic interface, this tool allows participants to vote interactively, ensuring an efficient and participative decision-making process.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Technologies Used
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend:** Next.js (React) + TailwindCSS  
+- **Backend:** Node.js + Express + Socket.io  
+- **Database:** In-memory (temporary server-side storage)  
+- **Authentication:** LocalStorage-based session  
+- **Deployment:** Configured for Docker, Vercel, or other environments  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎮 Features
 
-## Learn More
+✔️ Create and join rooms with a custom name  
+✔️ Interactive voting with Poker Planning cards  
+✔️ Vote reveal system with animations and statistics  
+✔️ Responsive and modern user interface  
+✔️ Real-time communication via WebSockets  
+✔️ Toasts and modals for an enhanced user experience  
 
-To learn more about Next.js, take a look at the following resources:
+## 👥 Installation and Setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🔧 Prerequisites
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Node.js **>= 16.x**  
+- npm or yarn  
 
-## Deploy on Vercel
+### 🛠️ Step by Step
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Clone the repository**  
+   ```sh
+   git clone https://github.com/your-username/poker-planning.git
+   cd poker-planning
+   ```
+2. **Install dependencies**  
+   ```sh
+   npm install
+   # or
+   yarn install
+   ```
+3. **Start the backend server**  
+   ```sh
+   npm run server
+   ```
+4. **Start the frontend**  
+   ```sh
+   npm run dev
+   ```
+5. **Access in your browser**  
+   ```sh
+   http://localhost:3000
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎲 How to Use
+
+### Creating a session
+
+1. Go to the homepage and enter a session name.  
+2. Click "Create Session" and share the generated link.  
+
+### Joining a session
+
+1. Open the shared link or manually enter the session URL.  
+2. Enter your name and click "Join."  
+
+### Voting and revealing
+
+1. Select a card with your estimation.  
+2. The moderator can click "Reveal" to display the votes.  
+3. The system calculates the average votes and shows an "agreement thermometer."  
+
+## 🌍 Internationalization (i18n)
+
+The application supports multiple languages. Available translations include:
+
+- **Portuguese (pt-BR)**  
+- **English (en-US)**  
+
+To add a new language, simply include the translations in `i18n/index.ts`.
+
+## 🤝 Contribution
+
+Contributions are welcome! To contribute:
+
+1. **Fork** the repository  
+2. Create a **branch** with your feature/fix (`git checkout -b new-feature`)  
+3. **Commit** your changes (`git commit -m 'Adding new feature'`)  
+4. **Push** to the branch (`git push origin new-feature`)  
+5. Open a **Pull Request** 🚀  
+
+## 🐟 License
+
+This project is under the **MIT** license. Feel free to use and modify it as needed!
+
+---
+
+🌟 Need help or want to give feedback? Get in touch! 🚀
+
