@@ -35,7 +35,7 @@ export default function VoteSummary ({ votes }: VoteSummaryProps) {
                     </div>
                 </div>
 
-                <VoteSummary.AgreementComponent validVotes={validVotes} />
+                {/* <VoteSummary.AgreementComponent validVotes={validVotes} /> */}
             </div>
 
         </div>
