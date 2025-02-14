@@ -43,15 +43,11 @@ The **Poker Planning App** is a collaborative tool for effort estimation in agil
    # or
    yarn install
    ```
-3. **Start the backend server**  
-   ```sh
-   npm run server
-   ```
-4. **Start the frontend**  
+3. **Run**  
    ```sh
    npm run dev
    ```
-5. **Access in your browser**  
+4. **Access in your browser**  
    ```sh
    http://localhost:3000
    ```

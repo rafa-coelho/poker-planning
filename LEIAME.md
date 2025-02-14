@@ -43,15 +43,11 @@ O **Poker Planning App** é uma aplicação colaborativa para estimativa de esfo
    # ou
    yarn install
    ```
-3. **Inicie o servidor backend**
-   ```sh
-   npm run server
-   ```
-4. **Inicie o frontend**
+3. **Execute**
    ```sh
    npm run dev
    ```
-5. **Acesse no navegador**
+4. **Acesse no navegador**
    ```sh
    http://localhost:3000
    ```
