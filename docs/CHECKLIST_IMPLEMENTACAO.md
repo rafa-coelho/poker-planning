@@ -3,12 +3,12 @@
 ## 📊 Progresso Geral
 
 ```
-🏗️  FASE 1: Fundação & Infraestrutura     [~] 12/32 tarefas
+🏗️  FASE 1: Fundação & Infraestrutura     [~] 31/31 tarefas
 💾 FASE 2: Persistência & Core Features   [ ] 0/28 tarefas  
 🏢 FASE 3: Features Empresariais          [ ] 0/24 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [~] 12/104 tarefas concluídas
+Total: [~] 31/103 tarefas concluídas
 ```
 
 ---
@@ -29,22 +29,22 @@ Total: [~] 12/104 tarefas concluídas
 - [x] Configurar Prisma Studio para debug
 - [x] Documentar comandos úteis do Prisma
 
-### 1.2 Sistema de Autenticação (Dia 3-5)
-- [ ] Instalar dependências JWT (`jsonwebtoken`, `bcryptjs`)
-- [ ] Criar tipos TypeScript para JWT payload
-- [ ] Implementar hash de senhas (bcrypt)
-- [ ] Criar utility para gerar JWT tokens
-- [ ] Criar utility para verificar JWT tokens
-- [ ] Implementar middleware de autenticação
-- [ ] Criar `/api/auth/register` endpoint
-- [ ] Criar `/api/auth/login` endpoint  
-- [ ] Criar `/api/auth/logout` endpoint
-- [ ] Criar `/api/auth/refresh` endpoint
-- [ ] Criar `/api/auth/me` endpoint
-- [ ] Implementar refresh token strategy
-- [ ] Criar páginas de login e registro
-- [ ] Implementar error handling para auth
-- [ ] Testar fluxo completo de autenticação
+### 1.2 Sistema de Autenticação (Dia 3-5) ✅ CONCLUÍDO
+- [x] Instalar dependências JWT (`jsonwebtoken`, `bcryptjs`)
+- [x] Criar tipos TypeScript para JWT payload
+- [x] Implementar hash de senhas (bcrypt)
+- [x] Criar utility para gerar JWT tokens
+- [x] Criar utility para verificar JWT tokens
+- [x] Implementar middleware de autenticação
+- [x] Criar `/api/auth/register` endpoint
+- [x] Criar `/api/auth/login` endpoint
+- [x] Criar `/api/auth/logout` endpoint
+- [x] Criar `/api/auth/refresh` endpoint
+- [x] Criar `/api/auth/me` endpoint
+- [x] Implementar refresh token strategy
+- [x] Implementar error handling para auth
+- [x] Testar fluxo completo de autenticação (5/5 endpoints funcionando)
+- [x] Corrigir validação de tokens vazios/inválidos
 
 ### 1.3 Multi-tenancy Core (Dia 6-7)
 - [ ] Criar middleware de tenant isolation

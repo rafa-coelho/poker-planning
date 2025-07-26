@@ -40,7 +40,7 @@ async function main() {
     data: {
       email: 'admin@nyxlab.com',
       name: 'Admin Demo',
-      passwordHash: '$2a$10$rYWIIr7NvYlrUYmU4l2iAeE2KmK8.6JXL1i3zX6Y4nC8wI2.3l.3y', // senha: 'admin123'
+      passwordHash: '$2b$10$6J4XsIakHljV9RFZfqEmuexzSA4CAjyysRg/ss36dQXZjtU/m8Mhu', // senha: 'admin123'
       role: UserRole.ADMIN,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
@@ -52,7 +52,7 @@ async function main() {
     data: {
       email: 'scrum@nyxlab.com',
       name: 'Scrum Master',
-      passwordHash: '$2a$10$rYWIIr7NvYlrUYmU4l2iAeE2KmK8.6JXL1i3zX6Y4nC8wI2.3l.3y', // senha: 'scrum123'
+      passwordHash: '$2b$10$7XvCiberK1RcDs0tUyHcK.EFRgeikRhUuCCb8W5FfABB.ABrh2tHa', // senha: 'scrum123'
       role: UserRole.MEMBER,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
@@ -64,7 +64,7 @@ async function main() {
     data: {
       email: 'dev1@nyxlab.com',
       name: 'Developer 1',
-      passwordHash: '$2a$10$rYWIIr7NvYlrUYmU4l2iAeE2KmK8.6JXL1i3zX6Y4nC8wI2.3l.3y', // senha: 'dev123'
+      passwordHash: '$2b$10$71Yp1QjZRoxsveucav7dsuMcIf0Ploc9ZY68Q9C/yH2ugGhPZ44G.', // senha: 'dev123'
       role: UserRole.MEMBER,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
@@ -76,7 +76,7 @@ async function main() {
     data: {
       email: 'dev2@nyxlab.com',
       name: 'Developer 2',
-      passwordHash: '$2a$10$rYWIIr7NvYlrUYmU4l2iAeE2KmK8.6JXL1i3zX6Y4nC8wI2.3l.3y', // senha: 'dev123'
+      passwordHash: '$2b$10$71Yp1QjZRoxsveucav7dsuMcIf0Ploc9ZY68Q9C/yH2ugGhPZ44G.', // senha: 'dev123'
       role: UserRole.MEMBER,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
