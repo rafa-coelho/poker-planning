@@ -1,0 +1,152 @@
+# Cursor Rules - Poker Planning Empresarial
+
+## Contexto do Projeto
+
+Este é um projeto de **Poker Planning** sendo transformado em uma solução empresarial robusta. A aplicação permite que times estimem tarefas usando cartas do planning poker com recursos avançados para empresas.
+
+### Stack Tecnológica
+- **Frontend**: Next.js 15 + React 19 + TypeScript
+- **Backend**: API Routes do Next.js + Express server customizado
+- **Banco de Dados**: PostgreSQL com Prisma ORM
+- **Real-time**: Socket.io (sendo migrado para solução mais robusta)
+- **Autenticação**: JWT com suporte a multi-tenancy
+- **Estilização**: TailwindCSS
+- **Internacionalização**: react-i18next
+
+### Arquitetura Atual
+```
+src/
+├── app/                    # App Router do Next.js
+│   ├── api/               # API Routes
+│   ├── (auth)/           # Grupo de rotas de autenticação
+│   ├── [sessionId]/      # Páginas dinâmicas de sessão
+│   └── dashboard/        # Dashboard empresarial
+├── components/           # Componentes React reutilizáveis
+├── lib/                 # Utilitários e configurações
+└── i18n/               # Sistema de internacionalização
+```
+
+## Regras de Desenvolvimento
+
+### 1. Internacionalização (i18n)
+- **SEMPRE** use `useTranslation` hook para textos
+- **NUNCA** hardcode strings em português ou inglês
+- Adicione traduções em `src/i18n/locales/pt/` e `src/i18n/locales/en/`
+- Mantenha consistência nas chaves de tradução
+
+### 2. Banco de Dados & Persistência
+- Use **Prisma ORM** para todas as operações de banco
+- Siga o padrão de **multi-tenancy** com `organizationId`
+- Modele dados considerando escalabilidade empresarial
+- Mantenha migrations organizadas e documentadas
+
+### 3. Autenticação & Autorização
+- Implemente **JWT** com suporte a `externalId` para integração futura
+- Suporte **níveis de usuário**: admin, member, viewer
+- **Multi-tenancy**: todos os recursos devem ser isolados por organização
+- Prepare para migração futura para AuthService externo
+
+### 4. API Design
+- Use **API Routes** do Next.js em `/src/app/api/`
+- Implemente **middleware** de autenticação e autorização
+- Siga padrões **RESTful** com códigos HTTP apropriados
+- Valide entrada com **Zod** ou similar
+
+### 5. Real-time & WebSockets
+- Mantenha **Socket.io** por enquanto, prepare para migração
+- Implemente **rooms** isoladas por organização
+- Garanta **cleanup** adequado de conexões
+- Considere **rate limiting** para evitar abuse
+
+### 6. Componentes & UI
+- Use **TailwindCSS** para estilização
+- Componentes devem ser **acessíveis** (a11y)
+- Mantenha **responsividade** em todos os dispositivos
+- Implemente **loading states** e **error handling**
+
+### 7. Estrutura de Features
+Para cada nova feature empresarial:
+```
+src/app/api/[feature]/          # API routes
+src/components/[Feature]/       # Componentes específicos
+src/lib/[feature].ts           # Lógica de negócio
+src/types/[feature].ts         # Tipos TypeScript
+```
+
+### 8. Paywall & Limitações
+- Use **claims** do JWT para verificar permissões
+- Implemente **middleware** para bloqueio de features
+- Mantenha lógica de limitação **server-side**
+- Prepare para diferentes **planos de assinatura**
+
+## Padrões de Código
+
+### TypeScript
+- Use **tipos explícitos** sempre que possível
+- Crie **interfaces** para objetos complexos
+- Mantenha **strict mode** habilitado
+
+### React
+- Use **hooks** funcionais preferencialmente
+- Implemente **error boundaries** para robustez
+- Otimize com **memo** e **useCallback** quando necessário
+
+### Styling
+- Use **classes utilitárias** do Tailwind
+- Mantenha **dark mode** como consideração futura
+- Implemente **design system** consistente
+
+## Funcionalidades Empresariais
+
+### Sessões Persistentes
+- Salvar sessões no banco de dados
+- Histórico de votações por sessão
+- Exportação de relatórios
+
+### Tickets & Estimativas
+- CRUD completo de tickets
+- Múltiplos modos de votação (Fibonacci, T-shirt, etc.)
+- Histórico de estimativas por ticket
+
+### Gestão de Times
+- Hierarquia organizacional
+- Convites por email
+- Permissões granulares
+
+### Dashboard & Analytics
+- Métricas de produtividade
+- Relatórios de consenso
+- Tendências de estimativas
+
+## Comandos Úteis
+
+```bash
+# Desenvolvimento
+npm run dev
+
+# Build para produção
+npm run build
+
+# Linting
+npm run lint
+
+# Prisma
+npx prisma generate
+npx prisma migrate dev
+npx prisma studio
+
+# Testes (quando implementados)
+npm test
+```
+
+## Observações Importantes
+
+1. **Performance**: Considere cache Redis para sessões ativas
+2. **Segurança**: Sanitize inputs, rate limiting, CORS adequado
+3. **Monitoramento**: Prepare para APM (Sentry, DataDog, etc.)
+4. **Deploy**: Configure para containerização (Docker)
+5. **Backup**: Estratégia de backup para dados críticos
+
+---
+
+**Lembre-se**: Esta aplicação será usada por empresas, então **qualidade**, **segurança** e **escalabilidade** são prioridades máximas. 

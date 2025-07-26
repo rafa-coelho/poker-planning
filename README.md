@@ -1,99 +1,325 @@
-# Poker Planning App 🃏
+# 🎯 Poker Planning Empresarial
 
-[Leia em Portguês](./LEIAME.md)
+> **Plataforma completa de estimativas ágeis para empresas de todos os tamanhos**
 
-## 📌 About the Project
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-blue)](https://www.postgresql.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-Latest-2D3748)](https://www.prisma.io/)
 
-The **Poker Planning App** is a collaborative tool for effort estimation in agile development teams. Supporting multiple players and featuring a dynamic interface, this tool allows participants to vote interactively, ensuring an efficient and participative decision-making process.
+## 🌟 Visão Geral
 
-## 🚀 Technologies Used
+Uma aplicação robusta de **Poker Planning** transformada em uma solução empresarial completa. Permite que times estimem tarefas de forma colaborativa com recursos avançados de gestão, persistência, relatórios e controle de acesso.
 
-- **Frontend:** Next.js (React) + TailwindCSS  
-- **Backend:** Node.js + Express + Socket.io  
-- **Database:** In-memory (temporary server-side storage)  
-- **Authentication:** LocalStorage-based session  
-- **Deployment:** Configured for Docker, Vercel, or other environments  
+### ✨ Principais Diferenciais
 
-## 🎮 Features
+- 🏢 **Multi-tenancy** - Isolamento completo por organização
+- 🔐 **Autenticação Empresarial** - JWT, roles, integração externa
+- 📊 **Relatórios Avançados** - Analytics e exportação
+- 🎮 **Múltiplos Modos** - Fibonacci, T-shirt, Linear, Custom
+- ⚡ **Real-time Otimizado** - WebSocket escalável
+- 💰 **Paywall Ready** - Limitações por plano
+- 🌍 **Internacionalização** - PT/EN (expansível)
 
-✔️ Create and join rooms with a custom name  
-✔️ Interactive voting with Poker Planning cards  
-✔️ Vote reveal system with animations and statistics  
-✔️ Responsive and modern user interface  
-✔️ Real-time communication via WebSockets  
-✔️ Toasts and modals for an enhanced user experience  
+## 🚀 Demo
 
-## 👥 Installation and Setup
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/poker-planning.git
+cd poker-planning
 
-### 🔧 Prerequisites
+# Instale dependências
+npm install
 
-- Node.js **>= 16.x**  
-- npm or yarn  
+# Configure ambiente (veja seção Setup)
+cp .env.example .env.local
 
-### 🛠️ Step by Step
+# Execute desenvolvimento
+npm run dev
+```
 
-1. **Clone the repository**  
-   ```sh
-   git clone https://github.com/your-username/poker-planning.git
-   cd poker-planning
-   ```
-2. **Install dependencies**  
-   ```sh
-   npm install
-   # or
-   yarn install
-   ```
-3. **Run**  
-   ```sh
-   npm run dev
-   ```
-4. **Access in your browser**  
-   ```sh
-   http://localhost:3000
-   ```
+Acesse [http://localhost:3000](http://localhost:3000)
 
-## 🎲 How to Use
+## 🏗️ Arquitetura
 
-### Creating a session
+### Stack Tecnológica
 
-1. Go to the homepage and enter a session name.  
-2. Click "Create Session" and share the generated link.  
+**Frontend:**
+- **Next.js 15** (App Router) + **React 19**
+- **TypeScript** para type safety
+- **TailwindCSS** para design system
+- **Framer Motion** para animações
+- **react-i18next** para internacionalização
 
-### Joining a session
+**Backend:**
+- **Next.js API Routes** (RESTful)
+- **Express** server customizado (WebSocket)
+- **PostgreSQL** + **Prisma ORM**
+- **JWT** authentication
+- **Socket.io** para real-time
 
-1. Open the shared link or manually enter the session URL.  
-2. Enter your name and click "Join."  
+**Deploy & DevOps:**
+- **Docker** para containerização
+- **Vercel/Railway** para deploy
+- **GitHub Actions** para CI/CD
 
-### Voting and revealing
+### Estrutura do Projeto
 
-1. Select a card with your estimation.  
-2. The moderator can click "Reveal" to display the votes.  
-3. The system calculates the average votes and shows an "agreement thermometer."  
+```
+poker-planning/
+├── docs/                   # 📚 Documentação completa
+├── src/
+│   ├── app/               # 🌐 App Router (Next.js 15)
+│   │   ├── api/          # 🔌 API Routes
+│   │   ├── (auth)/       # 🔐 Páginas de autenticação
+│   │   ├── dashboard/    # 📊 Dashboard empresarial
+│   │   └── [sessionId]/  # 🎮 Páginas de sessão
+│   ├── components/       # 🧩 Componentes React
+│   ├── lib/             # 🛠️ Utilitários e configurações
+│   └── i18n/           # 🌍 Sistema de tradução
+├── prisma/              # 🗄️ Schema e migrations
+├── public/              # 📁 Assets estáticos
+└── server.js           # 🚀 Servidor Express
+```
 
-## 🌍 Internationalization (i18n)
+## 💾 Banco de Dados
 
-The application supports multiple languages. Available translations include:
+### Principais Entidades
 
-- **Portuguese (pt-BR)**  
-- **English (en-US)**  
+```typescript
+Organization  // Multi-tenancy
+├── User[]           // Usuários da organização
+├── Session[]        // Sessões de planning
+├── Project[]        // Projetos/times
+└── Invite[]         // Convites pendentes
 
-To add a new language, simply include the translations in `i18n/index.ts`.
+Session
+├── Ticket[]         // Histórias para estimar
+├── Participant[]    // Participantes ativos
+└── Vote[]          // Votos dos participantes
+```
 
-## 🤝 Contribution
+### Features do Banco
 
-Contributions are welcome! To contribute:
+- **Multi-tenancy**: Isolamento completo por organização
+- **Soft Deletes**: Preserva histórico
+- **Audit Trail**: Tracking de mudanças
+- **Performance**: Índices otimizados
+- **Backup**: Estratégia de recuperação
 
-1. **Fork** the repository  
-2. Create a **branch** with your feature/fix (`git checkout -b new-feature`)  
-3. **Commit** your changes (`git commit -m 'Adding new feature'`)  
-4. **Push** to the branch (`git push origin new-feature`)  
-5. Open a **Pull Request** 🚀  
+## 🔐 Autenticação & Autorização
 
-## 🐟 License
+### Níveis de Usuário
 
-This project is under the **MIT** license. Feel free to use and modify it as needed!
+- **Admin**: Gestão completa da organização
+- **Member**: Criar sessões, participar, relatórios básicos
+- **Viewer**: Apenas visualizar e participar
+
+### Features de Auth
+
+- JWT com refresh tokens
+- Multi-tenancy por organização
+- Integração externa preparada (`externalId`)
+- Rate limiting por endpoint
+- Session persistence
+
+## 🎮 Features Principais
+
+### Sessões de Planning
+
+- **Criação Rápida**: Interface intuitiva
+- **Modos de Votação**: Fibonacci, T-shirt, Linear, Custom
+- **Real-time**: Sincronização instantânea
+- **Persistência**: Histórico completo
+- **Configurável**: Timer, auto-reveal, observers
+
+### Gestão de Tickets
+
+- CRUD completo de histórias
+- Priorização e categorização
+- Estimativas com consenso
+- Histórico de votações
+- Comentários e confiança
+
+### Relatórios & Analytics
+
+- Dashboard executivo
+- Métricas de consenso
+- Tempo médio de votação
+- Produtividade por time
+- Exportação CSV/PDF
+
+### Sistema de Convites
+
+- Convite por email
+- Roles granulares
+- Expiração automática
+- Onboarding guiado
+
+## 🔧 Setup do Ambiente
+
+### Pré-requisitos
+
+- **Node.js 18+**
+- **PostgreSQL 14+**
+- **npm** ou **yarn**
+
+### Configuração
+
+1. **Clone e instale:**
+```bash
+git clone https://github.com/seu-usuario/poker-planning.git
+cd poker-planning
+npm install
+```
+
+2. **Configure o banco:**
+```bash
+# Inicie PostgreSQL
+# Crie database: poker_planning_dev
+
+# Configure .env.local
+DATABASE_URL="postgresql://user:password@localhost:5432/poker_planning_dev"
+JWT_SECRET="seu-jwt-secret-seguro"
+NEXTAUTH_SECRET="seu-nextauth-secret"
+```
+
+3. **Execute migrations:**
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+4. **Popule dados de teste:**
+```bash
+npx prisma db seed
+```
+
+5. **Inicie desenvolvimento:**
+```bash
+npm run dev
+```
+
+### Comandos Úteis
+
+```bash
+# Desenvolvimento
+npm run dev          # Servidor de desenvolvimento
+npm run build        # Build para produção
+npm run start        # Servidor de produção
+npm run lint         # Linting
+
+# Banco de dados
+npx prisma studio    # Interface visual
+npx prisma migrate dev  # Nova migration
+npx prisma generate  # Gera client
+
+# Testes (quando implementados)
+npm test            # Executa testes
+npm run test:watch  # Testes em watch mode
+```
+
+## 📚 Documentação
+
+Documentação completa disponível em [`docs/`](./docs/):
+
+- **[Contexto do Projeto](./docs/CONTEXTO_PROJETO.md)** - Visão geral e objetivos
+- **[Plano de Implementação](./docs/PLANO_IMPLEMENTACAO.md)** - Roadmap de 8 semanas
+- **[Schema do Banco](./docs/SCHEMA_BANCO_DADOS.md)** - Estrutura completa do PostgreSQL
+- **[API Endpoints](./docs/API_ENDPOINTS.md)** - Documentação da API REST
+- **[Checklist](./docs/CHECKLIST_IMPLEMENTACAO.md)** - Lista de tarefas detalhada
+
+## 🚀 Roadmap de Implementação
+
+### 🏗️ Fase 1: Fundação (Semanas 1-2)
+- ✅ Setup PostgreSQL + Prisma
+- ✅ Sistema de autenticação JWT
+- ✅ Multi-tenancy core
+- ✅ Migração de rotas
+
+### 💾 Fase 2: Core Features (Semanas 3-4)
+- 🔄 Sessões persistentes
+- 🔄 Gestão de tickets
+- 🔄 Real-time otimizado
+- 🔄 Dashboard básico
+
+### 🏢 Fase 3: Empresarial (Semanas 5-6)
+- ⏳ Múltiplos modos de votação
+- ⏳ Sistema de convites
+- ⏳ Relatórios e analytics
+- ⏳ Gestão de times
+
+### 🔧 Fase 4: Produção (Semanas 7-8)
+- ⏳ Preparação para paywall
+- ⏳ Otimizações de performance
+- ⏳ Landing page
+- ⏳ Testes e QA
+
+## 💼 Planos de Negócio
+
+### Free Plan
+- 1 organização
+- 5 usuários
+- 10 sessões/mês
+- Recursos básicos
+
+### Pro Plan
+- Usuários ilimitados
+- 100 sessões/mês
+- Relatórios avançados
+- Integrações
+
+### Enterprise
+- Tudo ilimitado
+- SSO/SAML
+- Suporte prioritário
+- API dedicada
+
+## 🤝 Contribuição
+
+### Como Contribuir
+
+1. **Fork** o projeto
+2. **Crie** uma branch (`git checkout -b feature/nova-feature`)
+3. **Commit** suas mudanças (`git commit -m 'Add: nova feature'`)
+4. **Push** para a branch (`git push origin feature/nova-feature`)
+5. **Abra** um Pull Request
+
+### Padrões de Código
+
+- Use **TypeScript** estrito
+- Siga as regras do **ESLint**
+- Mantenha **i18n** em todos os textos
+- Implemente **testes** para features críticas
+- Documente **mudanças significativas**
+
+### Estrutura de Commits
+
+```
+feat: adiciona nova funcionalidade
+fix: corrige bug existente
+docs: atualiza documentação
+style: mudanças de formatação
+refactor: refatora código sem mudança funcional
+test: adiciona ou modifica testes
+chore: mudanças em build/config
+```
+
+## 📄 Licença
+
+Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+## 🙏 Agradecimentos
+
+- **Next.js** team pela excelente framework
+- **Prisma** team pelo ORM incrível
+- **Tailwind CSS** pela produtividade em styling
+- **Socket.io** pelo real-time robusto
 
 ---
 
-🌟 Need help or want to give feedback? Get in touch! 🚀
+**Transformando estimativas ágeis em vantagem competitiva empresarial** 🚀
+
+Para suporte: [issues](https://github.com/seu-usuario/poker-planning/issues) | [docs](./docs/) | [contato](mailto:contato@empresa.com)
 
