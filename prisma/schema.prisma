@@ -1,0 +1,321 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 🏢 Organizações (Multi-tenancy)
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique // Para URLs amigáveis
+  plan        Plan     @default(FREE)
+  settings    Json     @default("{}")
+  logoUrl     String?
+  domain      String?  // Para SSO futuro
+  isActive    Boolean  @default(true)
+  
+  // Audit fields
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  users       User[]
+  sessions    Session[]
+  invites     Invite[]
+  projects    Project[]
+  
+  @@map("organizations")
+}
+
+// 👥 Usuários
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String
+  passwordHash   String?      // Nullable para usuários externos
+  avatar         String?
+  locale         String       @default("pt")
+  timezone       String       @default("America/Sao_Paulo")
+  role           UserRole     @default(MEMBER)
+  isActive       Boolean      @default(true)
+  lastLoginAt    DateTime?
+  
+  // Multi-tenancy
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // External integration (futuro AuthService)
+  externalId     String?      @unique
+  externalSource String?      // "google", "microsoft", "authservice"
+  
+  // Audit fields
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  // Relations
+  createdSessions Session[] @relation("SessionCreator")
+  participants   SessionParticipant[]
+  votes          Vote[]
+  invitesSent    Invite[] @relation("InviteCreator")
+  projectMembers ProjectMember[]
+  
+  @@map("users")
+}
+
+// 🎮 Sessões de Planning
+model Session {
+  id             String        @id @default(cuid())
+  name           String
+  description    String?
+  status         SessionStatus @default(ACTIVE)
+  
+  // Multi-tenancy
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Creator
+  createdById    String
+  createdBy      User          @relation("SessionCreator", fields: [createdById], references: [id])
+  
+  // Project association
+  projectId      String?
+  project        Project?      @relation(fields: [projectId], references: [id])
+  
+  // Settings
+  votingMode     VotingMode    @default(FIBONACCI)
+  customCards    String[]      @default([]) // Para modo custom
+  autoReveal     Boolean       @default(false)
+  allowObservers Boolean       @default(true)
+  timerDuration  Int?          // Em segundos
+  
+  // State
+  currentTicketId String?
+  currentTicket   Ticket?      @relation("CurrentTicket", fields: [currentTicketId], references: [id])
+  isRevealed     Boolean       @default(false)
+  
+  // Audit fields
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  endedAt        DateTime?
+  
+  // Relations
+  participants   SessionParticipant[]
+  tickets        Ticket[]
+  
+  @@map("sessions")
+}
+
+// 👤 Participantes de Sessão
+model SessionParticipant {
+  id        String   @id @default(cuid())
+  
+  // Relations
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Participant data
+  role      ParticipantRole @default(VOTER)
+  isActive  Boolean         @default(true)
+  
+  // Audit fields
+  joinedAt  DateTime @default(now())
+  leftAt    DateTime?
+  
+  @@unique([sessionId, userId])
+  @@map("session_participants")
+}
+
+// 📋 Projetos/Times
+model Project {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  color          String?  // Para UI
+  isActive       Boolean  @default(true)
+  
+  // Multi-tenancy
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Audit fields
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  members        ProjectMember[]
+  sessions       Session[]
+  
+  @@map("projects")
+}
+
+// 👥 Membros de Projeto
+model ProjectMember {
+  id        String      @id @default(cuid())
+  
+  // Relations
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Member data
+  role      ProjectRole @default(MEMBER)
+  
+  // Audit fields
+  joinedAt  DateTime    @default(now())
+  
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+// 🎫 Tickets/Histórias
+model Ticket {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  identifier  String?      // Ex: "PROJ-123"
+  priority    Priority     @default(MEDIUM)
+  status      TicketStatus @default(PENDING)
+  
+  // Relations
+  sessionId   String
+  session     Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  // Estimation
+  finalEstimate    String?     // Valor final escolhido
+  consensusReached Boolean     @default(false)
+  votingStartedAt  DateTime?
+  votingEndedAt    DateTime?
+  
+  // Audit fields
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  votes       Vote[]
+  sessions    Session[] @relation("CurrentTicket")
+  
+  @@map("tickets")
+}
+
+// 🗳️ Votos
+model Vote {
+  id       String @id @default(cuid())
+  
+  // Relations
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Vote data
+  value    String    // Valor da carta escolhida
+  confidence Int?    // 1-5, confiança na estimativa
+  comment  String?   // Comentário opcional
+  
+  // Audit fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([ticketId, userId]) // Um voto por ticket por usuário
+  @@map("votes")
+}
+
+// 📧 Convites
+model Invite {
+  id             String      @id @default(cuid())
+  email          String
+  role           UserRole    @default(MEMBER)
+  status         InviteStatus @default(PENDING)
+  token          String      @unique
+  expiresAt      DateTime
+  
+  // Multi-tenancy
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Creator
+  createdById    String
+  createdBy      User        @relation("InviteCreator", fields: [createdById], references: [id])
+  
+  // Metadata
+  metadata       Json        @default("{}") // Para dados extras
+  
+  // Audit fields
+  createdAt      DateTime    @default(now())
+  acceptedAt     DateTime?
+  
+  @@map("invites")
+}
+
+// 📊 Enums
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum UserRole {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+  CANCELLED
+}
+
+enum VotingMode {
+  FIBONACCI
+  TSHIRT
+  LINEAR
+  CUSTOM
+}
+
+enum ParticipantRole {
+  VOTER
+  OBSERVER
+  MODERATOR
+}
+
+enum ProjectRole {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  PENDING
+  VOTING
+  ESTIMATED
+  COMPLETED
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
