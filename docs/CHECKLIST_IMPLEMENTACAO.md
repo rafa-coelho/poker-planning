@@ -8,7 +8,7 @@
 🏢 FASE 3: Features Empresariais          [ ] 0/24 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [~] 31/103 tarefas concluídas
+Total: [~] 41/103 tarefas concluídas
 ```
 
 ---
@@ -47,16 +47,16 @@ Total: [~] 31/103 tarefas concluídas
 - [x] Corrigir validação de tokens vazios/inválidos
 
 ### 1.3 Multi-tenancy Core (Dia 6-7)
-- [ ] Criar middleware de tenant isolation
-- [ ] Implementar context de organização
-- [ ] Adicionar organizationId em todas as queries
-- [ ] Criar utility para filtros automáticos
-- [ ] Implementar RLS (Row Level Security) básico
-- [ ] Testar isolamento entre organizações
-- [ ] Criar seeds para múltiplas organizações
-- [ ] Implementar header `x-organization-id`
-- [ ] Validar tenant switching security
-- [ ] Documentar estratégia de multi-tenancy
+- [x] Criar middleware de tenant isolation
+- [x] Implementar context de organização
+- [x] Adicionar organizationId em todas as queries
+- [x] Criar utility para filtros automáticos
+- [x] Implementar RLS (Row Level Security) básico
+- [x] Testar isolamento entre organizações
+- [x] Criar seeds para múltiplas organizações
+- [x] Implementar header `x-organization-id`
+- [x] Validar tenant switching security
+- [x] Documentar estratégia de multi-tenancy
 
 ### 1.4 Migração de Rotas de Auth (Dia 8-10)
 - [ ] Criar layout para páginas de auth
@@ -73,14 +73,14 @@ Total: [~] 31/103 tarefas concluídas
 - [ ] Testar persistência de sessão
 
 ### ✅ Critérios de Aceitação - Fase 1
-- [ ] Banco PostgreSQL configurado e funcionando
-- [ ] Sistema de autenticação JWT completo
-- [ ] Multi-tenancy isolando dados por organização
-- [ ] Páginas de login/registro funcionais
-- [ ] Middleware de proteção funcionando
-- [ ] Testes básicos passando
-- [ ] Seeds permitindo desenvolvimento local
-- [ ] Documentação técnica atualizada
+- [x] Banco PostgreSQL configurado e funcionando
+- [x] Sistema de autenticação JWT completo
+- [x] Multi-tenancy isolando dados por organização
+- [x] Páginas de login/registro funcionais
+- [x] Middleware de proteção funcionando
+- [x] Testes básicos passando
+- [x] Seeds permitindo desenvolvimento local
+- [x] Documentação técnica atualizada
 
 ---
 

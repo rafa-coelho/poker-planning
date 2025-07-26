@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
     "db:studio": "npx prisma studio --port 5555",
-    "db:seed": "npx tsx prisma/seeds.ts",
+    "db:seed": "npx tsx prisma/seeds-multi-tenant.ts",
     "db:reset": "npx prisma migrate reset && npm run db:seed",
     "db:push": "npx prisma db push",
     "docker:up": "docker-compose up -d",
@@ -28,7 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.474.0",
     "next": "15.1.6",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "^2.7.0",
     "prisma": "^6.12.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -40,14 +42,17 @@
     "uuid": "^11.0.5"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",
+    "jest": "^30.0.5",
     "nodemon": "^3.1.9",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
+    "ts-jest": "^29.4.0",
     "typescript": "^5"
   }
 }
