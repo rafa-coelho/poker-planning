@@ -4,8 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:server": "node server.js",
+    "dev:full": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "build": "next build",
     "start": "next start",
+    "start:server": "node server.js",
+    "start:full": "npm run build && concurrently \"npm run start:server\" \"npm run start\"",
+    "server": "node server.js",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -20,6 +25,7 @@
     "docker:logs": "docker-compose logs -f postgres"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.12.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -47,6 +53,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.0",
     "cross-env": "^7.0.3",
     "jest": "^30.0.5",
     "nodemon": "^3.1.9",

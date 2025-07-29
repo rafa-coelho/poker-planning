@@ -4,10 +4,9 @@
   "invitePlayers": "Invite players",
   "pickYourCards": "Pick your cards!",
   "noCard": "No card?",
-  "chooseYourCard": "Choose your card",
   "flipCards": "Flip cards",
-  "startNewVoting": "Start new voting",
-  "shareThisLink": "Share this link with your teammates:",
+  "startNewVoting": "New voting",
+  "shareThisLink": "Share this link with your team:",
   "share": "Share",
   "close": "Close",
   "linkCopied": "Link copied!",
@@ -17,49 +16,124 @@
   "agreement": "Agreement",
   "welcomeTitle": "Welcome to Poker Planning",
   "welcomeDescription": "Create a session and invite your team to estimate tasks easily!",
-  "sessionPlaceholder": "Enter a session name...",
+  "sessionPlaceholder": "Type a name for the session...",
   "createGame": "Create Session",
   "errorEnterSessionName": "Please enter a session name!",
-  "joinSessionTitle": "Join the Planning Poker Session",
+  "joinSessionTitle": "Join Planning Poker Session",
   "joinSessionDescription": "Enter your name to join the session:",
   "loading": "Loading...",
   "yourName": "Your Name",
-  "namePlaceholder": "Enter your name...",
+  "namePlaceholder": "Type your name...",
   "enterSession": "Enter Session",
   "errorEnterName": "Please enter your name!",
+  "logs": {
+    "session": {
+      "loadingSessionData": "Loading session data...",
+      "sessionDataLoaded": "Session data loaded successfully",
+      "sessionDataError": "Error loading session data",
+      "loadingCurrentTicket": "Loading current ticket...",
+      "currentTicketLoaded": "Current ticket loaded successfully",
+      "currentTicketError": "Error loading current ticket",
+      "socketConnecting": "Connecting to WebSocket...",
+      "socketConnected": "Connected to WebSocket",
+      "socketDisconnected": "Disconnected from WebSocket",
+      "votingStarted": "Voting started",
+      "votingStartedError": "Error starting voting",
+      "votingFinished": "Voting finished",
+      "votingFinishedError": "Error finishing voting",
+      "finalEstimateSet": "Final estimate set",
+      "finalEstimateError": "Error setting final estimate",
+      "cardSelected": "Card selected",
+      "cardsFlipped": "Cards flipped",
+      "newVotingStarted": "New voting started"
+    }
+  },
+  "tickets": {
+    "title": "Tickets",
+    "create": "Create Ticket",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this ticket?",
+    "startVoting": "Start Voting",
+    "finishVoting": "Finish Voting",
+    "estimate": "Estimate",
+    "empty": "No tickets created yet. Create the first ticket to start!",
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "status": {
+      "pending": "Pending",
+      "voting": "Voting",
+      "estimated": "Estimated"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Type the ticket title...",
+      "description": "Description",
+      "descriptionPlaceholder": "Type the ticket description...",
+      "priority": "Priority"
+    },
+    "current": {
+      "title": "Current Ticket",
+      "noTicket": "No ticket selected",
+      "selectTicket": "Select a ticket from the list to start voting",
+      "startVoting": "Start Voting",
+      "finishVoting": "Finish Voting",
+      "votingInProgress": "Voting in progress",
+      "waitingForVotes": "Waiting for participant votes...",
+      "estimationComplete": "Estimation complete",
+      "finalEstimate": "Final estimate"
+    },
+    "finalEstimate": {
+      "title": "Set Final Estimate",
+      "averageVote": "Average vote",
+      "finalValue": "Final value",
+      "placeholder": "Type the final value...",
+      "help": "You can use the average as a base or set a different value",
+      "confirm": "Confirm Estimate"
+    },
+    "buttons": {
+      "edit": "✏️ Edit ticket",
+      "delete": "🗑️ Delete ticket",
+      "updateEstimate": "Update estimated value"
+    },
+    "hints": {
+      "pendingCreator": "Click to select and vote",
+      "pendingParticipant": "Waiting for creator selection",
+      "votingCreator": "Click to participate",
+      "votingParticipant": "Vote in the cards below",
+      "estimatedCreator": "Click to re-vote",
+      "estimatedParticipant": "Estimate finalized",
+      "currentEstimated": "Ticket selected for re-voting",
+      "selectedForVoting": "✓ Selected for voting"
+    }
+  },
   "api": {
     "errors": {
       "authenticationFailed": "Session expired. Please login again.",
-      "loginFailed": "Invalid email or password",
-      "registerFailed": "Error registering user",
-      "noRefreshToken": "Refresh token not found",
-      "refreshFailed": "Error refreshing token",
-      "generic": "Error {{status}}: {{statusText}}",
-      "listSessions": "Error listing sessions",
-      "loadSession": "Error loading session",
-      "createSession": "Error creating session",
-      "updateSession": "Error updating session",
-      "archiveSession": "Error archiving session",
-      "notFound": "Resource not found",
-      "serverError": "Internal server error",
-      "unknown": "Unknown error",
-      "nameRequired": "Session name is required"
+      "generic": "Request error ({{status}} {{statusText}})"
     },
     "success": {
       "sessionCreated": "Session created successfully",
       "sessionUpdated": "Session updated successfully",
-      "sessionArchived": "Session archived successfully"
+      "sessionArchived": "Session archived successfully",
+      "ticketCreated": "Ticket created successfully",
+      "ticketUpdated": "Ticket updated successfully",
+      "ticketDeleted": "Ticket deleted successfully"
     }
   },
   "auth": {
     "login": {
-      "title": "Sign in to Poker Planning",
-      "subtitle": "Sign in to access your sessions",
+      "title": "Login to Poker Planning",
+      "subtitle": "Login to access your sessions",
       "email": "Email",
       "password": "Password",
-      "emailPlaceholder": "Enter your email...",
-      "passwordPlaceholder": "Enter your password...",
-      "loginButton": "Sign in",
+      "emailPlaceholder": "Type your email...",
+      "passwordPlaceholder": "Type your password...",
+      "loginButton": "Login",
       "forgotPassword": "Forgot password?",
       "noAccount": "Don't have an account?",
       "registerLink": "Create account",
@@ -78,14 +152,14 @@
       "password": "Password",
       "confirmPassword": "Confirm password",
       "organizationName": "Organization name",
-      "namePlaceholder": "Enter your full name...",
-      "emailPlaceholder": "Enter your email...",
-      "passwordPlaceholder": "Enter your password...",
+      "namePlaceholder": "Type your full name...",
+      "emailPlaceholder": "Type your email...",
+      "passwordPlaceholder": "Type your password...",
       "confirmPasswordPlaceholder": "Confirm your password...",
-      "organizationPlaceholder": "Enter your organization name...",
+      "organizationPlaceholder": "Type your organization name...",
       "registerButton": "Create account",
       "hasAccount": "Already have an account?",
-      "loginLink": "Sign in",
+      "loginLink": "Login",
       "errors": {
         "nameRequired": "Name is required",
         "emailRequired": "Email is required",
@@ -93,17 +167,17 @@
         "confirmPasswordRequired": "Password confirmation is required",
         "organizationRequired": "Organization name is required",
         "invalidEmail": "Invalid email",
-        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordTooShort": "Password must have at least 6 characters",
         "passwordsDoNotMatch": "Passwords do not match",
         "emailAlreadyExists": "Email is already in use",
         "organizationAlreadyExists": "Organization name is already in use"
       }
     },
     "forgotPassword": {
-      "title": "Reset Password",
+      "title": "Recover Password",
       "subtitle": "Enter your email to receive a recovery link",
       "email": "Email",
-      "emailPlaceholder": "Enter your email...",
+      "emailPlaceholder": "Type your email...",
       "sendButton": "Send recovery link",
       "backToLogin": "Back to login",
       "success": "Recovery link sent to your email",
@@ -112,22 +186,60 @@
         "invalidEmail": "Invalid email",
         "userNotFound": "User not found"
       }
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "back": "Back",
+    "next": "Next",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "sessions": "Sessions",
+    "projects": "Projects",
+    "reports": "Reports"
+  },
+  "session": {
+    "defaultName": "Poker Planning Session",
+    "anonymous": "Anonymous",
+    "participantLeft": {
+      "title": "Participant left",
+      "message": "{{userName}} left the session"
     },
-    "common": {
-      "loading": "Loading...",
-      "error": "Error",
-      "success": "Success",
-      "back": "Back",
-      "next": "Next",
-      "cancel": "Cancel",
-      "save": "Save",
-      "delete": "Delete",
-      "edit": "Edit",
-      "logout": "Logout",
-      "dashboard": "Dashboard",
-      "sessions": "Sessions",
-      "projects": "Projects",
-      "reports": "Reports"
+    "participantJoined": {
+      "title": "Participant joined",
+      "message": "{{userName}} joined the session"
+    },
+    "revoting": {
+      "title": "🔄 Re-voting",
+      "description": "Ticket already estimated: {{estimate}}"
+    },
+    "units": {
+      "points": "pts"
+    },
+    "table": {
+      "noTicketSelected": "Select a ticket to vote",
+      "selectTicketHint": "Choose a ticket from the sidebar to start voting",
+      "noTicketSelectedCreator": "Select a ticket to start voting",
+      "selectTicketHintCreator": "Choose a ticket from the sidebar to start voting",
+      "noTicketSelectedParticipant": "Waiting for ticket selection",
+      "selectTicketHintParticipant": "The session creator will select a ticket for voting"
+    },
+    "errors": {
+      "sessionIdNotFound": "❌ [DEBUG] sessionId not found",
+      "loadSessionData": "Error loading session data",
+      "loadCurrentTicket": "Error loading current ticket",
+      "startVoting": "Error starting voting",
+      "finishVoting": "Error finishing voting",
+      "setFinalEstimate": "Error setting final estimate"
+    },
+    "voteBar": {
+      "chooseYourCard": "Choose your card"
     }
   }
 }

@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withTenantIsolation } from '@/lib/middleware/tenant'
 import { SessionService } from '@/lib/services/sessionService'
-import { withTenantIsolation, TenantContext } from '@/lib/middleware/tenant'
 import { SessionStatus, VotingMode } from '@prisma/client'
-import i18next from 'i18next'
+import { TenantContext } from '@/lib/middleware/tenant'
+import i18next from '@/i18n/server'
 
 /**
- * GET /api/sessions/[id] - Busca uma sessão específica
+ * GET /api/sessions/[id]
+ * Busca uma sessão específica
  */
 async function getSession(req: NextRequest, context: TenantContext) {
   try {
-    const sessionId = req.nextUrl.pathname.split('/').pop()!
-    
+    const sessionId = req.nextUrl.pathname.split('/')[3]
+
+    // Verificar se a sessão existe e pertence à organização
     const session = await SessionService.getSessionById(sessionId, context.organizationId)
-    
     if (!session) {
       return NextResponse.json(
         { 
@@ -36,7 +38,7 @@ async function getSession(req: NextRequest, context: TenantContext) {
       { 
         error: {
           code: 'GET_SESSION_ERROR',
-          message: i18next.t('api.errors.loadSession'),
+          message: i18next.t('api.errors.notFound'),
           timestamp: new Date().toISOString()
         }
       },

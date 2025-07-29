@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface VoteBarProps {
   cards: string[];
@@ -10,9 +11,10 @@ interface VoteBarProps {
 }
 
 export default function VoteBar({ cards, selectedCard, onSelectCard, disabled }: VoteBarProps) {
+  const { t } = useTranslation("common");
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white border-t py-2 flex flex-col items-center z-50">
-      <p className="text-gray-600 text-sm mb-1">Choose your card</p>
+    <div className="w-full bg-white border-t py-2 flex flex-col items-center z-50">
+      <p className="text-gray-600 text-sm mb-1">{t("session.voteBar.chooseYourCard")}</p>
       <div className="flex space-x-2">
         {cards.map((card) => (
           <button
@@ -25,6 +27,7 @@ export default function VoteBar({ cards, selectedCard, onSelectCard, disabled }:
                   ? "border-blue-600 bg-blue-50 text-blue-600"
                   : "border-gray-300 text-gray-600 hover:bg-blue-50"
               }
+              ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
             `}
           >
             {card}

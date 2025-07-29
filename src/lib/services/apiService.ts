@@ -25,6 +25,7 @@ interface Session {
   id: string;
   name: string;
   description?: string;
+  currentTicketId: string|null;
   status: string;
   votingMode: string;
   autoReveal: boolean;
@@ -112,10 +113,12 @@ interface UpdateSessionData {
 class ApiService {
   private baseUrl: string;
   private refreshTokenFn: () => Promise<boolean>;
+  private onAuthFailure?: () => void;
 
-  constructor(refreshTokenFn: () => Promise<boolean>) {
-    this.baseUrl = '';
+  constructor(refreshTokenFn: () => Promise<boolean>, onAuthFailure?: () => void) {
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
     this.refreshTokenFn = refreshTokenFn;
+    this.onAuthFailure = onAuthFailure;
   }
 
   /**
@@ -131,7 +134,6 @@ class ApiService {
       options.headers = {
         ...options.headers,
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
       };
     }
 
@@ -152,7 +154,10 @@ class ApiService {
           response = await fetch(`${this.baseUrl}${endpoint}`, options);
         }
       } else {
-        // Refresh falhou, retornar erro de autenticação
+        // Refresh falhou, chamar callback de logout
+        this.onAuthFailure?.();
+        
+        // Retornar erro de autenticação
         return {
           success: false,
           error: {
@@ -522,6 +527,13 @@ class ApiService {
   }
 
   /**
+   * Alias para listTickets - busca tickets de uma sessão
+   */
+  async getSessionTickets(sessionId: string): Promise<ApiResponse<Ticket[]>> {
+    return this.listTickets(sessionId);
+  }
+
+  /**
    * Cria um novo ticket
    */
   async createTicket(sessionId: string, data: {
@@ -532,6 +544,39 @@ class ApiService {
     return this.request<Ticket>(`/api/sessions/${sessionId}/tickets`, {
       method: 'POST',
       body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Busca um ticket específico por ID
+   */
+  async getTicket(ticketId: string): Promise<ApiResponse<Ticket>> {
+    return this.request<Ticket>(`/api/tickets/${ticketId}`);
+  }
+
+  /**
+   * Atualiza um ticket específico
+   */
+  async updateTicket(ticketId: string, data: {
+    title?: string;
+    description?: string;
+    priority?: string;
+    status?: string;
+    finalEstimate?: string;
+    averageVote?: number;
+  }): Promise<ApiResponse<Ticket>> {
+    return this.request<Ticket>(`/api/tickets/${ticketId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Remove um ticket
+   */
+  async deleteTicket(ticketId: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/api/tickets/${ticketId}`, {
+      method: 'DELETE'
     });
   }
 }

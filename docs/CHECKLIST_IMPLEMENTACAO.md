@@ -4,11 +4,11 @@
 
 ```
 🏗️  FASE 1: Fundação & Infraestrutura     [x] 43/43 tarefas
-💾 FASE 2: Persistência & Core Features   [~] 12/40 tarefas  
+💾 FASE 2: Persistência & Core Features   [~] 25/40 tarefas  
 🏢 FASE 3: Features Empresariais          [ ] 0/24 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [~] 55/127 tarefas concluídas
+Total: [~] 68/127 tarefas concluídas
 ```
 
 ---
@@ -100,19 +100,114 @@ Total: [~] 55/127 tarefas concluídas
 - [x] Integrar com WebSocket existente
 - [x] Implementar histórico de sessões
 
-### 2.2 Gestão de Tickets (Dia 14-16)
-- [ ] Criar model Ticket no Prisma
-- [ ] Implementar API `/api/tickets` (CRUD)
-- [ ] Associar tickets com sessões
-- [ ] Criar model Vote no Prisma
-- [ ] Implementar sistema de votação por ticket
-- [ ] Criar API para votes `/api/votes`
-- [ ] Implementar estados de ticket (pending, voting, estimated)
-- [ ] Adicionar prioridades de ticket
-- [ ] Implementar histórico de estimativas
-- [ ] Criar relatórios básicos por ticket
-- [ ] Testar fluxo completo de votação
-- [ ] Implementar consenso de votos
+### 2.2 Gestão de Tickets e Votação (Dia 14-16) ✅ CONCLUÍDO
+
+#### 2.2.1 Estrutura de Dados ✅ CONCLUÍDO
+- [x] Criar model Ticket no Prisma (já existe, verificar se precisa ajustes)
+- [x] Remover model Vote do Prisma (não será usado)
+- [x] Adicionar campos necessários ao Ticket:
+  - [x] `finalEstimate` (string) - valor final decidido pelo dono
+  - [x] `averageVote` (float) - média dos votos calculada
+  - [x] `status` (enum: PENDING, VOTING, ESTIMATED)
+  - [x] `priority` (enum: LOW, MEDIUM, HIGH, URGENT)
+- [x] Verificar se campos existentes estão corretos
+
+#### 2.2.2 APIs de Tickets ✅ CONCLUÍDO
+- [x] Implementar API `/api/sessions/[sessionId]/tickets` (CRUD)
+- [x] Criar endpoint POST para criar ticket
+- [x] Criar endpoint GET para listar tickets da sessão
+- [x] Criar endpoint PUT para atualizar ticket
+- [x] Criar endpoint DELETE para remover ticket
+- [x] Implementar validação de permissões (apenas criador da sessão pode gerenciar)
+- [x] Associar tickets com sessões corretamente
+
+#### 2.2.3 Sistema de Votação ✅ CONCLUÍDO
+- [x] Implementar votação em memória (não persistir no DB)
+- [x] Criar estrutura para armazenar votos temporários por sessão
+- [x] Implementar cálculo de média dos votos
+- [x] Criar sistema de eventos para sincronização real-time
+- [x] Implementar validação de votos por modo (Fibonacci, T-shirt, Linear)
+- [x] Criar lógica para finalizar votação e calcular média
+
+#### 2.2.4 Interface de Votação ✅ CONCLUÍDO
+- [x] Atualizar tela de votação para suportar múltiplos modos
+- [x] Implementar cards dinâmicos baseados no `votingMode` da sessão
+- [x] Criar componentes para cada modo de votação:
+  - [x] Fibonacci (1, 2, 3, 5, 8, 13, 21)
+  - [x] T-shirt (XS, S, M, L, XL, XXL)
+  - [x] Linear (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+- [x] Implementar seleção de cards por modo
+- [x] Criar animação de revelação dos votos
+
+#### 2.2.5 Modal de Decisão Final ✅ CONCLUÍDO
+- [x] Criar modal para dono da sessão definir valor final
+- [x] Implementar campo com média como valor default
+- [x] Permitir edição do valor final
+- [x] Adicionar botão para confirmar decisão
+- [x] Implementar salvamento do `finalEstimate` no ticket
+- [x] Estruturar para futuras integrações (eventos)
+
+#### 2.2.6 Gestão de Tickets na Sessão ✅ CONCLUÍDO
+- [x] Criar interface para adicionar tickets na tela da sessão
+- [x] Implementar formulário de criação de ticket
+- [x] Adicionar campos: título, descrição, prioridade
+- [x] Criar lista de tickets da sessão
+- [x] Implementar ações por ticket (editar, deletar, iniciar votação)
+- [x] Adicionar validação de permissões (apenas criador)
+
+#### 2.2.7 Autenticação e Usuários ✅ CONCLUÍDO
+- [x] Remover dependência do localStorage para nome do usuário
+- [x] Integrar sistema de autenticação existente
+- [x] Usar dados do usuário logado em vez de pedir nome
+- [x] Implementar validação de permissões baseada no usuário
+- [x] Garantir que apenas usuários autenticados podem votar
+
+#### 2.2.8 Estados e Fluxo ✅ CONCLUÍDO
+- [x] Implementar estados de ticket (PENDING, VOTING, ESTIMATED)
+- [x] Criar transições de estado:
+  - [x] PENDING → VOTING (iniciar votação)
+  - [x] VOTING → ESTIMATED (finalizar votação)
+- [x] Implementar controle de qual ticket está sendo votado
+- [x] Criar lógica para finalizar votação automaticamente
+
+#### 2.2.9 Real-time e Sincronização ✅ CONCLUÍDO
+- [x] Integrar votação com WebSocket existente
+- [x] Implementar sincronização de votos em tempo real
+- [x] Criar eventos para:
+  - [x] Novo voto registrado
+  - [x] Votação iniciada
+  - [x] Votação finalizada
+  - [x] Cards revelados
+  - [x] Decisão final definida
+- [x] Garantir que todos os participantes vejam as mudanças
+
+#### 2.2.10 Testes e Validação ✅ CONCLUÍDO
+- [x] Testar fluxo completo de criação de ticket
+- [x] Testar votação em todos os modos
+- [x] Testar cálculo de média
+- [x] Testar modal de decisão final
+- [x] Testar permissões e validações
+- [x] Testar sincronização real-time
+- [x] Validar que votos não são persistidos no DB
+
+#### 2.2.11 Estrutura para Integrações Futuras ✅ CONCLUÍDO
+- [x] Criar sistema de eventos para decisões finais
+- [x] Estruturar payload de eventos para integrações
+- [x] Documentar pontos de extensão
+- [x] Preparar para webhooks futuros
+- [x] Criar logs de auditoria para decisões
+
+### ✅ Critérios de Aceitação - Fase 2.2 ✅ CONCLUÍDO
+- [x] Tickets podem ser criados apenas pelo dono da sessão
+- [x] Votação funciona em todos os modos (Fibonacci, T-shirt, Linear)
+- [x] Votos são calculados em tempo real sem persistir no DB
+- [x] Modal de decisão final aparece para o dono da sessão
+- [x] Média é calculada corretamente e usada como default
+- [x] Sistema usa usuário logado em vez de localStorage
+- [x] Real-time funciona para todos os participantes
+- [x] Estados de ticket funcionam corretamente
+- [x] Permissões estão implementadas e funcionando
+- [x] Estrutura para integrações futuras está preparada
 
 ### 2.3 Melhoria do Real-time (Dia 17-19)
 - [ ] Otimizar WebSocket para persistência
@@ -376,4 +471,4 @@ Total: [~] 55/127 tarefas concluídas
 
 ---
 
-**Próximo Passo**: Iniciar com a Fase 2, item 2.1 - Persistência de Sessões. 
+**Próximo Passo**: Iniciar com a Fase 2.3 - Melhoria do Real-time ou Fase 2.4 - Dashboard Básico. 

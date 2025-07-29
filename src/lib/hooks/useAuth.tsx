@@ -45,6 +45,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleAuthFailure = () => {
+    // Logout automático quando a autenticação falhar
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    setUser(null);
+    
+    // Redirecionar para login se estiver em área autenticada
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      const publicPaths = ['/login', '/register', '/forgot-password'];
+      
+      if (!publicPaths.some(path => currentPath.startsWith(path))) {
+        window.location.href = '/login';
+      }
+    }
+  };
+
   const refreshToken = async (): Promise<boolean> => {
     try {
       const refreshTokenValue = localStorage.getItem('refreshToken');
@@ -52,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
-      const apiService = new ApiService(refreshToken);
+      const apiService = new ApiService(refreshToken, handleAuthFailure);
       const response = await apiService.refreshToken();
 
       if (response.success && response.data) {
@@ -78,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const apiService = new ApiService(refreshToken);
+      const apiService = new ApiService(refreshToken, handleAuthFailure);
       const response = await apiService.checkAuth();
 
       if (response.success && response.data) {
@@ -99,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const apiService = new ApiService(refreshToken);
+      const apiService = new ApiService(refreshToken, handleAuthFailure);
       const response = await apiService.login(email, password);
 
       if (response.success && response.data) {
@@ -121,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (userData: RegisterData): Promise<boolean> => {
     try {
-      const apiService = new ApiService(refreshToken);
+      const apiService = new ApiService(refreshToken, handleAuthFailure);
       const response = await apiService.register(userData);
 
       if (response.success && response.data) {
@@ -143,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async (): Promise<void> => {
     try {
-      const apiService = new ApiService(refreshToken);
+      const apiService = new ApiService(refreshToken, handleAuthFailure);
       await apiService.logout();
     } catch (error) {
       console.error('Logout error:', error);
@@ -161,7 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Create the main ApiService instance, passing the AuthProvider's refreshToken function as callback
-  const apiService = new ApiService(refreshToken);
+  const apiService = new ApiService(refreshToken, handleAuthFailure);
 
   useEffect(() => {
     checkAuth();

@@ -62,7 +62,6 @@ model User {
   // Relations
   createdSessions Session[] @relation("SessionCreator")
   participants   SessionParticipant[]
-  votes          Vote[]
   invitesSent    Invite[] @relation("InviteCreator")
   projectMembers ProjectMember[]
   
@@ -193,7 +192,8 @@ model Ticket {
   session     Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   
   // Estimation
-  finalEstimate    String?     // Valor final escolhido
+  finalEstimate    String?     // Valor final escolhido pelo dono da sessão
+  averageVote      Float?      // Média dos votos calculada
   consensusReached Boolean     @default(false)
   votingStartedAt  DateTime?
   votingEndedAt    DateTime?
@@ -203,34 +203,9 @@ model Ticket {
   updatedAt   DateTime @updatedAt
   
   // Relations
-  votes       Vote[]
   sessions    Session[] @relation("CurrentTicket")
   
   @@map("tickets")
-}
-
-// 🗳️ Votos
-model Vote {
-  id       String @id @default(cuid())
-  
-  // Relations
-  ticketId String
-  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Vote data
-  value    String    // Valor da carta escolhida
-  confidence Int?    // 1-5, confiança na estimativa
-  comment  String?   // Comentário opcional
-  
-  // Audit fields
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@unique([ticketId, userId]) // Um voto por ticket por usuário
-  @@map("votes")
 }
 
 // 📧 Convites

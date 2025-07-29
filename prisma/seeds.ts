@@ -8,7 +8,6 @@ async function main() {
 
   // Limpar dados existentes (opcional para desenvolvimento)
   console.log('🧹 Limpando dados existentes...')
-  await prisma.vote.deleteMany()
   await prisma.ticket.deleteMany()
   await prisma.sessionParticipant.deleteMany()
   await prisma.session.deleteMany()
@@ -172,43 +171,6 @@ async function main() {
     }),
   ])
 
-  // 8. Criar alguns votos de exemplo
-  console.log('🗳️ Criando votos demo...')
-  await prisma.vote.createMany({
-    data: [
-      // Votos para o primeiro ticket
-      { 
-        ticketId: tickets[0].id, 
-        userId: developer1.id, 
-        value: '8', 
-        confidence: 4,
-        comment: 'Complexidade média, já temos experiência com JWT'
-      },
-      { 
-        ticketId: tickets[0].id, 
-        userId: developer2.id, 
-        value: '5', 
-        confidence: 5,
-        comment: 'Implementação padrão, sem grandes desafios'
-      },
-      // Votos para o segundo ticket
-      { 
-        ticketId: tickets[1].id, 
-        userId: developer1.id, 
-        value: '5', 
-        confidence: 4,
-        comment: 'CRUD básico com algumas validações'
-      },
-      { 
-        ticketId: tickets[1].id, 
-        userId: developer2.id, 
-        value: '8', 
-        confidence: 3,
-        comment: 'Pode ter complexidade nas validações de negócio'
-      },
-    ]
-  })
-
   console.log('✅ Seeds executados com sucesso!')
   console.log('')
   console.log('📊 Dados criados:')
@@ -217,7 +179,6 @@ async function main() {
   console.log(`   • 1 Projeto: ${demoProject.name}`)
   console.log(`   • 1 Sessão: ${demoSession.name}`)
   console.log(`   • ${tickets.length} Tickets`)
-  console.log(`   • 4 Votos de exemplo`)
   console.log('')
   console.log('🔑 Credenciais de acesso:')
   console.log('   Admin: admin@nyxlab.com / Admin123!@')

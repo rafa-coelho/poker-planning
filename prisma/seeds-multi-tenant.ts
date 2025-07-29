@@ -7,7 +7,6 @@ async function main() {
   console.log('🌱 Iniciando seeds multi-tenant...')
 
   // Limpar dados existentes
-  await prisma.vote.deleteMany()
   await prisma.ticket.deleteMany()
   await prisma.sessionParticipant.deleteMany()
   await prisma.session.deleteMany()
@@ -424,35 +423,6 @@ async function main() {
 
   console.log('🎫 Tickets criados')
 
-  // Criar alguns votos de exemplo
-  const tickets = await prisma.ticket.findMany({
-    where: { status: 'VOTING' },
-    select: { id: true, sessionId: true }
-  })
-
-  for (const ticket of tickets) {
-    const participants = await prisma.sessionParticipant.findMany({
-      where: { 
-        sessionId: ticket.sessionId,
-        role: { in: ['MODERATOR', 'VOTER'] }
-      },
-      select: { userId: true }
-    })
-
-    for (const participant of participants) {
-      await prisma.vote.create({
-        data: {
-          ticketId: ticket.id,
-          userId: participant.userId,
-          value: String(Math.floor(Math.random() * 8) + 1), // 1-8 para Fibonacci
-          createdAt: new Date()
-        }
-      })
-    }
-  }
-
-  console.log('🗳️ Votos criados')
-
   console.log('✅ Seeds multi-tenant concluídos!')
   console.log('\n📊 Resumo:')
   console.log(`   🏢 Organizações: 3 (TechCorp, StartupXYZ, EnterpriseInc)`)
@@ -460,7 +430,6 @@ async function main() {
   console.log(`   📁 Projetos: 5 (1 TechCorp, 2 StartupXYZ, 2 EnterpriseInc)`)
   console.log(`   🎯 Sessões: 4 (1 TechCorp, 2 StartupXYZ, 1 EnterpriseInc)`)
   console.log(`   🎫 Tickets: 6 (2 por organização)`)
-  console.log(`   🗳️ Votos: ${tickets.length * 3} (3 votos por ticket em votação)`)
 }
 
 main()

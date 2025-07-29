@@ -4,116 +4,105 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 interface VoteSummaryProps {
-    votes: string[];
+  votes: string[];
+  average?: number;
+  totalParticipants?: number;
+  votedCount?: number;
 }
 
-export default function VoteSummary ({ votes }: VoteSummaryProps) {
-    const { t } = useTranslation("common");
+export default function VoteSummary({ 
+  votes, 
+  average, 
+  totalParticipants, 
+  votedCount 
+}: VoteSummaryProps) {
+  const { t } = useTranslation("common");
 
-    const validVotes = votes.filter(v => !isNaN(Number(v)) && Number(v) > 0).map(v => Number(v));
+  // Calcular estatísticas
+  const numericVotes = votes
+    .map(vote => {
+      const num = parseFloat(vote);
+      return isNaN(num) ? null : num;
+    })
+    .filter(vote => vote !== null && vote > 0) as number[];
 
+  const calculatedAverage = numericVotes.length > 0 
+    ? numericVotes.reduce((sum, vote) => sum + vote, 0) / numericVotes.length 
+    : 0;
 
-    const average = validVotes.length > 0
-        ? (validVotes.reduce((sum, val) => sum + val, 0) / validVotes.length).toFixed(1)
-        : "N/A";
+  const finalAverage = average || calculatedAverage;
+  const totalVotes = votes.length;
+  const numericVoteCount = numericVotes.length;
+  const nonNumericVotes = totalVotes - numericVoteCount;
 
-
-
-    return (
-        <div className="flex w-full border-t border-gray-300 pt-4 bg-gray-50 rounded-lg shadow-lg pb-4" style={{ height: "12em" }}>
-
-            <VoteSummary.VoteCount validVotes={validVotes} />
-
-            <div className="w-1/2 flex items-center justify-start gap-6 pl-6">
-
-                <div className="flex flex-col items-center">
-                    <div className="text-gray-600 text-sm">{t("average")}:</div>
-                    <div className="text-4xl font-bold text-gray-800">
-                        {
-                            new Intl.NumberFormat().format(Number(average))
-                        }
-                    </div>
-                </div>
-
-                {/* <VoteSummary.AgreementComponent validVotes={validVotes} /> */}
-            </div>
-
+  return (
+    <div className="bg-white rounded-lg shadow p-4 mb-4">
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+        {t("votes")} ({totalVotes})
+      </h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Média */}
+        <div className="bg-blue-50 rounded-lg p-3">
+          <div className="text-sm font-medium text-blue-900 mb-1">
+            {t("average")}
+          </div>
+          <div className="text-2xl font-bold text-blue-900">
+            {finalAverage > 0 ? finalAverage.toFixed(1) : "N/A"}
+          </div>
         </div>
-    );
+
+        {/* Estatísticas de participação */}
+        {totalParticipants !== undefined && votedCount !== undefined && (
+          <div className="bg-green-50 rounded-lg p-3">
+            <div className="text-sm font-medium text-green-900 mb-1">
+              Participação
+            </div>
+            <div className="text-2xl font-bold text-green-900">
+              {votedCount}/{totalParticipants}
+            </div>
+            <div className="text-xs text-green-700">
+              {((votedCount / totalParticipants) * 100).toFixed(0)}%
+            </div>
+          </div>
+        )}
+
+        {/* Distribuição de votos */}
+        <div className="bg-purple-50 rounded-lg p-3">
+          <div className="text-sm font-medium text-purple-900 mb-1">
+            Distribuição
+          </div>
+          <div className="text-2xl font-bold text-purple-900">
+            {numericVoteCount}/{totalVotes}
+          </div>
+          <div className="text-xs text-purple-700">
+            {nonNumericVotes > 0 && `${nonNumericVotes} não numéricos`}
+          </div>
+        </div>
+      </div>
+
+      {/* Lista de votos */}
+      {votes.length > 0 && (
+        <div className="mt-4">
+          <div className="text-sm font-medium text-gray-700 mb-2">
+            Votos registrados:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {votes.map((vote, index) => (
+              <span
+                key={index}
+                className={`px-2 py-1 rounded text-sm font-medium ${
+                  isNaN(parseFloat(vote)) || parseFloat(vote) <= 0
+                    ? "bg-gray-100 text-gray-700"
+                    : "bg-blue-100 text-blue-700"
+                }`}
+              >
+                {vote}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
-
-VoteSummary.VoteCount = function VoteCount ({ validVotes }: { validVotes: number[] }) {
-    const voteCounts: { [key: number]: number } = {};
-    validVotes.forEach(vote => {
-        voteCounts[vote] = (voteCounts[vote] || 0) + 1;
-    });
-    const maxVotes = Math.max(...Object.values(voteCounts));
-
-    return (
-        <div className="w-1/2 flex flex-wrap items-end justify-end pr-4">
-            {
-                Object.entries(voteCounts).map(([value, count]) => (
-                    <VoteSummary.VoteCountCard key={value} value={value} count={count} maxVotes={maxVotes} />
-                ))
-            }
-        </div>
-    );
-};
-
-VoteSummary.VoteCountCard = function VoteCountCard ({ value, count, maxVotes }: { value: string, count: number, maxVotes: number }) {
-    const { t } = useTranslation("common");
-    return (
-        <div key={value} className="flex flex-col items-center mx-2">
-
-            <div className="flex flex-col-reverse items-center">
-
-                <div className="border border-gray-800 bg-white shadow-lg text-gray-800 font-bold w-12 h-12 flex items-center justify-center rounded-lg">
-                    {value}
-                </div>
-
-                <div
-                    className="w-6 bg-gradient-to-b from-gray-700 to-gray-500 rounded-t-lg"
-                    style={{
-                        height: `${(count / maxVotes) * 100}px`,
-                        minHeight: "10px",
-                    }}
-                />
-            </div>
-            <span className="text-xs text-gray-600 mt-1">{count} {t("votes")}</span>
-        </div>
-    )
-};
-
-
-VoteSummary.AgreementComponent = function AgreementComponent ({ validVotes }: { validVotes: number[] }) {
-    const { t } = useTranslation("common");
-
-    const agreement = validVotes.length > 1
-        ? 1 - (Math.max(...validVotes) - Math.min(...validVotes)) / Math.max(...validVotes)
-        : 1;
-
-    let agreementColor = "bg-green-500";
-    let agreementEmoji = "🎯";
-
-    if (agreement > 0.8) {
-        agreementColor = "bg-green-500";
-        agreementEmoji = "😁";
-    } else if (agreement > 0.5) {
-        agreementColor = "bg-yellow-500";
-        agreementEmoji = "😐";
-    } else {
-        agreementColor = "bg-red-500";
-        agreementEmoji = "😡";
-    }
-
-    return (
-        <div className="flex flex-col items-center">
-            <div className="text-gray-600 text-sm">{t("agreement")}:</div>
-            <div
-                className={`w-12 h-12 flex items-center justify-center rounded-full shadow-md text-white text-2xl ${agreementColor}`}
-            >
-                {agreementEmoji}
-            </div>
-        </div>
-    );
-};

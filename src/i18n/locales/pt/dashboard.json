@@ -117,7 +117,60 @@
     "createSession": "Erro ao criar sessão",
     "updateSession": "Erro ao atualizar sessão",
     "archiveSession": "Erro ao arquivar sessão",
+    "loadTickets": "Erro ao carregar tickets",
+    "createTicket": "Erro ao criar ticket",
+    "updateTicket": "Erro ao atualizar ticket",
+    "deleteTicket": "Erro ao deletar ticket",
+    "titleRequired": "Título é obrigatório",
+    "sessionIdRequired": "ID da sessão é obrigatório",
+    "ticketIdRequired": "ID do ticket é obrigatório",
+    "insufficientPermissions": "Permissões insuficientes",
     "unknown": "Erro desconhecido",
     "notFound": "Sessão não encontrada"
+  },
+  "tickets": {
+    "title": "Tickets",
+    "add": "Adicionar Ticket",
+    "create": "Criar Ticket",
+    "cancel": "Cancelar",
+    "delete": "Deletar",
+    "confirmDelete": "Tem certeza que deseja deletar este ticket?",
+    "description": "Descrição",
+    "identifier": "Identificador",
+    "priority": "Prioridade",
+    "priority.low": "Baixa",
+    "priority.medium": "Média",
+    "priority.high": "Alta",
+    "priority.urgent": "Urgente",
+    "status": {
+      "pending": "Pendente",
+      "voting": "Votando",
+      "estimated": "Estimado"
+    },
+    "startVoting": "Iniciar Votação",
+    "finishVoting": "Finalizar Votação",
+    "finalEstimate": "Estimativa Final",
+    "votes": "Votos",
+    "noTickets": "Nenhum ticket criado ainda"
+  },
+  "voting": {
+    "title": "Votação",
+    "currentTicket": "Ticket Atual",
+    "noCurrentTicket": "Nenhum ticket em votação",
+    "startVoting": "Iniciar Votação",
+    "finishVoting": "Finalizar Votação",
+    "revealCards": "Revelar Cartas",
+    "hideCards": "Ocultar Cartas",
+    "averageVote": "Média dos Votos",
+    "finalDecision": "Decisão Final",
+    "confirmDecision": "Confirmar Decisão",
+    "decisionModal": {
+      "title": "Definir Estimativa Final",
+      "description": "Defina a estimativa final para este ticket",
+      "averageLabel": "Média dos votos",
+      "finalLabel": "Estimativa final",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
+    }
   }
 }

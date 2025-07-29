@@ -2,50 +2,142 @@
 
 import React, { useState } from "react";
 import "../../i18n/index";
+import { useTranslation } from "react-i18next";
 
 import HeaderBar from "../../components/HeaderBar";
 import LonelyCard from "../../components/LonelyCard";
 import VoteBar from "../../components/VoteBar";
 import InviteModal from "../../components/InviteModal";
+import TicketManager from "../../components/TicketManager";
+import CurrentTicketDisplay from "../../components/CurrentTicketDisplay";
+import FinalEstimateModal from "../../components/FinalEstimateModal";
+import ParticipantNotification from "../../components/ParticipantNotification";
 import { useSession } from "@/components/useSession";
 import Table from "@/components/Table";
 import { ensureLocalUser } from "@/components/utils";
 import VoteSummary from "@/components/VoteSummary";
 
-export default function SessionPage () {
+export default function SessionPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
+  const { t } = useTranslation();
 
-  const cards = ["1", "2", "3", "5", "8", "13", "21", "34", "55", "89", "?", "☕"];
+  const {
+    sessionData,
+    user,
+    selectedCard,
+    countdown,
+    inviteLink,
+    currentTicket,
+    isCreator,
+    averageVote,
+    showFinalEstimateModal,
+    setShowFinalEstimateModal,
+    votingCards,
+    isVotingInProgress,
+    canVote,
+    canManageTickets,
+    participantNotification,
+    setParticipantNotification,
+    handleSelectCard,
+    handleFlipCards,
+    handleNewVoting,
+    handleTicketSelect,
+    startVoting,
+    finishVoting,
+    setFinalEstimate,
+    handleOpenFinalEstimateModal,
+    registerTicketUpdateCallback,
+    emitTicketCreated,
+    emitTicketUpdated,
+    emitTicketDeleted,
+    reloadCurrentTicket,
+    getVotingStats,
+  } = useSession();
 
-  const { sessionData, user, selectedCard, countdown, inviteLink, handleSelectCard, handleFlipCards, handleNewVoting } = useSession();
   const finalParticipants = ensureLocalUser(sessionData.participants, user.userId, user.userName);
+  const votingStats = getVotingStats();
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-gray-800">
+    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
       <HeaderBar sessionData={sessionData} userName={user.userName} onInviteOpen={() => setInviteOpen(true)} />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-4">
+      {/* Notificação de participante */}
+      <ParticipantNotification 
+        notification={participantNotification}
+        onClose={() => setParticipantNotification(null)}
+      />
 
-        <Table
-          participants={finalParticipants}
-          isRevealed={sessionData.isRevealed}
-          countdown={countdown}
-          canFlip={!!selectedCard}
-          onFlipCards={handleFlipCards}
-          onNewVoting={handleNewVoting}
-        />
+      <main className="flex-1 flex">
+        {/* Área principal - Mesa de votação */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="w-full h-full flex flex-col items-center justify-between">
+            <div />
+
+            <Table
+              participants={finalParticipants}
+              isRevealed={sessionData.isRevealed}
+              countdown={countdown}
+              canFlip={!!selectedCard}
+              onFlipCards={handleFlipCards}
+              onNewVoting={handleNewVoting}
+              onFinishVoting={canManageTickets && currentTicket ? finishVoting : undefined}
+              canFinishVoting={canManageTickets && !!currentTicket}
+              hasSelectedTicket={!!currentTicket}
+            />
+
+            {/* Resumo de votos ou barra de votação */}
+            {sessionData.isRevealed ? (
+              <VoteSummary 
+                votes={sessionData.participants.map(p => p.selectedCard).filter(card => card !== null && card !== undefined && card.trim() !== "") as string[]}
+                average={averageVote || undefined}
+                totalParticipants={votingStats.totalParticipants}
+                votedCount={votingStats.votedCount}
+              />
+            ) : (
+              <VoteBar
+                cards={votingCards}
+                selectedCard={selectedCard}
+                onSelectCard={handleSelectCard}
+                disabled={!canVote}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar direita - Gerenciador de tickets */}
+        <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+          {sessionData.sessionId && (
+            <TicketManager
+              sessionId={sessionData.sessionId}
+              isCreator={canManageTickets}
+              currentTicketId={currentTicket?.id || null}
+              onTicketSelect={handleTicketSelect}
+              onOpenFinalEstimateModal={handleOpenFinalEstimateModal}
+              registerTicketUpdateCallback={registerTicketUpdateCallback}
+              emitTicketCreated={emitTicketCreated}
+              emitTicketUpdated={emitTicketUpdated}
+              emitTicketDeleted={emitTicketDeleted}
+              reloadCurrentTicket={reloadCurrentTicket}
+            />
+          )}
+        </div>
       </main>
 
-      {
-        sessionData.isRevealed
-          ? <VoteSummary votes={sessionData.participants.map(p => p.selectedCard || "")} />
-          : <VoteBar cards={cards} selectedCard={selectedCard} onSelectCard={handleSelectCard} disabled={sessionData.isRevealed} />
-      }
+      {/* Modal de convite */}
+      {inviteOpen && (
+        <InviteModal inviteLink={inviteLink} onClose={() => setInviteOpen(false)} />
+      )}
 
-      {
-        inviteOpen
-        && <InviteModal inviteLink={inviteLink} onClose={() => setInviteOpen(false)} />
-      }
+      {/* Modal de estimativa final */}
+      {showFinalEstimateModal && currentTicket && (
+        <FinalEstimateModal
+          ticket={currentTicket}
+          isOpen={showFinalEstimateModal}
+          onClose={() => setShowFinalEstimateModal(false)}
+          onConfirm={setFinalEstimate}
+          averageVote={averageVote || 0}
+        />
+      )}
     </div>
   );
 }
