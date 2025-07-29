@@ -1,9 +1,13 @@
-const express = require("express");
-const { createServer } = require("http");
-const next = require("next");
-const { Server } = require("socket.io");
+const express = require('express')
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+const next = require('next')
+const { APP_CONFIG } = require('./src/lib/config')
 
-const dev = process.env.NODE_ENV !== "production";
+const dev = APP_CONFIG.IS_DEVELOPMENT
+const hostname = APP_CONFIG.HOST
+const port = APP_CONFIG.PORT
+
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
@@ -163,6 +167,5 @@ app.prepare().then(() => {
   expressApp.all("*", (req, res) => handle(req, res));
 
   // 🚀 Iniciar servidor
-  const port = process.env.PORT || 3000;
   server.listen(port);
 });

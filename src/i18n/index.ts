@@ -1,18 +1,29 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import en from './locales/en/common.json';
-import pt from './locales/pt/common.json';
+import enCommon from './locales/en/common.json';
+import ptCommon from './locales/pt/common.json';
+import enDashboard from './locales/en/dashboard.json';
+import ptDashboard from './locales/pt/dashboard.json';
 
 i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: en },
-      pt: { common: pt },
+      en: { 
+        common: enCommon,
+        dashboard: enDashboard
+      },
+      pt: { 
+        common: ptCommon,
+        dashboard: ptDashboard
+      },
     },
-    lng: 'en', // ou detecte automaticamente
-    fallbackLng: 'en',
+    lng: 'pt', // Português como padrão
+    fallbackLng: 'pt',
     interpolation: { escapeValue: false },
+    react: {
+      useSuspense: false, // Importante para Next.js
+    },
   });
 
 export default i18n;

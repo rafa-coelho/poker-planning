@@ -1,6 +1,6 @@
 "use client";
 
-import "../i18n/index";
+import "@/i18n/index";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";

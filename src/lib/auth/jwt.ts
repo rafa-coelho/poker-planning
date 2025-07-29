@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken'
 import { JWTPayload, RefreshTokenPayload, PLAN_FEATURES } from '@/types/auth'
 import { User, Organization, Plan } from '@prisma/client'
+import { APP_CONFIG } from '@/lib/config'
 
 /**
  * Configurações JWT
  */
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-development'
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret'
-const JWT_ISSUER = 'poker-planning-app'
+const JWT_SECRET = APP_CONFIG.JWT_SECRET
+const JWT_REFRESH_SECRET = APP_CONFIG.JWT_REFRESH_SECRET
+const JWT_ISSUER = APP_CONFIG.JWT_ISSUER
 
 // Tempos de expiração
 export const TOKEN_EXPIRATION = {

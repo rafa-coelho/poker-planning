@@ -1,9 +1,11 @@
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
+import { APP_CONFIG } from '@/lib/config'
 
 /**
  * Configurações para hashing de senhas
  */
-const SALT_ROUNDS = 12
+const SALT_ROUNDS = APP_CONFIG.PASSWORD_SALT_ROUNDS
 
 /**
  * Critérios para validação de senha
@@ -119,4 +121,36 @@ export function generateTemporaryPassword(length: number = 12): string {
   
   // Embaralhar a senha
   return password.split('').sort(() => Math.random() - 0.5).join('')
+}
+
+/**
+ * Gera um token seguro para reset de senha
+ * @param userId ID do usuário
+ * @returns Promise com token de reset
+ */
+export async function generatePasswordResetToken(userId: string): Promise<string> {
+  // Gerar token aleatório seguro
+  const token = crypto.randomBytes(32).toString('hex')
+  
+  // Hash do token para armazenamento seguro
+  const hashedToken = await hashPassword(token)
+  
+  // TODO: Armazenar o hash do token no banco com expiração
+  // Por enquanto, apenas retornamos o token
+  // Em produção, você deve:
+  // 1. Salvar o hash no banco com userId e expiração
+  // 2. Enviar o token original por email
+  // 3. Verificar o hash ao resetar a senha
+  
+  return token
+}
+
+/**
+ * Verifica se um token de reset é válido
+ * @param token Token fornecido pelo usuário
+ * @param hashedToken Hash armazenado no banco
+ * @returns Promise com resultado da verificação
+ */
+export async function verifyPasswordResetToken(token: string, hashedToken: string): Promise<boolean> {
+  return verifyPassword(token, hashedToken)
 } 

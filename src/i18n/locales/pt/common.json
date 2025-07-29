@@ -1,4 +1,5 @@
 {
+  "copyright": "© {{year}} {{appName}}. Todos os direitos reservados.",
   "feelingLonely": "Tá sozinho?",
   "invitePlayers": "Convidar jogadores",
   "pickYourCards": "Escolha suas cartas!",
@@ -25,5 +26,103 @@
   "yourName": "Seu Nome",
   "namePlaceholder": "Digite seu nome...",
   "enterSession": "Entrar na Sessão",
-  "errorEnterName": "Por favor, insira seu nome!"
+  "errorEnterName": "Por favor, insira seu nome!",
+  "auth": {
+    "login": {
+      "title": "Entrar no Poker Planning",
+      "subtitle": "Faça login para acessar suas sessões",
+      "email": "E-mail",
+      "password": "Senha",
+      "emailPlaceholder": "Digite seu e-mail...",
+      "passwordPlaceholder": "Digite sua senha...",
+      "loginButton": "Entrar",
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "registerLink": "Criar conta",
+      "errors": {
+        "invalidCredentials": "E-mail ou senha inválidos",
+        "requiredEmail": "E-mail é obrigatório",
+        "requiredPassword": "Senha é obrigatória",
+        "invalidEmail": "E-mail inválido"
+      }
+    },
+    "register": {
+      "title": "Criar Conta",
+      "subtitle": "Junte-se ao Poker Planning",
+      "name": "Nome completo",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "organizationName": "Nome da organização",
+      "namePlaceholder": "Digite seu nome completo...",
+      "emailPlaceholder": "Digite seu e-mail...",
+      "passwordPlaceholder": "Digite sua senha...",
+      "confirmPasswordPlaceholder": "Confirme sua senha...",
+      "organizationPlaceholder": "Digite o nome da sua organização...",
+      "registerButton": "Criar conta",
+      "hasAccount": "Já tem uma conta?",
+      "loginLink": "Fazer login",
+      "errors": {
+        "nameRequired": "Nome é obrigatório",
+        "emailRequired": "E-mail é obrigatório",
+        "passwordRequired": "Senha é obrigatória",
+        "confirmPasswordRequired": "Confirmação de senha é obrigatória",
+        "organizationRequired": "Nome da organização é obrigatório",
+        "invalidEmail": "E-mail inválido",
+        "passwordTooShort": "Senha deve ter pelo menos 6 caracteres",
+        "passwordsDoNotMatch": "Senhas não coincidem",
+        "emailAlreadyExists": "E-mail já está em uso",
+        "organizationAlreadyExists": "Nome da organização já está em uso"
+      }
+    },
+    "forgotPassword": {
+      "title": "Recuperar Senha",
+      "subtitle": "Digite seu e-mail para receber um link de recuperação",
+      "email": "E-mail",
+      "emailPlaceholder": "Digite seu e-mail...",
+      "sendButton": "Enviar link de recuperação",
+      "backToLogin": "Voltar ao login",
+      "success": "Link de recuperação enviado para seu e-mail",
+      "errors": {
+        "emailRequired": "E-mail é obrigatório",
+        "invalidEmail": "E-mail inválido",
+        "userNotFound": "Usuário não encontrado"
+      }
+    },
+    "common": {
+      "loading": "Carregando...",
+      "error": "Erro",
+      "success": "Sucesso",
+      "back": "Voltar",
+      "next": "Próximo",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "logout": "Sair",
+      "dashboard": "Dashboard",
+      "sessions": "Sessões",
+      "projects": "Projetos",
+      "reports": "Relatórios"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Bem-vindo ao Poker Planning Empresarial",
+    "description": "Esta é a página do dashboard. Aqui você poderá gerenciar suas sessões, projetos e relatórios.",
+    "hello": "Olá, {name}",
+    "logout": "Sair",
+    "sessions": {
+      "title": "Sessões",
+      "description": "Gerencie suas sessões de planning poker"
+    },
+    "projects": {
+      "title": "Projetos",
+      "description": "Organize seus projetos e times"
+    },
+    "reports": {
+      "title": "Relatórios",
+      "description": "Visualize relatórios e analytics"
+    }
+  }
 }

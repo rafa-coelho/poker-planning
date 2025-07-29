@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { JWTPayload } from '@/types/auth'
+import { APP_CONFIG } from '@/lib/config'
 
 export interface TenantContext {
   organizationId: string
@@ -37,7 +38,7 @@ export function withTenantIsolation(
 
       // Verificar token e extrair dados do usuário
       const jwt = require('jsonwebtoken')
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload
+      const decoded = jwt.verify(token, APP_CONFIG.JWT_SECRET) as JWTPayload
 
       if (!decoded.organizationId) {
         return NextResponse.json(

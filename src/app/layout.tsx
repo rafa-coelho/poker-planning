@@ -1,6 +1,10 @@
 import './globals.css';
+import { AuthProvider } from '@/lib/hooks/useAuth';
+import { APP_CONFIG } from '@/lib/config';
+
 export const metadata = {
-  title: "Poker Planning",
+  title: APP_CONFIG.APP_NAME,
+  description: APP_CONFIG.APP_DESCRIPTION,
 };
 
 export default function RootLayout({
@@ -9,8 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="pt-BR">
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }

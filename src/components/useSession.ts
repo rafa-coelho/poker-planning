@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { io, Socket } from "socket.io-client";
+import { APP_CONFIG } from '@/lib/config';
 
 export interface Participant {
   userId: string;
@@ -17,7 +18,7 @@ export interface SessionState {
   isRevealed: boolean;
 }
 
-const HOST = process.env.NEXT_PUBLIC_HOST || "http://localhost:3000";
+const HOST = APP_CONFIG.BASE_URL;
 
 export function useSession () {
   const router = useRouter();

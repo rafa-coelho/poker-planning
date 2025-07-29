@@ -1,0 +1,19 @@
+{
+  "title": "Dashboard",
+  "welcome": "Bem-vindo ao Poker Planning Empresarial",
+  "description": "Esta é a página do dashboard. Aqui você poderá gerenciar suas sessões, projetos e relatórios.",
+  "hello": "Olá, {{name}}",
+  "logout": "Sair",
+  "sessions": {
+    "title": "Sessões",
+    "description": "Gerencie suas sessões de planning poker"
+  },
+  "projects": {
+    "title": "Projetos",
+    "description": "Organize seus projetos e times"
+  },
+  "reports": {
+    "title": "Relatórios",
+    "description": "Visualize relatórios e analytics"
+  }
+}

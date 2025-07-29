@@ -1,4 +1,5 @@
 import { PrismaClient, Plan, UserRole, VotingMode } from '@prisma/client'
+import { hashPassword } from '../src/lib/auth/password'
 
 const prisma = new PrismaClient()
 
@@ -36,11 +37,17 @@ async function main() {
 
   // 2. Criar Usuários de Demo
   console.log('👥 Criando usuários demo...')
+  
+  // Gerar hashes das senhas usando a mesma função do sistema
+  const adminPasswordHash = await hashPassword('Admin123!@')
+  const scrumPasswordHash = await hashPassword('Scrum123!@')
+  const devPasswordHash = await hashPassword('Dev123!@')
+
   const adminUser = await prisma.user.create({
     data: {
       email: 'admin@nyxlab.com',
       name: 'Admin Demo',
-      passwordHash: '$2b$10$6J4XsIakHljV9RFZfqEmuexzSA4CAjyysRg/ss36dQXZjtU/m8Mhu', // senha: 'admin123'
+      passwordHash: adminPasswordHash,
       role: UserRole.ADMIN,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
@@ -52,7 +59,7 @@ async function main() {
     data: {
       email: 'scrum@nyxlab.com',
       name: 'Scrum Master',
-      passwordHash: '$2b$10$7XvCiberK1RcDs0tUyHcK.EFRgeikRhUuCCb8W5FfABB.ABrh2tHa', // senha: 'scrum123'
+      passwordHash: scrumPasswordHash,
       role: UserRole.MEMBER,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
@@ -64,7 +71,7 @@ async function main() {
     data: {
       email: 'dev1@nyxlab.com',
       name: 'Developer 1',
-      passwordHash: '$2b$10$71Yp1QjZRoxsveucav7dsuMcIf0Ploc9ZY68Q9C/yH2ugGhPZ44G.', // senha: 'dev123'
+      passwordHash: devPasswordHash,
       role: UserRole.MEMBER,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
@@ -76,7 +83,7 @@ async function main() {
     data: {
       email: 'dev2@nyxlab.com',
       name: 'Developer 2',
-      passwordHash: '$2b$10$71Yp1QjZRoxsveucav7dsuMcIf0Ploc9ZY68Q9C/yH2ugGhPZ44G.', // senha: 'dev123'
+      passwordHash: devPasswordHash,
       role: UserRole.MEMBER,
       locale: 'pt',
       timezone: 'America/Sao_Paulo',
@@ -213,10 +220,10 @@ async function main() {
   console.log(`   • 4 Votos de exemplo`)
   console.log('')
   console.log('🔑 Credenciais de acesso:')
-  console.log('   Admin: admin@nyxlab.com / admin123')
-  console.log('   Scrum: scrum@nyxlab.com / scrum123')
-  console.log('   Dev1: dev1@nyxlab.com / dev123')
-  console.log('   Dev2: dev2@nyxlab.com / dev123')
+  console.log('   Admin: admin@nyxlab.com / Admin123!@')
+  console.log('   Scrum: scrum@nyxlab.com / Scrum123!@')
+  console.log('   Dev1: dev1@nyxlab.com / Dev123!@')
+  console.log('   Dev2: dev2@nyxlab.com / Dev123!@')
   console.log('')
   console.log('🎯 Próximos passos:')
   console.log('   • Execute: npx prisma studio (para ver os dados)')
@@ -231,4 +238,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect()
-  }) 
+  })

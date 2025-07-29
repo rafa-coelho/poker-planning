@@ -1,0 +1,19 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome to Poker Planning Enterprise",
+  "description": "This is the dashboard page. Here you can manage your sessions, projects and reports.",
+  "hello": "Hello, {{name}}",
+  "logout": "Logout",
+  "sessions": {
+    "title": "Sessions",
+    "description": "Manage your planning poker sessions"
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "Organize your projects and teams"
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "View reports and analytics"
+  }
+}

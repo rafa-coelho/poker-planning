@@ -41,6 +41,30 @@ npm run dev
 
 Acesse [http://localhost:3000](http://localhost:3000)
 
+## ⚙️ Configuração
+
+### Variáveis de Ambiente
+
+A aplicação usa **configuração centralizada** através do arquivo `src/lib/config.ts`. Todas as variáveis de ambiente são validadas e tipadas.
+
+**Variáveis obrigatórias:**
+```bash
+DATABASE_URL=postgresql://username:password@localhost:5432/poker_planning
+JWT_SECRET=your-super-secret-jwt-key-here
+JWT_REFRESH_SECRET=your-super-secret-refresh-key-here
+```
+
+**Para ver todas as variáveis disponíveis:**
+- 📋 [Documentação completa das variáveis](docs/ENV_VARIABLES.md)
+- 🔧 [Configuração centralizada](src/lib/config.ts)
+
+### Setup Rápido
+
+1. **Configure o banco PostgreSQL**
+2. **Copie `.env.example` para `.env`**
+3. **Preencha as variáveis obrigatórias**
+4. **Execute `npm run dev`**
+
 ## 🏗️ Arquitetura
 
 ### Stack Tecnológica

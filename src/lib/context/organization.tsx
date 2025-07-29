@@ -160,4 +160,4 @@ export function getFeatureErrorMessage(
   feature: string
 ): string {
   return `A feature "${feature}" não está disponível no seu plano atual. Faça upgrade para acessar recursos avançados.`
-} 
+}

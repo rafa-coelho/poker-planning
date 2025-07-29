@@ -3,12 +3,12 @@
 ## 📊 Progresso Geral
 
 ```
-🏗️  FASE 1: Fundação & Infraestrutura     [~] 31/31 tarefas
-💾 FASE 2: Persistência & Core Features   [ ] 0/28 tarefas  
+🏗️  FASE 1: Fundação & Infraestrutura     [x] 43/43 tarefas
+💾 FASE 2: Persistência & Core Features   [ ] 0/40 tarefas  
 🏢 FASE 3: Features Empresariais          [ ] 0/24 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [~] 41/103 tarefas concluídas
+Total: [~] 43/127 tarefas concluídas
 ```
 
 ---
@@ -46,7 +46,7 @@ Total: [~] 41/103 tarefas concluídas
 - [x] Testar fluxo completo de autenticação (5/5 endpoints funcionando)
 - [x] Corrigir validação de tokens vazios/inválidos
 
-### 1.3 Multi-tenancy Core (Dia 6-7)
+### 1.3 Multi-tenancy Core (Dia 6-7) ✅ CONCLUÍDO
 - [x] Criar middleware de tenant isolation
 - [x] Implementar context de organização
 - [x] Adicionar organizationId em todas as queries
@@ -58,19 +58,19 @@ Total: [~] 41/103 tarefas concluídas
 - [x] Validar tenant switching security
 - [x] Documentar estratégia de multi-tenancy
 
-### 1.4 Migração de Rotas de Auth (Dia 8-10)
-- [ ] Criar layout para páginas de auth
-- [ ] Implementar página `/login`
-- [ ] Implementar página `/register`
-- [ ] Implementar página `/forgot-password`
-- [ ] Criar middleware de proteção de rotas
-- [ ] Migrar lógica atual para nova auth
-- [ ] Implementar redirecionamentos baseados em auth
-- [ ] Criar hook `useAuth` para components
-- [ ] Testar fluxos de autenticação na UI
-- [ ] Implementar loading states
-- [ ] Adicionar tratamento de erros na UI
-- [ ] Testar persistência de sessão
+### 1.4 Migração de Rotas de Auth (Dia 8-10) ✅ CONCLUÍDO
+- [x] Criar layout para páginas de auth
+- [x] Implementar página `/login`
+- [x] Implementar página `/register`
+- [x] Implementar página `/forgot-password`
+- [x] Criar middleware de proteção de rotas
+- [x] Migrar lógica atual para nova auth
+- [x] Implementar redirecionamentos baseados em auth
+- [x] Criar hook `useAuth` para components
+- [x] Testar fluxos de autenticação na UI
+- [x] Implementar loading states
+- [x] Adicionar tratamento de erros na UI
+- [x] Testar persistência de sessão
 
 ### ✅ Critérios de Aceitação - Fase 1
 - [x] Banco PostgreSQL configurado e funcionando
@@ -142,6 +142,20 @@ Total: [~] 41/103 tarefas concluídas
 - [ ] Adicionar empty states
 - [ ] Testar usabilidade do dashboard
 
+### 2.5 Sistema de Email (Dia 23-25)
+- [ ] Configurar serviço de email (SendGrid/Resend)
+- [ ] Implementar template de email de reset de senha
+- [ ] Integrar envio de email no forgot-password
+- [ ] Implementar expiração de tokens de reset
+- [ ] Criar página de reset de senha (`/reset-password`)
+- [ ] Implementar API `/api/auth/reset-password`
+- [ ] Adicionar validação de token de reset
+- [ ] Criar template de email de boas-vindas
+- [ ] Implementar envio de email no registro
+- [ ] Configurar variáveis de ambiente para email
+- [ ] Testar fluxo completo de reset de senha
+- [ ] Implementar rate limiting para emails
+
 ### ✅ Critérios de Aceitação - Fase 2
 - [ ] Sessões são persistidas no banco de dados
 - [ ] Sistema completo de tickets funcionando
@@ -151,6 +165,8 @@ Total: [~] 41/103 tarefas concluídas
 - [ ] Performance aceitável (<2s carregamento)
 - [ ] Testes de integração passando
 - [ ] Real-time sincronizado com persistência
+- [ ] Sistema de email funcionando (reset de senha)
+- [ ] Fluxo completo de recuperação de senha operacional
 
 ---
 
@@ -310,13 +326,13 @@ Total: [~] 41/103 tarefas concluídas
 
 ## 🚀 Marcos de Entrega
 
-### Marco 1 - MVP Empresarial (Fim Semana 2)
+### Marco 1 - MVP Empresarial (Fim Semana 2) ✅ CONCLUÍDO
 **Critérios:**
-- [ ] Login/registro funcionando
-- [ ] Multi-tenancy operacional
-- [ ] Banco de dados configurado
-- [ ] Autenticação JWT implementada
-- [ ] Páginas básicas funcionais
+- [x] Login/registro funcionando
+- [x] Multi-tenancy operacional
+- [x] Banco de dados configurado
+- [x] Autenticação JWT implementada
+- [x] Páginas básicas funcionais
 
 ### Marco 2 - Funcionalidade Completa (Fim Semana 4)
 **Critérios:**
@@ -360,4 +376,4 @@ Total: [~] 41/103 tarefas concluídas
 
 ---
 
-**Próximo Passo**: Iniciar com a Fase 1, item 1.1 - Setup do Banco de Dados. 
+**Próximo Passo**: Iniciar com a Fase 2, item 2.1 - Persistência de Sessões. 

@@ -1,4 +1,5 @@
 {
+  "copyright": "© {{year}} {{appName}}. All rights reserved.",
   "feelingLonely": "Feeling lonely?",
   "invitePlayers": "Invite players",
   "pickYourCards": "Pick your cards!",
@@ -25,5 +26,103 @@
   "yourName": "Your Name",
   "namePlaceholder": "Enter your name...",
   "enterSession": "Enter Session",
-  "errorEnterName": "Please enter your name!"
+  "errorEnterName": "Please enter your name!",
+  "auth": {
+    "login": {
+      "title": "Sign in to Poker Planning",
+      "subtitle": "Sign in to access your sessions",
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "Enter your email...",
+      "passwordPlaceholder": "Enter your password...",
+      "loginButton": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Create account",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "requiredEmail": "Email is required",
+        "requiredPassword": "Password is required",
+        "invalidEmail": "Invalid email"
+      }
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join Poker Planning",
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "organizationName": "Organization name",
+      "namePlaceholder": "Enter your full name...",
+      "emailPlaceholder": "Enter your email...",
+      "passwordPlaceholder": "Enter your password...",
+      "confirmPasswordPlaceholder": "Confirm your password...",
+      "organizationPlaceholder": "Enter your organization name...",
+      "registerButton": "Create account",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "errors": {
+        "nameRequired": "Name is required",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required",
+        "confirmPasswordRequired": "Password confirmation is required",
+        "organizationRequired": "Organization name is required",
+        "invalidEmail": "Invalid email",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "emailAlreadyExists": "Email is already in use",
+        "organizationAlreadyExists": "Organization name is already in use"
+      }
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive a recovery link",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email...",
+      "sendButton": "Send recovery link",
+      "backToLogin": "Back to login",
+      "success": "Recovery link sent to your email",
+      "errors": {
+        "emailRequired": "Email is required",
+        "invalidEmail": "Invalid email",
+        "userNotFound": "User not found"
+      }
+    },
+    "common": {
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success",
+      "back": "Back",
+      "next": "Next",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "logout": "Logout",
+      "dashboard": "Dashboard",
+      "sessions": "Sessions",
+      "projects": "Projects",
+      "reports": "Reports"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Poker Planning Enterprise",
+    "description": "This is the dashboard page. Here you can manage your sessions, projects and reports.",
+    "hello": "Hello, {name}",
+    "logout": "Logout",
+    "sessions": {
+      "title": "Sessions",
+      "description": "Manage your planning poker sessions"
+    },
+    "projects": {
+      "title": "Projects",
+      "description": "Organize your projects and teams"
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "View reports and analytics"
+    }
+  }
 }
