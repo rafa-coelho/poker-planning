@@ -111,7 +111,7 @@ export interface UserProfile {
 export interface AuthError {
   code: string
   message: string
-  details?: any
+  details?: Record<string, unknown>
 }
 
 export const AUTH_ERRORS = {

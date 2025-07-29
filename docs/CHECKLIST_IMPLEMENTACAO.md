@@ -4,11 +4,11 @@
 
 ```
 🏗️  FASE 1: Fundação & Infraestrutura     [x] 43/43 tarefas
-💾 FASE 2: Persistência & Core Features   [ ] 0/40 tarefas  
+💾 FASE 2: Persistência & Core Features   [~] 12/40 tarefas  
 🏢 FASE 3: Features Empresariais          [ ] 0/24 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [~] 43/127 tarefas concluídas
+Total: [~] 55/127 tarefas concluídas
 ```
 
 ---
@@ -86,19 +86,19 @@ Total: [~] 43/127 tarefas concluídas
 
 ## 💾 FASE 2: Persistência & Core Features (Semanas 3-4)
 
-### 2.1 Persistência de Sessões (Dia 11-13)
-- [ ] Criar model Session no Prisma
-- [ ] Implementar API `/api/sessions` (CRUD)
-- [ ] Migrar lógica de sessão do WebSocket
-- [ ] Criar service layer para sessões
-- [ ] Implementar soft delete para sessões
-- [ ] Adicionar filtros por organização
-- [ ] Criar seeds para sessões de teste
-- [ ] Implementar paginação nas listagens
-- [ ] Adicionar busca e filtros
-- [ ] Testar persistência de sessões
-- [ ] Integrar com WebSocket existente
-- [ ] Implementar histórico de sessões
+### 2.1 Persistência de Sessões (Dia 11-13) ✅ CONCLUÍDO
+- [x] Criar model Session no Prisma
+- [x] Implementar API `/api/sessions` (CRUD)
+- [x] Migrar lógica de sessão do WebSocket
+- [x] Criar service layer para sessões
+- [x] Implementar soft delete para sessões
+- [x] Adicionar filtros por organização
+- [x] Criar seeds para sessões de teste
+- [x] Implementar paginação nas listagens
+- [x] Adicionar busca e filtros
+- [x] Testar persistência de sessões
+- [x] Integrar com WebSocket existente
+- [x] Implementar histórico de sessões
 
 ### 2.2 Gestão de Tickets (Dia 14-16)
 - [ ] Criar model Ticket no Prisma

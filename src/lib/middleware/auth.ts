@@ -73,7 +73,7 @@ export function authenticateRequest(req: NextRequest): JWTPayload | NextResponse
  * Middleware que requer autenticação
  * Wrapper para API routes que precisam de autenticação
  */
-export function withAuth<T extends any[]>(
+export function withAuth<T extends unknown[]>(
   handler: (req: NextRequest, user: JWTPayload, ...args: T) => Promise<NextResponse>
 ) {
   return async (req: NextRequest, ...args: T): Promise<NextResponse> => {

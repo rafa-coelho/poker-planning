@@ -27,6 +27,30 @@
   "namePlaceholder": "Enter your name...",
   "enterSession": "Enter Session",
   "errorEnterName": "Please enter your name!",
+  "api": {
+    "errors": {
+      "authenticationFailed": "Session expired. Please login again.",
+      "loginFailed": "Invalid email or password",
+      "registerFailed": "Error registering user",
+      "noRefreshToken": "Refresh token not found",
+      "refreshFailed": "Error refreshing token",
+      "generic": "Error {{status}}: {{statusText}}",
+      "listSessions": "Error listing sessions",
+      "loadSession": "Error loading session",
+      "createSession": "Error creating session",
+      "updateSession": "Error updating session",
+      "archiveSession": "Error archiving session",
+      "notFound": "Resource not found",
+      "serverError": "Internal server error",
+      "unknown": "Unknown error",
+      "nameRequired": "Session name is required"
+    },
+    "success": {
+      "sessionCreated": "Session created successfully",
+      "sessionUpdated": "Session updated successfully",
+      "sessionArchived": "Session archived successfully"
+    }
+  },
   "auth": {
     "login": {
       "title": "Sign in to Poker Planning",
@@ -104,25 +128,6 @@
       "sessions": "Sessions",
       "projects": "Projects",
       "reports": "Reports"
-    }
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "welcome": "Welcome to Poker Planning Enterprise",
-    "description": "This is the dashboard page. Here you can manage your sessions, projects and reports.",
-    "hello": "Hello, {name}",
-    "logout": "Logout",
-    "sessions": {
-      "title": "Sessions",
-      "description": "Manage your planning poker sessions"
-    },
-    "projects": {
-      "title": "Projects",
-      "description": "Organize your projects and teams"
-    },
-    "reports": {
-      "title": "Reports",
-      "description": "View reports and analytics"
     }
   }
 }

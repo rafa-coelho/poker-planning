@@ -1,16 +1,35 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { ApiService } from '@/lib/services/apiService';
 import { JWTPayload } from '@/types/auth';
 
+// Tipo para o usuário autenticado (diferente do JWT payload)
+interface AuthenticatedUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  organizationId: string;
+  organizationSlug: string;
+  avatar?: string;
+  locale: string;
+  timezone: string;
+  isActive: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
+}
+
 interface AuthContextType {
-  user: JWTPayload | null;
+  user: AuthenticatedUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (userData: RegisterData) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  refreshToken: () => Promise<boolean>;
+  apiService: ApiService;
 }
 
 interface RegisterData {
@@ -23,22 +42,47 @@ interface RegisterData {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<JWTPayload | null>(null);
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthenticated = !!user;
+  const refreshToken = async (): Promise<boolean> => {
+    try {
+      const refreshTokenValue = localStorage.getItem('refreshToken');
+      if (!refreshTokenValue) {
+        return false;
+      }
+
+      const apiService = new ApiService(refreshToken);
+      const response = await apiService.refreshToken();
+
+      if (response.success && response.data) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        if (response.data.refreshToken) {
+          localStorage.setItem('refreshToken', response.data.refreshToken);
+        }
+        return true;
+      } else {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setUser(null);
+        return false;
+      }
+    } catch (error) {
+      console.error('Refresh token error:', error);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      setUser(null);
+      return false;
+    }
+  };
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
+      const apiService = new ApiService(refreshToken);
+      const response = await apiService.checkAuth();
 
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
+      if (response.success && response.data) {
+        setUser(response.data.user);
       } else {
         // Token inválido ou expirado
         localStorage.removeItem('accessToken');
@@ -55,27 +99,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const apiService = new ApiService(refreshToken);
+      const response = await apiService.login(email, password);
 
-      if (!response.ok) {
+      if (response.success && response.data) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        if (response.data.refreshToken) {
+          localStorage.setItem('refreshToken', response.data.refreshToken);
+        }
+        
+        setUser(response.data.user);
+        return true;
+      } else {
         return false;
       }
-
-      const data = await response.json();
-      
-      localStorage.setItem('accessToken', data.accessToken);
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-      }
-      
-      setUser(data.user);
-      return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -84,27 +121,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (userData: RegisterData): Promise<boolean> => {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
+      const apiService = new ApiService(refreshToken);
+      const response = await apiService.register(userData);
 
-      if (!response.ok) {
+      if (response.success && response.data) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        if (response.data.refreshToken) {
+          localStorage.setItem('refreshToken', response.data.refreshToken);
+        }
+        
+        setUser(response.data.user);
+        return true;
+      } else {
         return false;
       }
-
-      const data = await response.json();
-      
-      localStorage.setItem('accessToken', data.accessToken);
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-      }
-      
-      setUser(data.user);
-      return true;
     } catch (error) {
       console.error('Register error:', error);
       return false;
@@ -113,13 +143,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async (): Promise<void> => {
     try {
-      // Chamar endpoint de logout se disponível
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
+      const apiService = new ApiService(refreshToken);
+      await apiService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -130,8 +155,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshUser = async (): Promise<void> => {
-    await checkAuth();
+    if (user) {
+      await checkAuth();
+    }
   };
+
+  // Create the main ApiService instance, passing the AuthProvider's refreshToken function as callback
+  const apiService = new ApiService(refreshToken);
 
   useEffect(() => {
     checkAuth();
@@ -140,18 +170,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     user,
     isLoading,
-    isAuthenticated,
+    isAuthenticated: !!user,
     login,
     register,
     logout,
     refreshUser,
+    refreshToken,
+    apiService,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -104,7 +104,12 @@ export const PATCH = withAuth(async (req: NextRequest, user) => {
     const { name, avatar, locale, timezone } = body
 
     // Validar dados
-    const updateData: any = {}
+    const updateData: {
+      name?: string;
+      avatar?: string | null;
+      locale?: string;
+      timezone?: string;
+    } = {}
     
     if (name !== undefined) {
       if (typeof name !== 'string' || name.trim().length < 2) {

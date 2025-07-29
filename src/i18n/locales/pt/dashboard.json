@@ -1,19 +1,123 @@
 {
   "title": "Dashboard",
-  "welcome": "Bem-vindo ao Poker Planning Empresarial",
-  "description": "Esta é a página do dashboard. Aqui você poderá gerenciar suas sessões, projetos e relatórios.",
+  "description": "Gerencie suas sessões de planning poker",
+  "welcome": "Bem-vindo ao Poker Planning",
   "hello": "Olá, {{name}}",
   "logout": "Sair",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "sessions": "Sessões",
+    "projects": "Projetos",
+    "reports": "Relatórios"
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "sessions": "Sessões",
+    "new": "Nova Sessão",
+    "projects": "Projetos",
+    "reports": "Relatórios"
+  },
+  "user": {
+    "user": "Usuário",
+    "profile": "Perfil",
+    "settings": "Configurações"
+  },
+  "newSession": {
+    "title": "Nova Sessão",
+    "description": "Crie uma nova sessão de planning poker para sua equipe",
+    "name": "Nome da Sessão",
+    "namePlaceholder": "Ex: Sprint Planning - API Backend",
+    "descriptionLabel": "Descrição",
+    "descriptionPlaceholder": "Descreva o objetivo desta sessão...",
+    "votingMode": "Modo de Votação",
+    "autoReveal": "Revelar votos automaticamente",
+    "allowObservers": "Permitir observadores",
+    "cancel": "Cancelar",
+    "create": "Criar Sessão",
+    "creating": "Criando...",
+    "error": "Erro ao criar sessão",
+    "serverError": "Erro ao conectar com o servidor"
+  },
+  "votingModes": {
+    "fibonacci": "Fibonacci (1, 2, 3, 5, 8, 13, 21)",
+    "tshirt": "T-Shirt (XS, S, M, L, XL, XXL)",
+    "linear": "Linear (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)"
+  },
+  "quickActions": {
+    "title": "Ações Rápidas",
+    "backToList": "Voltar à Lista"
+  },
+  "stats": {
+    "title": "Estatísticas",
+    "sessions": "Sessões",
+    "participants": "Participantes",
+    "tickets": "Tickets"
+  },
   "sessions": {
     "title": "Sessões",
-    "description": "Gerencie suas sessões de planning poker"
+    "description": "Gerencie suas sessões de planning poker",
+    "new": "Nova Sessão",
+    "join": "Entrar na Sessão",
+    "edit": "Editar Sessão",
+    "archive": "Arquivar Sessão",
+    "view": "Ver Sessão",
+    "noSessions": "Nenhuma sessão encontrada",
+    "createFirst": "Comece criando sua primeira sessão de planning poker",
+    "createSession": "Criar Sessão"
   },
-  "projects": {
-    "title": "Projetos",
-    "description": "Organize seus projetos e times"
+  "session": {
+    "info": "Informações da Sessão",
+    "status": "Status",
+    "votingMode": "Modo de Votação",
+    "createdBy": "Criado por",
+    "createdAt": "Criado em",
+    "participants": "Participantes",
+    "tickets": "Tickets",
+    "noTickets": "Nenhum ticket criado ainda",
+    "quickActions": "Ações Rápidas",
+    "settings": "Configurações",
+    "autoReveal": "Auto-revelar",
+    "observers": "Observadores",
+    "timer": "Timer",
+    "disabled": "Desabilitado",
+    "enabled": "Habilitado",
+    "allowed": "Permitido",
+    "blocked": "Bloqueado"
   },
-  "reports": {
-    "title": "Relatórios",
-    "description": "Visualize relatórios e analytics"
+  "status": {
+    "active": "Ativa",
+    "completed": "Concluída",
+    "archived": "Arquivada"
+  },
+  "votingMode": {
+    "fibonacci": "Fibonacci",
+    "tshirt": "T-Shirt",
+    "linear": "Linear"
+  },
+  "role": {
+    "moderator": "Moderador",
+    "voter": "Votante",
+    "observer": "Observador"
+  },
+  "form": {
+    "name": "Nome da Sessão",
+    "description": "Descrição",
+    "votingMode": "Modo de Votação",
+    "autoReveal": "Revelar votos automaticamente",
+    "allowObservers": "Permitir observadores",
+    "create": "Criar Sessão",
+    "creating": "Criando...",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "saving": "Salvando..."
+  },
+  "errors": {
+    "loadSessions": "Erro ao carregar sessões",
+    "loadSession": "Erro ao carregar sessão",
+    "createSession": "Erro ao criar sessão",
+    "updateSession": "Erro ao atualizar sessão",
+    "archiveSession": "Erro ao arquivar sessão",
+    "unknown": "Erro desconhecido",
+    "notFound": "Sessão não encontrada"
   }
 }

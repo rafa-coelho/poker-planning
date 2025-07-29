@@ -4,9 +4,103 @@
   "description": "This is the dashboard page. Here you can manage your sessions, projects and reports.",
   "hello": "Hello, {{name}}",
   "logout": "Logout",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "sessions": "Sessions",
+    "projects": "Projects",
+    "reports": "Reports"
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "sessions": "Sessions",
+    "new": "New Session",
+    "projects": "Projects",
+    "reports": "Reports"
+  },
+  "user": {
+    "user": "User",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "newSession": {
+    "title": "New Session",
+    "description": "Create a new planning poker session for your team",
+    "name": "Session Name",
+    "namePlaceholder": "Ex: Sprint Planning - Backend API",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe the purpose of this session...",
+    "votingMode": "Voting Mode",
+    "autoReveal": "Automatically reveal votes",
+    "allowObservers": "Allow observers",
+    "cancel": "Cancel",
+    "create": "Create Session",
+    "creating": "Creating...",
+    "error": "Error creating session",
+    "serverError": "Error connecting to server"
+  },
+  "votingModes": {
+    "fibonacci": "Fibonacci (1, 2, 3, 5, 8, 13, 21)",
+    "tshirt": "T-Shirt (XS, S, M, L, XL, XXL)",
+    "linear": "Linear (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "backToList": "Back to List"
+  },
   "sessions": {
     "title": "Sessions",
-    "description": "Manage your planning poker sessions"
+    "description": "Manage your planning poker sessions",
+    "new": "New Session",
+    "join": "Join Session",
+    "edit": "Edit Session",
+    "archive": "Archive Session",
+    "view": "View Session",
+    "noSessions": "No sessions found",
+    "createFirst": "Start by creating your first planning poker session",
+    "createSession": "Create Session"
+  },
+  "session": {
+    "info": "Session Information",
+    "status": "Status",
+    "votingMode": "Voting Mode",
+    "createdBy": "Created by",
+    "createdAt": "Created at",
+    "participants": "Participants",
+    "tickets": "Tickets",
+    "noTickets": "No tickets created yet",
+    "quickActions": "Quick Actions",
+    "settings": "Settings",
+    "autoReveal": "Auto-reveal",
+    "observers": "Observers",
+    "timer": "Timer",
+    "disabled": "Disabled",
+    "enabled": "Enabled",
+    "allowed": "Allowed",
+    "blocked": "Blocked"
+  },
+  "status": {
+    "active": "Active",
+    "completed": "Completed",
+    "archived": "Archived"
+  },
+  "votingMode": {
+    "fibonacci": "Fibonacci",
+    "tshirt": "T-Shirt",
+    "linear": "Linear"
+  },
+  "role": {
+    "moderator": "Moderator",
+    "voter": "Voter",
+    "observer": "Observer"
+  },
+  "errors": {
+    "loadSessions": "Error loading sessions",
+    "loadSession": "Error loading session",
+    "createSession": "Error creating session",
+    "updateSession": "Error updating session",
+    "archiveSession": "Error archiving session",
+    "unknown": "Unknown error",
+    "notFound": "Session not found"
   },
   "projects": {
     "title": "Projects",

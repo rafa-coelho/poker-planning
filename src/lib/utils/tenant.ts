@@ -1,6 +1,65 @@
 import { prisma } from '@/lib/db'
 import { TenantContext } from '@/lib/middleware/tenant'
 
+// Tipos para where clauses do Prisma
+type SessionWhere = {
+  id?: string
+  name?: string
+  status?: string
+  projectId?: string
+  createdAt?: { gte?: Date; lte?: Date }
+  updatedAt?: { gte?: Date; lte?: Date }
+  OR?: Array<{ name?: { contains: string; mode?: 'insensitive' }; description?: { contains: string; mode?: 'insensitive' } }>
+  AND?: SessionWhere[]
+}
+
+type TicketWhere = {
+  id?: string
+  title?: string
+  status?: string
+  priority?: string
+  createdAt?: { gte?: Date; lte?: Date }
+  OR?: Array<{ title?: { contains: string; mode?: 'insensitive' }; description?: { contains: string; mode?: 'insensitive' } }>
+  AND?: TicketWhere[]
+}
+
+type ProjectWhere = {
+  id?: string
+  name?: string
+  description?: string
+  createdAt?: { gte?: Date; lte?: Date }
+  OR?: Array<{ name?: { contains: string; mode?: 'insensitive' }; description?: { contains: string; mode?: 'insensitive' } }>
+  AND?: ProjectWhere[]
+}
+
+type UserWhere = {
+  id?: string
+  name?: string
+  email?: string
+  role?: string
+  isActive?: boolean
+  createdAt?: { gte?: Date; lte?: Date }
+  OR?: Array<{ name?: { contains: string; mode?: 'insensitive' }; email?: { contains: string; mode?: 'insensitive' } }>
+  AND?: UserWhere[]
+}
+
+type InviteWhere = {
+  id?: string
+  email?: string
+  status?: string
+  role?: string
+  createdAt?: { gte?: Date; lte?: Date }
+  OR?: Array<{ email?: { contains: string; mode?: 'insensitive' } }>
+  AND?: InviteWhere[]
+}
+
+type VoteWhere = {
+  id?: string
+  value?: string
+  createdAt?: { gte?: Date; lte?: Date }
+  AND?: VoteWhere[]
+}
+
 /**
  * Utility para aplicar filtros automáticos de organização em queries Prisma
  */
@@ -14,7 +73,7 @@ export class TenantQueryBuilder {
   /**
    * Aplicar filtro de organização em query de sessões
    */
-  sessions(additionalWhere: any = {}) {
+  sessions(additionalWhere: SessionWhere = {}) {
     return {
       ...additionalWhere,
       organizationId: this.organizationId
@@ -24,7 +83,7 @@ export class TenantQueryBuilder {
   /**
    * Aplicar filtro de organização em query de tickets
    */
-  tickets(additionalWhere: any = {}) {
+  tickets(additionalWhere: TicketWhere = {}) {
     return {
       ...additionalWhere,
       session: {
@@ -36,7 +95,7 @@ export class TenantQueryBuilder {
   /**
    * Aplicar filtro de organização em query de projetos
    */
-  projects(additionalWhere: any = {}) {
+  projects(additionalWhere: ProjectWhere = {}) {
     return {
       ...additionalWhere,
       organizationId: this.organizationId
@@ -46,7 +105,7 @@ export class TenantQueryBuilder {
   /**
    * Aplicar filtro de organização em query de usuários
    */
-  users(additionalWhere: any = {}) {
+  users(additionalWhere: UserWhere = {}) {
     return {
       ...additionalWhere,
       organizationId: this.organizationId
@@ -56,7 +115,7 @@ export class TenantQueryBuilder {
   /**
    * Aplicar filtro de organização em query de convites
    */
-  invites(additionalWhere: any = {}) {
+  invites(additionalWhere: InviteWhere = {}) {
     return {
       ...additionalWhere,
       organizationId: this.organizationId
@@ -66,7 +125,7 @@ export class TenantQueryBuilder {
   /**
    * Aplicar filtro de organização em query de votos
    */
-  votes(additionalWhere: any = {}) {
+  votes(additionalWhere: VoteWhere = {}) {
     return {
       ...additionalWhere,
       ticket: {

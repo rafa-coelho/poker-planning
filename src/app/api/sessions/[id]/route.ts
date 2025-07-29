@@ -1,65 +1,151 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
-import { withResourceAccess } from '@/lib/middleware/tenant'
+import { SessionService } from '@/lib/services/sessionService'
+import { withTenantIsolation, TenantContext } from '@/lib/middleware/tenant'
+import { SessionStatus, VotingMode } from '@prisma/client'
+import i18next from 'i18next'
 
-// GET /api/sessions/[id] - Detalhe da sessão
-export const GET = withResourceAccess(
-  // resourceId extraído da URL
-  undefined as any,
-  'session',
-  async (req, context) => {
-    const { pathname } = new URL(req.url)
-    const id = pathname.split('/').pop()
-    if (!id) return NextResponse.json({ error: 'ID da sessão é obrigatório' }, { status: 400 })
-    const session = await prisma.session.findUnique({
-      where: { id, organizationId: context.organizationId },
-      include: {
-        project: { select: { id: true, name: true } },
-        participants: { select: { id: true, userId: true, role: true } },
-        tickets: true
-      }
+/**
+ * GET /api/sessions/[id] - Busca uma sessão específica
+ */
+async function getSession(req: NextRequest, context: TenantContext) {
+  try {
+    const sessionId = req.nextUrl.pathname.split('/').pop()!
+    
+    const session = await SessionService.getSessionById(sessionId, context.organizationId)
+    
+    if (!session) {
+      return NextResponse.json(
+        { 
+          error: {
+            code: 'SESSION_NOT_FOUND',
+            message: i18next.t('api.errors.notFound'),
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: session
     })
-    if (!session) return NextResponse.json({ error: 'Sessão não encontrada' }, { status: 404 })
-    return NextResponse.json({ session })
+  } catch (error) {
+    console.error('Get session error:', error)
+    return NextResponse.json(
+      { 
+        error: {
+          code: 'GET_SESSION_ERROR',
+          message: i18next.t('api.errors.loadSession'),
+          timestamp: new Date().toISOString()
+        }
+      },
+      { status: 500 }
+    )
   }
-)
+}
 
-// PATCH /api/sessions/[id] - Atualizar sessão
-export const PATCH = withResourceAccess(
-  undefined as any,
-  'session',
-  async (req, context) => {
-    const { pathname } = new URL(req.url)
-    const id = pathname.split('/').pop()
-    if (!id) return NextResponse.json({ error: 'ID da sessão é obrigatório' }, { status: 400 })
+/**
+ * PUT /api/sessions/[id] - Atualiza uma sessão
+ */
+async function updateSession(req: NextRequest, context: TenantContext) {
+  try {
+    const sessionId = req.nextUrl.pathname.split('/').pop()!
     const body = await req.json()
-    const { name, description, status, votingMode, autoReveal, allowObservers } = body
-    const session = await prisma.session.update({
-      where: { id, organizationId: context.organizationId },
-      data: {
-        name,
-        description,
-        status,
-        votingMode,
-        autoReveal,
-        allowObservers
-      }
-    })
-    return NextResponse.json({ session })
-  }
-)
+    
+    const {
+      name,
+      description,
+      status,
+      votingMode,
+      autoReveal,
+      allowObservers,
+    } = body
 
-// DELETE /api/sessions/[id] - Remover sessão
-export const DELETE = withResourceAccess(
-  undefined as any,
-  'session',
-  async (req, context) => {
-    const { pathname } = new URL(req.url)
-    const id = pathname.split('/').pop()
-    if (!id) return NextResponse.json({ error: 'ID da sessão é obrigatório' }, { status: 400 })
-    await prisma.session.delete({
-      where: { id, organizationId: context.organizationId }
+    const session = await SessionService.updateSession(sessionId, context.organizationId, {
+      name,
+      description,
+      status: status ? SessionStatus[status as keyof typeof SessionStatus] : undefined,
+      votingMode: votingMode ? VotingMode[votingMode as keyof typeof VotingMode] : undefined,
+      autoReveal,
+      allowObservers,
     })
-    return NextResponse.json({ ok: true })
+
+    if (!session) {
+      return NextResponse.json(
+        { 
+          error: {
+            code: 'SESSION_NOT_FOUND',
+            message: i18next.t('api.errors.notFound'),
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: session,
+      message: i18next.t('api.success.sessionUpdated')
+    })
+  } catch (error) {
+    console.error('Update session error:', error)
+    return NextResponse.json(
+      { 
+        error: {
+          code: 'UPDATE_SESSION_ERROR',
+          message: i18next.t('api.errors.updateSession'),
+          timestamp: new Date().toISOString()
+        }
+      },
+      { status: 500 }
+    )
   }
-) 
+}
+
+/**
+ * DELETE /api/sessions/[id] - Arquivar uma sessão
+ */
+async function archiveSession(req: NextRequest, context: TenantContext) {
+  try {
+    const sessionId = req.nextUrl.pathname.split('/').pop()!
+    
+    const session = await SessionService.archiveSession(sessionId, context.organizationId)
+    
+    if (!session) {
+      return NextResponse.json(
+        { 
+          error: {
+            code: 'SESSION_NOT_FOUND',
+            message: i18next.t('api.errors.notFound'),
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: i18next.t('api.success.sessionArchived')
+    })
+  } catch (error) {
+    console.error('Archive session error:', error)
+    return NextResponse.json(
+      { 
+        error: {
+          code: 'ARCHIVE_SESSION_ERROR',
+          message: i18next.t('api.errors.archiveSession'),
+          timestamp: new Date().toISOString()
+        }
+      },
+      { status: 500 }
+    )
+  }
+}
+
+// Exporta as funções com middleware de tenant isolation
+export const GET = withTenantIsolation(getSession)
+export const PUT = withTenantIsolation(updateSession)
+export const DELETE = withTenantIsolation(archiveSession) 

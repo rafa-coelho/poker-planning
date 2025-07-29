@@ -1,5 +1,6 @@
 import './globals.css';
 import { AuthProvider } from '@/lib/hooks/useAuth';
+import { BreadcrumbProvider } from '@/lib/context/breadcrumbContext';
 import { APP_CONFIG } from '@/lib/config';
 
 export const metadata = {
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <AuthProvider>
-          {children}
+          <BreadcrumbProvider>
+            {children}
+          </BreadcrumbProvider>
         </AuthProvider>
       </body>
     </html>

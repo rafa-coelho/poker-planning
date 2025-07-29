@@ -122,7 +122,7 @@ export const ENV_CONFIG = {
  */
 export function getEnvConfig<T extends keyof typeof ENV_CONFIG.development>(
   key: T
-): any {
+): boolean | string {
   const env = APP_CONFIG.NODE_ENV as keyof typeof ENV_CONFIG
   return ENV_CONFIG[env]?.[key] ?? ENV_CONFIG.development[key]
 } 
