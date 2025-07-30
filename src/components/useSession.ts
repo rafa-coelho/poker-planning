@@ -171,13 +171,33 @@ export function useSession () {
       (window as any).socket = socket;
     }
 
+    // Heartbeat para manter conexão ativa
+    const heartbeatInterval = setInterval(() => {
+      if (socket.connected) {
+        socket.emit('heartbeat');
+      }
+    }, 30000); // A cada 30 segundos
+
     socket.on("connect", () => {
       socket.emit("join_room", {
         sessionId,
         userId: storedUserId,
         userName: storedUserName,
-        sessionName: sessionName || sessionData.sessionName || t("session.defaultName")
+        sessionName: sessionName || sessionData.sessionName || t("session.defaultName"),
+        organizationId: authUser?.organizationId || null
       });
+    });
+
+    socket.on("heartbeat_ack", () => {
+      // Heartbeat confirmado
+    });
+
+    socket.on("error", (error: { message: string }) => {
+      console.error("WebSocket error:", error.message);
+      if (error.message === 'Rate limit exceeded') {
+        // Implementar retry logic ou mostrar mensagem ao usuário
+        console.warn("Rate limit exceeded, waiting before retry...");
+      }
     });
 
     socket.on("session_update", (data: SessionState) => updateSessionData(data, storedUserId));
@@ -189,7 +209,10 @@ export function useSession () {
     socket.on("voting_finished", handleVotingFinished);
     socket.on("participant_left", handleParticipantLeft);
 
-    return () => socket.disconnect();
+    return () => {
+      clearInterval(heartbeatInterval);
+      socket.disconnect();
+    };
   }
 
   /** 🔹 Atualiza os dados da sessão */
@@ -288,15 +311,26 @@ export function useSession () {
     }
     
     setSelectedCard(cardValue);
-    socketRef.current?.emit("select_card", { sessionId, userId: sessionUser.userId, cardValue });
+    socketRef.current?.emit("select_card", { 
+      sessionId, 
+      userId: sessionUser.userId, 
+      cardValue,
+      organizationId: authUser?.organizationId || null
+    });
   }
 
   function handleFlipCards () {
-    socketRef.current?.emit("flip_cards", { sessionId });
+    socketRef.current?.emit("flip_cards", { 
+      sessionId,
+      organizationId: authUser?.organizationId || null
+    });
   }
 
   function handleNewVoting () {
-    socketRef.current?.emit("new_voting", { sessionId });
+    socketRef.current?.emit("new_voting", { 
+      sessionId,
+      organizationId: authUser?.organizationId || null
+    });
   }
 
   // Função para resetar a mesa (limpar votos, esconder cartas, etc.)
@@ -307,7 +341,10 @@ export function useSession () {
     setShowFinalEstimateModal(false);
     
     // Emitir evento para resetar a mesa para todos os participantes
-    socketRef.current?.emit("new_voting", { sessionId });
+    socketRef.current?.emit("new_voting", { 
+      sessionId,
+      organizationId: authUser?.organizationId || null
+    });
   };
 
   const handleTicketSelect = async (ticket: Ticket) => {
@@ -327,7 +364,8 @@ export function useSession () {
       // Emitir evento para desselecionar para todos
       socketRef.current?.emit("ticket_selected", { 
         sessionId, 
-        ticketId: null 
+        ticketId: null,
+        organizationId: authUser?.organizationId || null
       });
       return; // IMPORTANTE: Retornar aqui para não executar o resto
     }
@@ -340,7 +378,8 @@ export function useSession () {
     // Emitir evento para compartilhar seleção com todos
     socketRef.current?.emit("ticket_selected", { 
       sessionId, 
-      ticketId: ticket.id 
+      ticketId: ticket.id,
+      organizationId: authUser?.organizationId || null
     });
     
     // Se o ticket já foi estimado, mostrar resultados mas permitir re-votar
@@ -435,19 +474,22 @@ export function useSession () {
         socketRef.current?.emit("final_estimate_set", { 
           sessionId, 
           ticketId: currentTicket.id, 
-          finalEstimate 
+          finalEstimate,
+          organizationId: authUser?.organizationId || null
         });
         
         // Emitir também o evento ticket_updated para garantir atualização
         socketRef.current?.emit("ticket_updated", { 
           sessionId, 
-          ticket: updatedTicket 
+          ticket: updatedTicket,
+          organizationId: authUser?.organizationId || null
         });
         
         // Desselecionar ticket após confirmação
         socketRef.current?.emit("ticket_selected", { 
           sessionId, 
-          ticketId: null 
+          ticketId: null,
+          organizationId: authUser?.organizationId || null
         });
       }
     } catch (error) {
