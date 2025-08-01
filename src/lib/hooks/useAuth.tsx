@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Redirecionar para login se estiver em área autenticada
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      const publicPaths = ['/login', '/register', '/forgot-password'];
+      const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
       
       if (!publicPaths.some(path => currentPath.startsWith(path))) {
         window.location.href = '/login';

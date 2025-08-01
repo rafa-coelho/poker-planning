@@ -27,6 +27,111 @@
   "namePlaceholder": "Digite seu nome...",
   "enterSession": "Entrar na Sessão",
   "errorEnterName": "Por favor, insira seu nome!",
+  "auth": {
+    "common": {
+      "loading": "Carregando...",
+      "error": "Erro interno do servidor"
+    },
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Entre na sua conta",
+      "email": "Email",
+      "password": "Senha",
+      "emailPlaceholder": "Digite seu email...",
+      "passwordPlaceholder": "Digite sua senha...",
+      "loginButton": "Entrar",
+      "submit": "Entrar",
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "register": "Registrar",
+      "registerLink": "Criar conta",
+      "errors": {
+        "requiredEmail": "Email é obrigatório",
+        "invalidEmail": "Email inválido",
+        "requiredPassword": "Senha é obrigatória",
+        "invalidCredentials": "Email ou senha inválidos",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "register": {
+      "title": "Registrar",
+      "subtitle": "Crie sua conta",
+      "name": "Nome",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar Senha",
+      "organizationName": "Nome da Organização",
+      "namePlaceholder": "Digite seu nome completo...",
+      "emailPlaceholder": "Digite seu email...",
+      "passwordPlaceholder": "Digite sua senha...",
+      "confirmPasswordPlaceholder": "Confirme sua senha...",
+      "organizationPlaceholder": "Digite o nome da sua organização...",
+      "registerButton": "Criar conta",
+      "submit": "Registrar",
+      "hasAccount": "Já tem uma conta?",
+      "login": "Entrar",
+      "loginLink": "Fazer login",
+      "errors": {
+        "nameRequired": "Nome é obrigatório",
+        "emailRequired": "Email é obrigatório",
+        "passwordRequired": "Senha é obrigatória",
+        "confirmPasswordRequired": "Confirmação de senha é obrigatória",
+        "organizationRequired": "Nome da organização é obrigatório",
+        "invalidEmail": "Email inválido",
+        "passwordTooShort": "Senha deve ter pelo menos 6 caracteres",
+        "passwordsDoNotMatch": "Senhas não coincidem",
+        "emailAlreadyExists": "Email já está em uso",
+        "organizationAlreadyExists": "Nome da organização já está em uso",
+        "validationError": "Dados inválidos",
+        "emailExists": "Email já está em uso",
+        "weakPassword": "Senha muito fraca",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "forgotPassword": {
+      "title": "Esqueceu a senha?",
+      "subtitle": "Digite seu email para receber um link de recuperação",
+      "email": "Email",
+      "emailPlaceholder": "Digite seu email...",
+      "sendButton": "Enviar link de recuperação",
+      "submit": "Enviar link de recuperação",
+      "backToLogin": "Voltar para login",
+      "success": "Se o email existir, você receberá um link de recuperação",
+      "errors": {
+        "emailRequired": "Email é obrigatório",
+        "invalidEmail": "Email inválido",
+        "userNotFound": "Usuário não encontrado",
+        "emailNotConfigured": "Serviço de email não configurado",
+        "rateLimitExceeded": "Muitas tentativas. Tente novamente em alguns minutos",
+        "resetTokenExists": "Já existe um link de recuperação válido",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "resetPassword": {
+      "title": "Reset de Senha",
+      "subtitle": "Digite sua nova senha",
+      "newPassword": "Nova Senha",
+      "newPasswordPlaceholder": "Digite sua nova senha",
+      "confirmPassword": "Confirmar Senha",
+      "confirmPasswordPlaceholder": "Confirme sua nova senha",
+      "submit": "Alterar Senha",
+      "backToLogin": "Voltar para login",
+      "passwordRequirements": "Mínimo 6 caracteres",
+      "passwordsMatch": "Senhas coincidem",
+      "success": "Senha alterada com sucesso!",
+      "invalidToken": "Token inválido ou expirado",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+      "passwordsDoNotMatch": "As senhas não coincidem",
+      "error": "Erro ao alterar senha",
+      "errors": {
+        "invalidToken": "Token inválido ou expirado",
+        "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+        "passwordsDoNotMatch": "As senhas não coincidem",
+        "tokenExpired": "Token expirado",
+        "serverError": "Erro interno do servidor"
+      }
+    }
+  },
   "logs": {
     "session": {
       "loadingSessionData": "Carregando dados da sessão...",
@@ -99,149 +204,36 @@
     "buttons": {
       "edit": "✏️ Editar ticket",
       "delete": "🗑️ Excluir ticket",
-      "updateEstimate": "Atualizar valor estimado"
+      "updateEstimate": "📊 Atualizar estimativa"
     },
     "hints": {
-      "pendingCreator": "Clique para selecionar e votar",
-      "pendingParticipant": "Aguardando seleção do criador",
-      "votingCreator": "Clique para participar",
-      "votingParticipant": "Vote nas cartas abaixo",
-      "estimatedCreator": "Clique para re-votar",
-      "estimatedParticipant": "Estimativa finalizada",
-      "currentEstimated": "Ticket selecionado para re-votação",
-      "selectedForVoting": "✓ Selecionado para votação"
+      "selectToVote": "Clique para selecionar e votar",
+      "waitingForCreator": "Aguardando seleção do criador",
+      "estimated": "Ticket já estimado",
+      "voting": "Votação em andamento"
     }
-  },
-  "api": {
-    "errors": {
-      "authenticationFailed": "Sessão expirada. Por favor, faça login novamente.",
-      "generic": "Erro na requisição ({{status}} {{statusText}})"
-    },
-    "success": {
-      "sessionCreated": "Sessão criada com sucesso",
-      "sessionUpdated": "Sessão atualizada com sucesso",
-      "sessionArchived": "Sessão arquivada com sucesso",
-      "ticketCreated": "Ticket criado com sucesso",
-      "ticketUpdated": "Ticket atualizado com sucesso",
-      "ticketDeleted": "Ticket deletado com sucesso"
-    }
-  },
-  "auth": {
-    "login": {
-      "title": "Entrar no Poker Planning",
-      "subtitle": "Faça login para acessar suas sessões",
-      "email": "E-mail",
-      "password": "Senha",
-      "emailPlaceholder": "Digite seu e-mail...",
-      "passwordPlaceholder": "Digite sua senha...",
-      "loginButton": "Entrar",
-      "forgotPassword": "Esqueceu a senha?",
-      "noAccount": "Não tem uma conta?",
-      "registerLink": "Criar conta",
-      "errors": {
-        "invalidCredentials": "E-mail ou senha inválidos",
-        "requiredEmail": "E-mail é obrigatório",
-        "requiredPassword": "Senha é obrigatória",
-        "invalidEmail": "E-mail inválido"
-      }
-    },
-    "register": {
-      "title": "Criar Conta",
-      "subtitle": "Junte-se ao Poker Planning",
-      "name": "Nome completo",
-      "email": "E-mail",
-      "password": "Senha",
-      "confirmPassword": "Confirmar senha",
-      "organizationName": "Nome da organização",
-      "namePlaceholder": "Digite seu nome completo...",
-      "emailPlaceholder": "Digite seu e-mail...",
-      "passwordPlaceholder": "Digite sua senha...",
-      "confirmPasswordPlaceholder": "Confirme sua senha...",
-      "organizationPlaceholder": "Digite o nome da sua organização...",
-      "registerButton": "Criar conta",
-      "hasAccount": "Já tem uma conta?",
-      "loginLink": "Fazer login",
-      "errors": {
-        "nameRequired": "Nome é obrigatório",
-        "emailRequired": "E-mail é obrigatório",
-        "passwordRequired": "Senha é obrigatória",
-        "confirmPasswordRequired": "Confirmação de senha é obrigatória",
-        "organizationRequired": "Nome da organização é obrigatório",
-        "invalidEmail": "E-mail inválido",
-        "passwordTooShort": "Senha deve ter pelo menos 6 caracteres",
-        "passwordsDoNotMatch": "Senhas não coincidem",
-        "emailAlreadyExists": "E-mail já está em uso",
-        "organizationAlreadyExists": "Nome da organização já está em uso"
-      }
-    },
-    "forgotPassword": {
-      "title": "Recuperar Senha",
-      "subtitle": "Digite seu e-mail para receber um link de recuperação",
-      "email": "E-mail",
-      "emailPlaceholder": "Digite seu e-mail...",
-      "sendButton": "Enviar link de recuperação",
-      "backToLogin": "Voltar ao login",
-      "success": "Link de recuperação enviado para seu e-mail",
-      "errors": {
-        "emailRequired": "E-mail é obrigatório",
-        "invalidEmail": "E-mail inválido",
-        "userNotFound": "Usuário não encontrado"
-      }
-    }
-  },
-  "common": {
-    "loading": "Carregando...",
-    "error": "Erro",
-    "success": "Sucesso",
-    "back": "Voltar",
-    "next": "Próximo",
-    "cancel": "Cancelar",
-    "save": "Salvar",
-    "saving": "Salvando...",
-    "delete": "Excluir",
-    "edit": "Editar",
-    "logout": "Sair",
-    "dashboard": "Dashboard",
-    "sessions": "Sessões",
-    "projects": "Projetos",
-    "reports": "Relatórios"
   },
   "session": {
     "defaultName": "Sessão Poker Planning",
     "anonymous": "Anônimo",
+    "revoting": "Re-votação",
+    "units": {
+      "storyPoints": "Story Points",
+      "hours": "Horas",
+      "days": "Dias"
+    },
+    "table": {
+      "disabled": "Selecione um ticket para começar a votar",
+      "noTicketSelected": "Nenhum ticket selecionado"
+    },
     "participantLeft": {
       "title": "Participante saiu",
       "message": "{{userName}} saiu da sessão"
     },
-    "participantJoined": {
-      "title": "Participante entrou",
-      "message": "{{userName}} entrou na sessão"
-    },
-    "revoting": {
-      "title": "🔄 Re-votação",
-      "description": "Ticket já estimado: {{estimate}}"
-    },
-    "units": {
-      "points": "pts"
-    },
-    "table": {
-      "noTicketSelected": "Selecione um ticket para votar",
-      "selectTicketHint": "Escolha um ticket na barra lateral para começar a votação",
-      "noTicketSelectedCreator": "Selecione um ticket para iniciar a votação",
-      "selectTicketHintCreator": "Escolha um ticket na barra lateral para começar a votação",
-      "noTicketSelectedParticipant": "Aguardando seleção do ticket",
-      "selectTicketHintParticipant": "O criador da sessão irá selecionar um ticket para votação"
-    },
     "errors": {
-      "sessionIdNotFound": "❌ [DEBUG] sessionId não encontrado",
-      "loadSessionData": "Erro ao carregar dados da sessão",
-      "loadCurrentTicket": "Erro ao carregar ticket atual",
       "startVoting": "Erro ao iniciar votação",
       "finishVoting": "Erro ao finalizar votação",
       "setFinalEstimate": "Erro ao definir estimativa final"
-    },
-    "voteBar": {
-      "chooseYourCard": "Escolha sua carta"
     }
   }
 }

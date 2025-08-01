@@ -4,6 +4,7 @@ import { hashPassword, validatePassword } from '@/lib/auth/password'
 import { generateAccessToken, generateRefreshToken, generateTokenId } from '@/lib/auth/jwt'
 import { RegisterRequest, RegisterResponse, AUTH_ERRORS } from '@/types/auth'
 import { Plan, UserRole } from '@prisma/client'
+import { emailService } from '@/lib/email/service'
 
 /**
  * POST /api/auth/register
@@ -142,6 +143,17 @@ export async function POST(req: NextRequest) {
       where: { id: result.user.id },
       data: { lastLoginAt: new Date() }
     })
+
+    // Enviar email de boas-vindas (não bloquear se falhar)
+    if (emailService.isConfigured()) {
+      try {
+        await emailService.sendWelcomeEmail(result.user.email, result.user.name)
+        console.log('Welcome email sent to:', result.user.email)
+      } catch (error) {
+        console.error('Failed to send welcome email:', error)
+        // Não falhar o registro se o email falhar
+      }
+    }
 
     const response: RegisterResponse = {
       user: {

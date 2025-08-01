@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generatePasswordResetToken } from '@/lib/auth/password';
+import { emailService } from '@/lib/email/service';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,6 +17,21 @@ export async function POST(request: NextRequest) {
           }
         },
         { status: 400 }
+      );
+    }
+
+    // Verificar se o email está configurado
+    if (!emailService.isConfigured()) {
+      console.warn('Email service not configured');
+      return NextResponse.json(
+        { 
+          error: {
+            code: 'EMAIL_NOT_CONFIGURED',
+            message: 'Serviço de email não configurado',
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 503 }
       );
     }
 
@@ -35,12 +51,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verificar se já existe um token válido
+    if ((user as any).resetToken && (user as any).resetTokenExpiresAt && (user as any).resetTokenExpiresAt > new Date()) {
+      return NextResponse.json(
+        { 
+          error: {
+            code: 'RESET_TOKEN_EXISTS',
+            message: 'Já existe um link de recuperação válido. Verifique seu email ou aguarde alguns minutos.',
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 429 }
+      );
+    }
+
     // Gerar token de reset de senha
     const resetToken = await generatePasswordResetToken(user.id);
 
-    // TODO: Implementar envio de e-mail
-    // Por enquanto, apenas logamos o token
-    console.log('Password reset token for user:', user.email, 'Token:', resetToken);
+    // Enviar email de reset
+    const emailResult = await emailService.sendPasswordResetEmail(
+      user.email,
+      resetToken,
+      user.name
+    );
+
+    if (!emailResult.success) {
+      console.error('Failed to send password reset email:', emailResult.error);
+      
+      // Se falhou por rate limit, retornar erro específico
+      if (emailResult.error?.includes('Rate limit')) {
+        return NextResponse.json(
+          { 
+            error: {
+              code: 'RATE_LIMIT_EXCEEDED',
+              message: 'Muitas tentativas. Tente novamente em alguns minutos.',
+              timestamp: new Date().toISOString()
+            }
+          },
+          { status: 429 }
+        );
+      }
+
+      return NextResponse.json(
+        { 
+          error: {
+            code: 'EMAIL_SEND_FAILED',
+            message: 'Erro ao enviar email. Tente novamente.',
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 500 }
+      );
+    }
+
+    console.log('Password reset email sent to:', user.email);
 
     return NextResponse.json(
       { 

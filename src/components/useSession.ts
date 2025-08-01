@@ -247,8 +247,6 @@ export function useSession () {
 
   /** 🔹 Manipula quando um participante sai da sessão */
   const handleParticipantLeft = (data: { userId: string; userName: string }) => {
-    console.log(`👤 Participante saiu: ${data.userName}`);
-    
     // Mostrar notificação visual
     setParticipantNotification({ userName: data.userName, type: 'left' });
     
@@ -583,7 +581,6 @@ export function useSession () {
     
     // Verificar se todos votaram
     if (checkAllVoted()) {
-      console.log("Todos os participantes votaram, finalizando automaticamente...");
       await finishVoting();
     }
   }, [currentTicket, sessionData.participants]);

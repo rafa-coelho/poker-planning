@@ -47,6 +47,10 @@ model User {
   isActive       Boolean      @default(true)
   lastLoginAt    DateTime?
   
+  // Password reset fields
+  resetToken     String?      @unique
+  resetTokenExpiresAt DateTime?
+  
   // Multi-tenancy
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
