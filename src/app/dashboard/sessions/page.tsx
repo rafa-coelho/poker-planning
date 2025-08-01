@@ -23,6 +23,12 @@ interface Session {
   };
 }
 
+interface Filters {
+  status: string;
+  votingMode: string;
+  search: string;
+}
+
 export default function SessionsPage() {
   const { t } = useTranslation("dashboard");
   const router = useRouter();
@@ -36,10 +42,16 @@ export default function SessionsPage() {
     totalPages: 0,
     limit: 10
   });
+  const [filters, setFilters] = useState<Filters>({
+    status: '',
+    votingMode: '',
+    search: ''
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     fetchSessions();
-  }, [pagination.page]);
+  }, [pagination.page, filters]);
 
   const fetchSessions = async () => {
     try {
@@ -47,7 +59,9 @@ export default function SessionsPage() {
       
       const response = await apiService.listSessions({
         page: pagination.page,
-        limit: pagination.limit
+        limit: pagination.limit,
+        search: filters.search || undefined,
+        status: filters.status || undefined
       });
 
       if (response.success && response.data) {
@@ -63,6 +77,20 @@ export default function SessionsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFilterChange = (key: keyof Filters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      status: '',
+      votingMode: '',
+      search: ''
+    });
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   const getStatusColor = (status: string) => {
@@ -116,6 +144,16 @@ export default function SessionsPage() {
 
   const handleCreateSession = () => {
     router.push('/dashboard/sessions/new');
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
@@ -173,6 +211,74 @@ export default function SessionsPage() {
         </div>
       </div>
 
+      {/* Filters and Search */}
+      <div className="bg-white shadow rounded-lg mb-6">
+        <div className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('filters.search')}
+              </label>
+              <input
+                type="text"
+                id="search"
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                placeholder={t('filters.searchPlaceholder')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <div className="sm:w-48">
+              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('filters.status')}
+              </label>
+              <select
+                id="status"
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">{t('filters.allStatuses')}</option>
+                <option value="ACTIVE">{t('status.active')}</option>
+                <option value="COMPLETED">{t('status.completed')}</option>
+                <option value="ARCHIVED">{t('status.archived')}</option>
+              </select>
+            </div>
+
+            {/* Voting Mode Filter */}
+            <div className="sm:w-48">
+              <label htmlFor="votingMode" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('filters.votingMode')}
+              </label>
+              <select
+                id="votingMode"
+                value={filters.votingMode}
+                onChange={(e) => handleFilterChange('votingMode', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">{t('filters.allModes')}</option>
+                <option value="FIBONACCI">{t('votingMode.fibonacci')}</option>
+                <option value="TSHIRT">{t('votingMode.tshirt')}</option>
+                <option value="LINEAR">{t('votingMode.linear')}</option>
+              </select>
+            </div>
+
+            {/* Clear Filters */}
+            <div className="flex items-end">
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                {t('filters.clear')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white shadow rounded-lg">
         {sessions.length === 0 ? (
           <div className="p-6 text-center">
@@ -217,6 +323,9 @@ export default function SessionsPage() {
                     {t('session.createdBy')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('session.createdAt')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Ações
                   </th>
                 </tr>
@@ -253,6 +362,9 @@ export default function SessionsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {session.createdBy.name}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(session.createdAt)}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => handleViewSession(session.id)}
@@ -281,7 +393,11 @@ export default function SessionsPage() {
       {pagination.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm text-gray-700">
-            Mostrando {((pagination.page - 1) * pagination.limit) + 1} a {Math.min(pagination.page * pagination.limit, pagination.total)} de {pagination.total} resultados
+            {t('pagination.showing', {
+              from: ((pagination.page - 1) * pagination.limit) + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total
+            })}
           </div>
           <div className="flex space-x-2">
             <button
@@ -289,14 +405,14 @@ export default function SessionsPage() {
               disabled={pagination.page === 1}
               className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Anterior
+              {t('pagination.previous')}
             </button>
             <button
               onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
               disabled={pagination.page === pagination.totalPages}
               className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Próxima
+              {t('pagination.next')}
             </button>
           </div>
         </div>

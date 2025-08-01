@@ -61,6 +61,8 @@
     "edit": "Editar Sessão",
     "archive": "Arquivar Sessão",
     "view": "Ver Sessão",
+    "viewAll": "Ver Todas",
+    "recent": "Sessões Recentes",
     "noSessions": "Nenhuma sessão encontrada",
     "createFirst": "Comece criando sua primeira sessão de planning poker",
     "createSession": "Criar Sessão"
@@ -172,5 +174,22 @@
       "confirm": "Confirmar",
       "cancel": "Cancelar"
     }
+  },
+  "filters": {
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar por nome ou descrição...",
+    "status": "Status",
+    "votingMode": "Modo de Votação",
+    "allStatuses": "Todos os Status",
+    "allModes": "Todos os Modos",
+    "clear": "Limpar Filtros"
+  },
+  "pagination": {
+    "showing": "Mostrando {{from}} a {{to}} de {{total}} resultados",
+    "previous": "Anterior",
+    "next": "Próxima"
+  },
+  "session": {
+    "noParticipants": "Nenhum participante encontrado"
   }
 }

@@ -47,6 +47,12 @@
     "title": "Quick Actions",
     "backToList": "Back to List"
   },
+  "stats": {
+    "title": "Statistics",
+    "sessions": "Sessions",
+    "participants": "Participants",
+    "tickets": "Tickets"
+  },
   "sessions": {
     "title": "Sessions",
     "description": "Manage your planning poker sessions",
@@ -55,6 +61,8 @@
     "edit": "Edit Session",
     "archive": "Archive Session",
     "view": "View Session",
+    "viewAll": "View All",
+    "recent": "Recent Sessions",
     "noSessions": "No sessions found",
     "createFirst": "Start by creating your first planning poker session",
     "createSession": "Create Session"
@@ -162,5 +170,22 @@
   "reports": {
     "title": "Reports",
     "description": "View reports and analytics"
+  },
+  "filters": {
+    "search": "Search",
+    "searchPlaceholder": "Search by name or description...",
+    "status": "Status",
+    "votingMode": "Voting Mode",
+    "allStatuses": "All Statuses",
+    "allModes": "All Modes",
+    "clear": "Clear Filters"
+  },
+  "pagination": {
+    "showing": "Showing {{from}} to {{to}} of {{total}} results",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "session": {
+    "noParticipants": "No participants found"
   }
 }

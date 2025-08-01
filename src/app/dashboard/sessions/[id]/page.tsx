@@ -4,28 +4,8 @@ import "@/i18n/index";
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter, useParams } from 'next/navigation';
-import { useBreadcrumbs } from '@/lib/context/breadcrumbContext';
 import { useAuth } from '@/lib/hooks/useAuth';
-
-interface Participant {
-  id: string;
-  role: string;
-  isActive: boolean;
-  joinedAt: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-}
-
-interface Ticket {
-  id: string;
-  title: string;
-  status: string;
-  finalEstimate?: string;
-}
+import { useBreadcrumbs } from '@/lib/context/breadcrumbContext';
 
 interface Session {
   id: string;
@@ -33,15 +13,8 @@ interface Session {
   description?: string;
   status: string;
   votingMode: string;
-  autoReveal: boolean;
-  allowObservers: boolean;
-  timerDuration?: number;
-  isRevealed: boolean;
   createdAt: string;
   updatedAt: string;
-  endedAt?: string;
-  participants: Participant[];
-  tickets: Ticket[];
   _count: {
     participants: number;
     tickets: number;
@@ -50,30 +23,55 @@ interface Session {
     name: string;
     email: string;
   };
+  participants: Array<{
+    id: string;
+    role: string;
+    isActive: boolean;
+    joinedAt: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      avatar?: string;
+    };
+  }>;
+  tickets: Array<{
+    id: string;
+    title: string;
+    status: string;
+    finalEstimate?: string;
+  }>;
 }
 
 export default function SessionDetailPage() {
   const { t } = useTranslation("dashboard");
   const router = useRouter();
   const params = useParams();
-  const sessionId = params.id as string;
-  const { setBreadcrumbs, clearBreadcrumbs } = useBreadcrumbs();
   const { apiService } = useAuth();
-
+  const { setBreadcrumbs } = useBreadcrumbs();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const sessionId = params.id as string;
+
   useEffect(() => {
-    fetchSession();
-    
-    // Limpar breadcrumbs quando o componente for desmontado
-    return () => {
-      clearBreadcrumbs();
-    };
+    if (sessionId) {
+      fetchSessionDetails();
+    }
   }, [sessionId]);
 
-  const fetchSession = async () => {
+  useEffect(() => {
+    if (session) {
+      setBreadcrumbs([
+        { name: t('breadcrumbs.dashboard'), href: '/dashboard' },
+        { name: t('breadcrumbs.sessions'), href: '/dashboard/sessions' },
+        { name: session.name, href: `/dashboard/sessions/${session.id}` }
+      ]);
+    }
+  }, [session, setBreadcrumbs, t]);
+
+  const fetchSessionDetails = async () => {
     try {
       setLoading(true);
       
@@ -81,16 +79,6 @@ export default function SessionDetailPage() {
 
       if (response.success && response.data) {
         setSession(response.data);
-        
-        // Definir breadcrumbs customizados com o nome da sessão
-        setBreadcrumbs([
-          { name: t('breadcrumbs.dashboard'), href: '/dashboard' },
-          { name: t('breadcrumbs.sessions'), href: '/dashboard/sessions' },
-          { name: response.data.name, href: `/dashboard/sessions/${sessionId}` }
-        ]);
-        
-        // Atualizar o título da página
-        document.title = `${response.data.name} - Poker Planning`;
       } else {
         setError(response.error?.message || t('errors.loadSession'));
       }
@@ -142,21 +130,60 @@ export default function SessionDetailPage() {
     }
   };
 
-  const getRoleText = (role: string) => {
-    switch (role) {
-      case 'MODERATOR':
-        return t('role.moderator');
-      case 'VOTER':
-        return t('role.voter');
-      case 'OBSERVER':
-        return t('role.observer');
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'LOW':
+        return 'bg-gray-100 text-gray-800';
+      case 'MEDIUM':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'HIGH':
+        return 'bg-orange-100 text-orange-800';
+      case 'URGENT':
+        return 'bg-red-100 text-red-800';
       default:
-        return role;
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case 'LOW':
+        return t('tickets.priority.low');
+      case 'MEDIUM':
+        return t('tickets.priority.medium');
+      case 'HIGH':
+        return t('tickets.priority.high');
+      case 'URGENT':
+        return t('tickets.priority.urgent');
+      default:
+        return priority;
+    }
+  };
+
+  const getTicketStatusText = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return t('tickets.status.pending');
+      case 'VOTING':
+        return t('tickets.status.voting');
+      case 'ESTIMATED':
+        return t('tickets.status.estimated');
+      default:
+        return status;
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   const handleJoinSession = () => {
-    // Redirecionar para a sessão de votação
     router.push(`/${sessionId}`);
   };
 
@@ -166,24 +193,6 @@ export default function SessionDetailPage() {
 
   const handleBackToList = () => {
     router.push('/dashboard/sessions');
-  };
-
-  const handleArchiveSession = async () => {
-    if (!confirm('Tem certeza que deseja arquivar esta sessão?')) {
-      return;
-    }
-
-    try {
-      const response = await apiService.archiveSession(sessionId);
-
-      if (response.success) {
-        router.push('/dashboard/sessions');
-      } else {
-        setError(response.error?.message || t('errors.archiveSession'));
-      }
-    } catch (err) {
-      setError(t('errors.archiveSession'));
-    }
   };
 
   if (loading) {
@@ -199,7 +208,7 @@ export default function SessionDetailPage() {
     );
   }
 
-  if (error || !session) {
+  if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <div className="flex">
@@ -221,190 +230,221 @@ export default function SessionDetailPage() {
     );
   }
 
+  if (!session) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">
+              {t('errors.notFound')}
+            </h3>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => router.back()}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {session.name}
-              </h1>
-              <p className="mt-2 text-gray-600">
-                {session.description || t('session.description')}
-              </p>
-            </div>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{session.name}</h1>
+            {session.description && (
+              <p className="mt-2 text-gray-600">{session.description}</p>
+            )}
           </div>
           <div className="flex space-x-3">
+            <button
+              onClick={handleBackToList}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              {t('quickActions.backToList')}
+            </button>
             {session.status === 'ACTIVE' && (
               <>
                 <button
                   onClick={handleJoinSession}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
                 >
                   {t('sessions.join')}
                 </button>
                 <button
                   onClick={handleEditSession}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   {t('sessions.edit')}
                 </button>
               </>
-            )}
-            {session.status === 'ACTIVE' && (
-              <button
-                onClick={handleArchiveSession}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
-              >
-                {t('sessions.archive')}
-              </button>
             )}
           </div>
         </div>
       </div>
 
       {/* Session Info */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Info */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Status Card */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('session.info')}</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <dt className="text-sm font-medium text-gray-500">{t('session.status')}</dt>
-                <dd className="mt-1">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(session.status)}`}>
-                    {getStatusText(session.status)}
-                  </span>
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">{t('session.votingMode')}</dt>
-                <dd className="mt-1 text-sm text-gray-900">{getVotingModeText(session.votingMode)}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">{t('session.createdBy')}</dt>
-                <dd className="mt-1 text-sm text-gray-900">{session.createdBy.name}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">{t('session.createdAt')}</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {new Date(session.createdAt).toLocaleDateString('pt-BR')}
-                </dd>
-              </div>
+        <div className="lg:col-span-2">
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-medium text-gray-900">{t('session.info')}</h2>
             </div>
-          </div>
-
-          {/* Participants */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t('session.participants')} ({session._count.participants})
-            </h3>
-            <div className="space-y-3">
-              {session.participants.map((participant) => (
-                <div key={participant.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {participant.user.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{participant.user.name}</p>
-                      <p className="text-xs text-gray-500">{participant.user.email}</p>
-                    </div>
-                  </div>
-                  <span className="text-xs font-medium text-gray-500">
-                    {getRoleText(participant.role)}
-                  </span>
+            <div className="p-6">
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.status')}</dt>
+                  <dd className="mt-1">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(session.status)}`}>
+                      {getStatusText(session.status)}
+                    </span>
+                  </dd>
                 </div>
-              ))}
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.votingMode')}</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{getVotingModeText(session.votingMode)}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.createdBy')}</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{session.createdBy.name}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.createdAt')}</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{formatDate(session.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.participants')}</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{session._count.participants}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.tickets')}</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{session._count.tickets}</dd>
+                </div>
+              </dl>
             </div>
           </div>
 
           {/* Tickets */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t('session.tickets')} ({session._count.tickets})
-            </h3>
-            {session.tickets.length === 0 ? (
-              <p className="text-gray-500 text-sm">{t('session.noTickets')}</p>
-            ) : (
-              <div className="space-y-3">
-                {session.tickets.map((ticket) => (
-                  <div key={ticket.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{ticket.title}</p>
-                      <p className="text-xs text-gray-500">Status: {ticket.status}</p>
-                    </div>
-                    {ticket.finalEstimate && (
-                      <span className="text-sm font-medium text-blue-600">
-                        {ticket.finalEstimate}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="mt-8 bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-medium text-gray-900">{t('tickets.title')}</h2>
+            </div>
+            <div className="overflow-hidden">
+              {session.tickets.length === 0 ? (
+                <div className="p-6 text-center text-gray-500">
+                  {t('session.noTickets')}
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {t('tickets.title')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {t('tickets.priority')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {t('tickets.status')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {t('tickets.finalEstimate')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {t('session.createdAt')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {session.tickets.map((ticket) => (
+                      <tr key={ticket.id} className="hover:bg-gray-50">
+                                                 <td className="px-6 py-4 whitespace-nowrap">
+                           <div>
+                             <div className="text-sm font-medium text-gray-900">
+                               {ticket.title}
+                             </div>
+                           </div>
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap">
+                           <span className="text-sm text-gray-500">
+                             -
+                           </span>
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap">
+                           <span className="text-sm text-gray-900">
+                             {getTicketStatusText(ticket.status)}
+                           </span>
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                           {ticket.finalEstimate || '-'}
+                         </td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                           -
+                         </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('session.quickActions')}</h3>
-            <div className="space-y-3">
-              {session.status === 'ACTIVE' && (
-                <button
-                  onClick={handleJoinSession}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  {t('sessions.join')}
-                </button>
+          {/* Participants */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">{t('session.participants')}</h3>
+            </div>
+            <div className="p-6">
+              {session.participants.length === 0 ? (
+                <p className="text-sm text-gray-500">{t('session.noParticipants')}</p>
+              ) : (
+                <ul className="space-y-3">
+                  {session.participants.map((participant) => (
+                    <li key={participant.id} className="flex items-center">
+                                             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                         <span className="text-white text-sm font-medium">
+                           {participant.user.name?.charAt(0)?.toUpperCase() || '?'}
+                         </span>
+                       </div>
+                       <div className="ml-3">
+                         <p className="text-sm font-medium text-gray-900">{participant.user.name}</p>
+                         <p className="text-xs text-gray-500">{participant.user.email}</p>
+                       </div>
+                    </li>
+                  ))}
+                </ul>
               )}
-              <button
-                onClick={handleBackToList}
-                className="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-              >
-                {t('quickActions.backToList')}
-              </button>
             </div>
           </div>
 
-          {/* Session Settings */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('session.settings')}</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">{t('session.autoReveal')}</span>
-                <span className={session.autoReveal ? 'text-green-600' : 'text-gray-400'}>
-                  {session.autoReveal ? t('session.enabled') : t('session.disabled')}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">{t('session.observers')}</span>
-                <span className={session.allowObservers ? 'text-green-600' : 'text-gray-400'}>
-                  {session.allowObservers ? t('session.allowed') : t('session.blocked')}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">{t('session.timer')}</span>
-                <span className="text-gray-900">
-                  {session.timerDuration ? `${session.timerDuration}s` : t('session.disabled')}
-                </span>
-              </div>
+          {/* Quick Stats */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">{t('stats.title')}</h3>
+            </div>
+            <div className="p-6">
+              <dl className="space-y-4">
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.participants')}</dt>
+                  <dd className="mt-1 text-2xl font-semibold text-gray-900">{session._count.participants}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.tickets')}</dt>
+                  <dd className="mt-1 text-2xl font-semibold text-gray-900">{session._count.tickets}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">{t('session.createdAt')}</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{formatDate(session.createdAt)}</dd>
+                </div>
+              </dl>
             </div>
           </div>
         </div>
