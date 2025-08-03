@@ -758,5 +758,6 @@ export function useSession () {
     emitTicketDeleted,
     reloadCurrentTicket,
     getVotingStats,
+    createSession,
   };
 }

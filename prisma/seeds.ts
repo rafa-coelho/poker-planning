@@ -98,6 +98,7 @@ async function main() {
       description: 'Projeto de desenvolvimento do sistema de poker planning empresarial',
       color: '#3B82F6',
       organizationId: demoOrg.id,
+      createdById: scrumMaster.id
     }
   })
 

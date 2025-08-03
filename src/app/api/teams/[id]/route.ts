@@ -3,21 +3,21 @@ import { prisma } from '@/lib/db'
 import { withTenantIsolation } from '@/lib/middleware/tenant'
 import { requirePermission } from '@/lib/middleware/authorization'
 
-// GET /api/projects/[id] - Detalhe do projeto
+// GET /api/teams/[id] - Detalhe do time
 export const GET = withTenantIsolation(async (req, context) => {
   try {
     // Verificar permissão
-    const authCheck = await requirePermission('projects:read')(req as any);
+    const authCheck = await requirePermission('teams:read')(req as any);
     if (authCheck) return authCheck;
 
     const { pathname } = new URL(req.url);
     const id = pathname.split('/').pop();
     
     if (!id) {
-      return NextResponse.json({ error: 'ID do projeto é obrigatório' }, { status: 400 });
+      return NextResponse.json({ error: 'ID do time é obrigatório' }, { status: 400 });
     }
 
-    const project = await prisma.project.findFirst({
+    const team = await prisma.team.findFirst({
       where: { id, organizationId: context.organizationId },
       select: {
         id: true,
@@ -27,6 +27,13 @@ export const GET = withTenantIsolation(async (req, context) => {
         isActive: true,
         createdAt: true,
         updatedAt: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
         members: {
           select: {
             id: true,
@@ -45,48 +52,48 @@ export const GET = withTenantIsolation(async (req, context) => {
         _count: {
           select: {
             members: true,
-            sessions: true
+            projects: true
           }
         }
       }
     });
 
-    if (!project) {
-      return NextResponse.json({ error: 'Projeto não encontrado' }, { status: 404 });
+    if (!team) {
+      return NextResponse.json({ error: 'Time não encontrado' }, { status: 404 });
     }
 
-    return NextResponse.json({ project });
+    return NextResponse.json({ team });
   } catch (error) {
-    console.error('Erro ao buscar projeto:', error);
-    return NextResponse.json({ error: 'Erro ao buscar projeto', details: String(error) }, { status: 500 });
+    console.error('Erro ao buscar time:', error);
+    return NextResponse.json({ error: 'Erro ao buscar time', details: String(error) }, { status: 500 });
   }
 });
 
-// PATCH /api/projects/[id] - Atualizar dados do projeto
+// PATCH /api/teams/[id] - Atualizar dados do time
 export const PATCH = withTenantIsolation(async (req, context) => {
   try {
     // Verificar permissão
-    const authCheck = await requirePermission('projects:update')(req as any);
+    const authCheck = await requirePermission('teams:update')(req as any);
     if (authCheck) return authCheck;
 
     const { pathname } = new URL(req.url);
     const id = pathname.split('/').pop();
     
     if (!id) {
-      return NextResponse.json({ error: 'ID do projeto é obrigatório' }, { status: 400 });
+      return NextResponse.json({ error: 'ID do time é obrigatório' }, { status: 400 });
     }
 
     const body = await req.json();
     const { name, description, color, isActive } = body;
 
-    // Buscar projeto atual
-    const currentProject = await prisma.project.findFirst({ 
+    // Buscar time atual
+    const currentTeam = await prisma.team.findFirst({ 
       where: { id, organizationId: context.organizationId },
       select: { id: true, name: true, description: true, color: true, isActive: true }
     });
 
-    if (!currentProject) {
-      return NextResponse.json({ error: 'Projeto não encontrado' }, { status: 404 });
+    if (!currentTeam) {
+      return NextResponse.json({ error: 'Time não encontrado' }, { status: 404 });
     }
 
     // Preparar dados para atualização
@@ -96,7 +103,7 @@ export const PATCH = withTenantIsolation(async (req, context) => {
     if (color !== undefined) updateData.color = color;
     if (isActive !== undefined) updateData.isActive = isActive;
 
-    const updated = await prisma.project.update({
+    const updated = await prisma.team.update({
       where: { id },
       data: updateData,
       select: {
@@ -109,49 +116,49 @@ export const PATCH = withTenantIsolation(async (req, context) => {
       }
     });
 
-    return NextResponse.json({ project: updated });
+    return NextResponse.json({ team: updated });
   } catch (error) {
-    console.error('Erro ao atualizar projeto:', error);
-    return NextResponse.json({ error: 'Erro ao atualizar projeto', details: String(error) }, { status: 500 });
+    console.error('Erro ao atualizar time:', error);
+    return NextResponse.json({ error: 'Erro ao atualizar time', details: String(error) }, { status: 500 });
   }
 });
 
-// DELETE /api/projects/[id] - Soft delete (desativar projeto)
+// DELETE /api/teams/[id] - Soft delete (desativar time)
 export const DELETE = withTenantIsolation(async (req, context) => {
   try {
     // Verificar permissão
-    const authCheck = await requirePermission('projects:delete')(req as any);
+    const authCheck = await requirePermission('teams:delete')(req as any);
     if (authCheck) return authCheck;
 
     const { pathname } = new URL(req.url);
     const id = pathname.split('/').pop();
     
     if (!id) {
-      return NextResponse.json({ error: 'ID do projeto é obrigatório' }, { status: 400 });
+      return NextResponse.json({ error: 'ID do time é obrigatório' }, { status: 400 });
     }
 
-    // Buscar projeto
-    const project = await prisma.project.findFirst({ 
+    // Buscar time
+    const team = await prisma.team.findFirst({ 
       where: { id, organizationId: context.organizationId },
       select: { id: true, name: true, description: true }
     });
 
-    if (!project) {
-      return NextResponse.json({ error: 'Projeto não encontrado' }, { status: 404 });
+    if (!team) {
+      return NextResponse.json({ error: 'Time não encontrado' }, { status: 404 });
     }
 
     // Soft delete - apenas desativar
-    await prisma.project.update({ 
+    await prisma.team.update({ 
       where: { id }, 
       data: { isActive: false } 
     });
 
     return NextResponse.json({ 
-      message: 'Projeto desativado com sucesso',
-      project: { id: project.id, name: project.name, description: project.description }
+      message: 'Time desativado com sucesso',
+      team: { id: team.id, name: team.name, description: team.description }
     });
   } catch (error) {
-    console.error('Erro ao desativar projeto:', error);
-    return NextResponse.json({ error: 'Erro ao desativar projeto', details: String(error) }, { status: 500 });
+    console.error('Erro ao desativar time:', error);
+    return NextResponse.json({ error: 'Erro ao desativar time', details: String(error) }, { status: 500 });
   }
 }); 

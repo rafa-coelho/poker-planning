@@ -1,18 +1,22 @@
 {
   "title": "Dashboard",
-  "welcome": "Welcome to Poker Planning Enterprise",
-  "description": "This is the dashboard page. Here you can manage your sessions, projects and reports.",
+  "description": "Manage your planning poker sessions",
+  "welcome": "Welcome to Poker Planning",
   "hello": "Hello, {{name}}",
   "logout": "Logout",
   "navigation": {
     "dashboard": "Dashboard",
     "sessions": "Sessions",
+    "users": "Users",
+    "teams": "Teams",
     "projects": "Projects",
     "reports": "Reports"
   },
   "breadcrumbs": {
     "dashboard": "Dashboard",
     "sessions": "Sessions",
+    "users": "Users",
+    "teams": "Teams",
     "new": "New Session",
     "projects": "Projects",
     "reports": "Reports"
@@ -22,15 +26,278 @@
     "profile": "Profile",
     "settings": "Settings"
   },
+  "users": {
+    "title": "Users",
+    "description": "Manage users in your organization",
+    "new": "New User",
+    "edit": "Edit User",
+    "delete": "Deactivate User",
+    "activate": "Activate User",
+    "view": "View User",
+    "viewAll": "View All",
+    "noUsers": "No users found",
+    "createFirst": "Start by adding the first user to your organization",
+    "createUser": "Add User",
+    "searchPlaceholder": "Search by name or email...",
+    "filters": {
+      "allRoles": "All Roles",
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "lastLogin": "Last Login",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Full name of the user",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "role": "Role",
+      "rolePlaceholder": "Select a role",
+      "isActive": "Active User",
+      "create": "Add User",
+      "creating": "Adding...",
+      "update": "Update User",
+      "updating": "Updating...",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "roles": {
+      "SUPER_ADMIN": "Super Administrator",
+      "ADMIN": "Administrator",
+      "MEMBER": "Member",
+      "VIEWER": "Viewer"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Deactivate",
+      "activate": "Activate",
+      "view": "View",
+      "confirmDelete": "Are you sure you want to deactivate this user?",
+      "confirmActivate": "Are you sure you want to activate this user?"
+    },
+    "errors": {
+      "loadUsers": "Error loading users",
+      "loadUser": "Error loading user",
+      "createUser": "Error creating user",
+      "updateUser": "Error updating user",
+      "deleteUser": "Error deactivating user",
+      "activateUser": "Error activating user",
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email",
+      "roleRequired": "Role is required",
+      "userExists": "User already exists in the organization",
+      "insufficientPermissions": "Insufficient permissions",
+      "cannotDeleteSelf": "You cannot deactivate your own account",
+      "cannotChangeRole": "You don't have permission to change this user's role",
+      "unknown": "Unknown error",
+      "notFound": "User not found"
+    },
+    "success": {
+      "created": "User created successfully",
+      "updated": "User updated successfully",
+      "deleted": "User deactivated successfully",
+      "activated": "User activated successfully"
+    }
+  },
+  "teams": {
+    "title": "Teams",
+    "description": "Manage teams in your organization",
+    "new": "New Team",
+    "edit": "Edit Team",
+    "delete": "Deactivate Team",
+    "activate": "Activate Team",
+    "view": "View Team",
+    "viewAll": "View All",
+    "noTeams": "No teams found",
+    "createFirst": "Start by creating the first team in your organization",
+    "createTeam": "Create Team",
+    "searchPlaceholder": "Search by name or description...",
+    "filters": {
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "members": "Members",
+      "projects": "Projects",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Team name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the purpose of this team...",
+      "color": "Color",
+      "colorPlaceholder": "#3B82F6",
+      "isActive": "Active Team",
+      "create": "Create Team",
+      "creating": "Creating...",
+      "update": "Update Team",
+      "updating": "Updating...",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Deactivate",
+      "activate": "Activate",
+      "view": "View",
+      "manageMembers": "Manage Members",
+      "confirmDelete": "Are you sure you want to deactivate this team?",
+      "confirmActivate": "Are you sure you want to activate this team?"
+    },
+    "members": {
+      "title": "Team Members",
+      "addMember": "Add Member",
+      "removeMember": "Remove Member",
+      "changeRole": "Change Role",
+      "noMembers": "No members found",
+      "roles": {
+        "ADMIN": "Administrator",
+        "MEMBER": "Member",
+        "VIEWER": "Viewer"
+      }
+    },
+    "errors": {
+      "loadTeams": "Error loading teams",
+      "loadTeam": "Error loading team",
+      "createTeam": "Error creating team",
+      "updateTeam": "Error updating team",
+      "deleteTeam": "Error deactivating team",
+      "activateTeam": "Error activating team",
+      "nameRequired": "Name is required",
+      "teamExists": "A team with this name already exists in the organization",
+      "insufficientPermissions": "Insufficient permissions",
+      "unknown": "Unknown error",
+      "notFound": "Team not found"
+    },
+    "success": {
+      "created": "Team created successfully",
+      "updated": "Team updated successfully",
+      "deleted": "Team deactivated successfully",
+      "activated": "Team activated successfully"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "Manage projects in your organization",
+    "new": "New Project",
+    "edit": "Edit Project",
+    "delete": "Deactivate Project",
+    "activate": "Activate Project",
+    "view": "View Project",
+    "viewAll": "View All",
+    "noProjects": "No projects found",
+    "createFirst": "Start by creating the first project in your organization",
+    "createProject": "Create Project",
+    "searchPlaceholder": "Search by name or description...",
+    "filters": {
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "members": "Members",
+      "sessions": "Sessions",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Project name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the purpose of this project...",
+      "color": "Color",
+      "colorPlaceholder": "#3B82F6",
+      "isActive": "Active Project",
+      "create": "Create Project",
+      "creating": "Creating...",
+      "update": "Update Project",
+      "updating": "Updating...",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Deactivate",
+      "activate": "Activate",
+      "view": "View",
+      "manageMembers": "Manage Members",
+      "confirmDelete": "Are you sure you want to deactivate this project?",
+      "confirmActivate": "Are you sure you want to activate this project?"
+    },
+    "members": {
+      "title": "Project Members",
+      "addMember": "Add Member",
+      "removeMember": "Remove Member",
+      "changeRole": "Change Role",
+      "noMembers": "No members found",
+      "roles": {
+        "ADMIN": "Administrator",
+        "MEMBER": "Member",
+        "VIEWER": "Viewer"
+      }
+    },
+    "errors": {
+      "loadProjects": "Error loading projects",
+      "loadProject": "Error loading project",
+      "createProject": "Error creating project",
+      "updateProject": "Error updating project",
+      "deleteProject": "Error deactivating project",
+      "activateProject": "Error activating project",
+      "nameRequired": "Name is required",
+      "projectExists": "A project with this name already exists in the organization",
+      "insufficientPermissions": "Insufficient permissions",
+      "unknown": "Unknown error",
+      "notFound": "Project not found"
+    },
+    "success": {
+      "created": "Project created successfully",
+      "updated": "Project updated successfully",
+      "deleted": "Project deactivated successfully",
+      "activated": "Project activated successfully"
+    }
+  },
   "newSession": {
     "title": "New Session",
     "description": "Create a new planning poker session for your team",
     "name": "Session Name",
-    "namePlaceholder": "Ex: Sprint Planning - Backend API",
+    "namePlaceholder": "Ex: Sprint Planning - API Backend",
     "descriptionLabel": "Description",
     "descriptionPlaceholder": "Describe the purpose of this session...",
     "votingMode": "Voting Mode",
-    "autoReveal": "Automatically reveal votes",
+    "autoReveal": "Auto-reveal votes",
     "allowObservers": "Allow observers",
     "cancel": "Cancel",
     "create": "Create Session",
@@ -51,7 +318,8 @@
     "title": "Statistics",
     "sessions": "Sessions",
     "participants": "Participants",
-    "tickets": "Tickets"
+    "tickets": "Tickets",
+    "users": "Users"
   },
   "sessions": {
     "title": "Sessions",
@@ -84,7 +352,8 @@
     "disabled": "Disabled",
     "enabled": "Enabled",
     "allowed": "Allowed",
-    "blocked": "Blocked"
+    "blocked": "Blocked",
+    "noParticipants": "No participants found"
   },
   "status": {
     "active": "Active",
@@ -100,6 +369,18 @@
     "moderator": "Moderator",
     "voter": "Voter",
     "observer": "Observer"
+  },
+  "form": {
+    "name": "Session Name",
+    "description": "Description",
+    "votingMode": "Voting Mode",
+    "autoReveal": "Auto-reveal votes",
+    "allowObservers": "Allow observers",
+    "create": "Create Session",
+    "creating": "Creating...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving..."
   },
   "errors": {
     "loadSessions": "Error loading sessions",
@@ -157,15 +438,11 @@
     "decisionModal": {
       "title": "Set Final Estimate",
       "description": "Set the final estimate for this ticket",
-      "averageLabel": "Average of votes",
+      "averageLabel": "Average votes",
       "finalLabel": "Final estimate",
       "confirm": "Confirm",
       "cancel": "Cancel"
     }
-  },
-  "projects": {
-    "title": "Projects",
-    "description": "Organize your projects and teams"
   },
   "reports": {
     "title": "Reports",
@@ -184,8 +461,5 @@
     "showing": "Showing {{from}} to {{to}} of {{total}} results",
     "previous": "Previous",
     "next": "Next"
-  },
-  "session": {
-    "noParticipants": "No participants found"
   }
 }

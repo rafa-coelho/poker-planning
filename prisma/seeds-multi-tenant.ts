@@ -185,7 +185,8 @@ async function main() {
       description: 'Desenvolvimento da plataforma de e-commerce',
       organizationId: techCorp.id,
       color: '#3B82F6',
-      isActive: true
+      isActive: true,
+      createdById: techCorpAdmin.id
     }
   })
 
@@ -196,7 +197,8 @@ async function main() {
       description: 'Aplicativo mobile principal',
       organizationId: startupXyz.id,
       color: '#10B981',
-      isActive: true
+      isActive: true,
+      createdById: startupAdmin.id
     }
   })
 
@@ -206,7 +208,8 @@ async function main() {
       description: 'API REST para o mobile app',
       organizationId: startupXyz.id,
       color: '#F59E0B',
-      isActive: true
+      isActive: true,
+      createdById: startupAdmin.id
     }
   })
 
@@ -217,7 +220,8 @@ async function main() {
       description: 'Sistema de gestão de clientes',
       organizationId: enterpriseInc.id,
       color: '#8B5CF6',
-      isActive: true
+      isActive: true,
+      createdById: enterpriseAdmin.id
     }
   })
 
@@ -227,7 +231,8 @@ async function main() {
       description: 'Dashboard de analytics e relatórios',
       organizationId: enterpriseInc.id,
       color: '#EF4444',
-      isActive: true
+      isActive: true,
+      createdById: enterpriseAdmin.id
     }
   })
 

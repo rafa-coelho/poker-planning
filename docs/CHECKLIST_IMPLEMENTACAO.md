@@ -5,11 +5,11 @@
 ```
 🏗️  FASE 1: Fundação & Infraestrutura     [x] 43/43 tarefas
 💾 FASE 2: Persistência & Core Features   [x] 40/40 tarefas  
-👥 FASE 2.5: Gestão de Usuários e Times   [ ] 0/48 tarefas
+👥 FASE 2.5: Gestão de Usuários e Times   [x] 36/48 tarefas
 🏢 FASE 3: Features Empresariais          [ ] 0/60 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [x] 83/211 tarefas concluídas
+Total: [x] 119/211 tarefas concluídas
 ```
 
 ---
@@ -325,57 +325,57 @@ Organization
 - [x] Testar isolamento de permissões por organização
 - [x] Documentar hierarquia de roles e permissões
 
-### 2.5.2 Gestão de Usuários (Dia 22-23)
-- [ ] Criar API `/api/users` (CRUD) para gestão de usuários
-- [ ] Implementar endpoint GET `/api/users` (listar usuários da organização)
-- [ ] Implementar endpoint POST `/api/users` (criar usuário)
-- [ ] Implementar endpoint PUT `/api/users/[id]` (atualizar usuário)
-- [ ] Implementar endpoint DELETE `/api/users/[id]` (desativar usuário)
-- [ ] Criar página de gestão de usuários no dashboard
-- [ ] Implementar interface para listar usuários
-- [ ] Criar formulário para adicionar/editar usuários
-- [ ] Implementar sistema de ativação/desativação
-- [ ] Adicionar validação de permissões (apenas admins)
-- [ ] Testar CRUD completo de usuários
-- [ ] Implementar auditoria de ações administrativas
+### 2.5.2 Gestão de Usuários (Dia 22-23) ✅ CONCLUÍDO
+- [x] Criar API `/api/users` (CRUD) para gestão de usuários
+- [x] Implementar endpoint GET `/api/users` (listar usuários da organização)
+- [x] Implementar endpoint POST `/api/users` (criar usuário)
+- [x] Implementar endpoint PUT `/api/users/[id]` (atualizar usuário)
+- [x] Implementar endpoint DELETE `/api/users/[id]` (desativar usuário)
+- [x] Criar página de gestão de usuários no dashboard
+- [x] Implementar interface para listar usuários
+- [x] Criar formulário para adicionar/editar usuários
+- [x] Implementar sistema de ativação/desativação
+- [x] Adicionar validação de permissões (apenas admins)
+- [x] Testar CRUD completo de usuários
+- [x] Implementar auditoria de ações administrativas
 
-### 2.5.3 Sistema de Times (Dia 24-25)
-- [ ] Criar model Team no Prisma
-- [ ] Criar model TeamMember no Prisma
-- [ ] Implementar API `/api/teams` (CRUD)
-- [ ] Criar associação Teams ↔ Users
-- [ ] Implementar permissões por time
-- [ ] Criar interface de gestão de times
-- [ ] Criar links de convite para times
-- [ ] Criar filtros por time no dashboard
-- [ ] Testar isolamento de dados por time
-- [ ] Implementar auditoria de membros de time
-- [ ] Criar estatísticas por time
-- [ ] Documentar estrutura de times
+### 2.5.3 Sistema de Times (Dia 24-25) ✅ CONCLUÍDO
+- [x] Criar model Team no Prisma
+- [x] Criar model TeamMember no Prisma
+- [x] Implementar API `/api/teams` (CRUD)
+- [x] Criar associação Teams ↔ Users
+- [x] Implementar permissões por time
+- [x] Criar interface de gestão de times
+- [x] Criar links de convite para times
+- [x] Criar filtros por time no dashboard
+- [x] Testar isolamento de dados por time
+- [x] Implementar auditoria de membros de time
+- [x] Criar estatísticas por time
+- [x] Documentar estrutura de times
 
-### 2.5.4 Sistema de Projetos (Dia 26-27)
-- [ ] Criar model Project no Prisma
-- [ ] Criar model ProjectMember no Prisma
-- [ ] Implementar API `/api/projects` (CRUD)
-- [ ] Criar associação Projects ↔ Teams
-- [ ] Implementar permissões por projeto
-- [ ] Criar interface de gestão de projetos
-- [ ] Criar links de convite para projetos
-- [ ] Criar filtros por projeto no dashboard
-- [ ] Testar isolamento de dados por projeto
-- [ ] Implementar auditoria de membros de projeto
-- [ ] Criar estatísticas por projeto
-- [ ] Documentar estrutura de projetos
+### 2.5.4 Sistema de Projetos (Dia 26-27) ✅ CONCLUÍDO
+- [x] Criar model Project no Prisma
+- [x] Criar model ProjectMember no Prisma
+- [x] Implementar API `/api/projects` (CRUD)
+- [x] Criar associação Projects ↔ Teams
+- [x] Implementar permissões por projeto
+- [x] Criar interface de gestão de projetos
+- [x] Criar links de convite para projetos
+- [x] Criar filtros por projeto no dashboard
+- [x] Testar isolamento de dados por projeto
+- [x] Implementar auditoria de membros de projeto
+- [x] Criar estatísticas por projeto
+- [x] Documentar estrutura de projetos
 
-### ✅ Critérios de Aceitação - Fase 2.5
-- [ ] Sistema de roles e permissões implementado
-- [ ] CRUD completo de usuários funcionando
-- [ ] Gestão de times implementada
-- [ ] Gestão de projetos implementada
-- [ ] Isolamento de dados por organização/time/projeto
-- [ ] Auditoria de ações administrativas
-- [ ] Interface de gestão polida
-- [ ] Permissões granulares funcionando
+### ✅ Critérios de Aceitação - Fase 2.5 ✅ CONCLUÍDO
+- [x] Sistema de roles e permissões implementado
+- [x] CRUD completo de usuários funcionando
+- [x] Gestão de times implementada
+- [x] Gestão de projetos implementada
+- [x] Isolamento de dados por organização/time/projeto
+- [x] Auditoria de ações administrativas
+- [x] Interface de gestão polida
+- [x] Permissões granulares funcionando
 
 ---
 
@@ -585,11 +585,11 @@ Organization
 
 ### Marco 2.5 - Gestão de Usuários e Times (Fim Semana 4.5)
 **Critérios:**
-- [ ] Sistema de roles e permissões implementado
-- [ ] CRUD completo de usuários funcionando
-- [ ] Gestão de times implementada
-- [ ] Gestão de projetos implementada
-- [ ] Isolamento de dados por organização/time/projeto
+- [x] Sistema de roles e permissões implementado
+- [x] CRUD completo de usuários funcionando
+- [x] Gestão de times implementada
+- [x] Gestão de projetos implementada
+- [x] Isolamento de dados por organização/time/projeto
 
 ### Marco 3 - Solução Empresarial (Fim Semana 6)
 **Critérios:**

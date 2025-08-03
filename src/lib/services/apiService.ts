@@ -579,6 +579,225 @@ class ApiService {
       method: 'DELETE'
     });
   }
+
+  // ===== USUÁRIOS =====
+
+  /**
+   * Lista usuários da organização
+   */
+  async listUsers(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+    isActive?: boolean;
+  } = {}): Promise<ApiResponse<{
+    users: Array<{
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      isActive: boolean;
+      lastLoginAt: string | null;
+      createdAt: string;
+      avatar?: string;
+    }>;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+    };
+  }>> {
+    const searchParams = new URLSearchParams();
+    
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+    if (params.search) searchParams.append('search', params.search);
+    if (params.role) searchParams.append('role', params.role);
+    if (params.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
+
+    const queryString = searchParams.toString();
+    const endpoint = `/api/users${queryString ? `?${queryString}` : ''}`;
+
+    return this.request<{
+      users: Array<{
+        id: string;
+        name: string;
+        email: string;
+        role: string;
+        isActive: boolean;
+        lastLoginAt: string | null;
+        createdAt: string;
+        avatar?: string;
+      }>;
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        pages: number;
+      };
+    }>(endpoint);
+  }
+
+  /**
+   * Busca um usuário específico por ID
+   */
+  async getUser(userId: string): Promise<ApiResponse<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    lastLoginAt: string | null;
+    createdAt: string;
+    avatar?: string;
+    locale: string;
+    timezone: string;
+  }>> {
+    return this.request<{
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      isActive: boolean;
+      lastLoginAt: string | null;
+      createdAt: string;
+      avatar?: string;
+      locale: string;
+      timezone: string;
+    }>(`/api/users/${userId}`);
+  }
+
+  /**
+   * Cria um novo usuário
+   */
+  async createUser(data: {
+    name: string;
+    email: string;
+    role: string;
+    isActive?: boolean;
+  }): Promise<ApiResponse<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    createdAt: string;
+  }>> {
+    return this.request<{
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      isActive: boolean;
+      createdAt: string;
+    }>('/api/users', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Atualiza um usuário existente
+   */
+  async updateUser(userId: string, data: {
+    name?: string;
+    role?: string;
+    isActive?: boolean;
+  }): Promise<ApiResponse<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    lastLoginAt: string | null;
+    updatedAt: string;
+  }>> {
+    return this.request<{
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      isActive: boolean;
+      lastLoginAt: string | null;
+      updatedAt: string;
+    }>(`/api/users/${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Desativa um usuário (soft delete)
+   */
+  async deleteUser(userId: string): Promise<ApiResponse<{
+    message: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }>> {
+    return this.request<{
+      message: string;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+      };
+    }>(`/api/users/${userId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // ===== MÉTODOS GENÉRICOS =====
+
+  /**
+   * Método genérico GET
+   */
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint);
+  }
+
+  /**
+   * Método genérico POST
+   */
+  async post<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Método genérico PUT
+   */
+  async put<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Método genérico PATCH
+   */
+  async patch<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Método genérico DELETE
+   */
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'DELETE'
+    });
+  }
 }
 
 export { ApiService };

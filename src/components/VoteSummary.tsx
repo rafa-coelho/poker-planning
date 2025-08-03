@@ -5,17 +5,21 @@ import { useTranslation } from "react-i18next";
 
 interface VoteSummaryProps {
     votes: string[];
+    average?: number;
+    totalParticipants?: number;
+    votedCount?: number;
 }
 
-export default function VoteSummary ({ votes }: VoteSummaryProps) {
+export default function VoteSummary ({ votes, average: propAverage, totalParticipants, votedCount }: VoteSummaryProps) {
     const { t } = useTranslation("common");
 
     const validVotes = votes.filter(v => !isNaN(Number(v)) && Number(v) > 0).map(v => Number(v));
 
-
-    const average = validVotes.length > 0
-        ? (validVotes.reduce((sum, val) => sum + val, 0) / validVotes.length).toFixed(1)
-        : "N/A";
+    const average = propAverage !== undefined 
+        ? propAverage.toFixed(1)
+        : validVotes.length > 0
+            ? (validVotes.reduce((sum, val) => sum + val, 0) / validVotes.length).toFixed(1)
+            : "N/A";
 
 
 

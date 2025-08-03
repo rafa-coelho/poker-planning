@@ -30,6 +30,7 @@ model Organization {
   sessions    Session[]
   invites     Invite[]
   projects    Project[]
+  teams       Team[]
   
   @@map("organizations")
 }
@@ -65,9 +66,12 @@ model User {
   
   // Relations
   createdSessions Session[] @relation("SessionCreator")
+  createdTeams   Team[] @relation("TeamCreator")
+  createdProjects Project[] @relation("ProjectCreator")
   participants   SessionParticipant[]
   invitesSent    Invite[] @relation("InviteCreator")
   projectMembers ProjectMember[]
+  teamMembers    TeamMember[]
   
   @@map("users")
 }
@@ -150,6 +154,10 @@ model Project {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
+  // Creator
+  createdById    String
+  createdBy      User        @relation("ProjectCreator", fields: [createdById], references: [id])
+  
   // Audit fields
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -157,8 +165,57 @@ model Project {
   // Relations
   members        ProjectMember[]
   sessions       Session[]
+  teams          Team[]
   
   @@map("projects")
+}
+
+// 👥 Times
+model Team {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  color          String?  // Para UI
+  isActive       Boolean  @default(true)
+  
+  // Multi-tenancy
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Creator
+  createdById    String
+  createdBy      User        @relation("TeamCreator", fields: [createdById], references: [id])
+  
+  // Audit fields
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  members        TeamMember[]
+  projects       Project[]    // Times podem estar associados a projetos
+  
+  @@map("teams")
+}
+
+// 👥 Membros de Time
+model TeamMember {
+  id        String      @id @default(cuid())
+  
+  // Relations
+  teamId    String
+  team      Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Member data
+  role      TeamRole    @default(MEMBER)
+  
+  // Audit fields
+  joinedAt  DateTime    @default(now())
+  
+  @@unique([teamId, userId])
+  @@map("team_members")
 }
 
 // 👥 Membros de Projeto
@@ -274,6 +331,12 @@ enum ParticipantRole {
 }
 
 enum ProjectRole {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum TeamRole {
   ADMIN
   MEMBER
   VIEWER

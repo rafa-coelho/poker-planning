@@ -3,11 +3,11 @@ import { prisma } from '@/lib/db'
 import { withTenantIsolation } from '@/lib/middleware/tenant'
 import { requirePermission } from '@/lib/middleware/authorization'
 
-// GET /api/projects - Lista projetos da organização
+// GET /api/teams - Lista times da organização
 export const GET = withTenantIsolation(async (req, context) => {
   try {
     // Verificar permissão
-    const authCheck = await requirePermission('projects:read')(req as any);
+    const authCheck = await requirePermission('teams:read')(req as any);
     if (authCheck) return authCheck;
 
     const { searchParams } = new URL(req.url);
@@ -32,9 +32,9 @@ export const GET = withTenantIsolation(async (req, context) => {
       where.isActive = isActive === 'true';
     }
 
-    // Buscar projetos com paginação
-    const [projects, total] = await Promise.all([
-      prisma.project.findMany({
+    // Buscar times com paginação
+    const [teams, total] = await Promise.all([
+      prisma.team.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip,
@@ -57,18 +57,18 @@ export const GET = withTenantIsolation(async (req, context) => {
           _count: {
             select: {
               members: true,
-              sessions: true
+              projects: true
             }
           }
         }
       }),
-      prisma.project.count({ where })
+      prisma.team.count({ where })
     ]);
 
     const pages = Math.ceil(total / limit);
 
     return NextResponse.json({ 
-      projects,
+      teams,
       pagination: {
         page,
         limit,
@@ -77,16 +77,16 @@ export const GET = withTenantIsolation(async (req, context) => {
       }
     });
   } catch (error) {
-    console.error('Erro ao buscar projetos:', error);
-    return NextResponse.json({ error: 'Erro ao buscar projetos', details: String(error) }, { status: 500 });
+    console.error('Erro ao buscar times:', error);
+    return NextResponse.json({ error: 'Erro ao buscar times', details: String(error) }, { status: 500 });
   }
 });
 
-// POST /api/projects - Criar novo projeto
+// POST /api/teams - Criar novo time
 export const POST = withTenantIsolation(async (req, context) => {
   try {
     // Verificar permissão
-    const authCheck = await requirePermission('projects:create')(req as any);
+    const authCheck = await requirePermission('teams:create')(req as any);
     if (authCheck) return authCheck;
 
     const body = await req.json();
@@ -97,20 +97,20 @@ export const POST = withTenantIsolation(async (req, context) => {
       return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 });
     }
 
-    // Verificar se já existe projeto com o mesmo nome na organização
-    const existingProject = await prisma.project.findFirst({ 
+    // Verificar se já existe time com o mesmo nome na organização
+    const existingTeam = await prisma.team.findFirst({ 
       where: { 
         name, 
         organizationId: context.organizationId 
       } 
     });
     
-    if (existingProject) {
-      return NextResponse.json({ error: 'Já existe um projeto com este nome na organização' }, { status: 409 });
+    if (existingTeam) {
+      return NextResponse.json({ error: 'Já existe um time com este nome na organização' }, { status: 409 });
     }
 
-    // Criar projeto
-    const project = await prisma.project.create({
+    // Criar time
+    const team = await prisma.team.create({
       data: {
         name,
         description,
@@ -136,9 +136,9 @@ export const POST = withTenantIsolation(async (req, context) => {
       }
     });
 
-    return NextResponse.json({ project }, { status: 201 });
+    return NextResponse.json({ team }, { status: 201 });
   } catch (error) {
-    console.error('Erro ao criar projeto:', error);
-    return NextResponse.json({ error: 'Erro ao criar projeto', details: String(error) }, { status: 500 });
+    console.error('Erro ao criar time:', error);
+    return NextResponse.json({ error: 'Erro ao criar time', details: String(error) }, { status: 500 });
   }
 }); 

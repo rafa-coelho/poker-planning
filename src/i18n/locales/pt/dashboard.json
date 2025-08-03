@@ -7,12 +7,16 @@
   "navigation": {
     "dashboard": "Dashboard",
     "sessions": "Sessões",
+    "users": "Usuários",
+    "teams": "Times",
     "projects": "Projetos",
     "reports": "Relatórios"
   },
   "breadcrumbs": {
     "dashboard": "Dashboard",
     "sessions": "Sessões",
+    "users": "Usuários",
+    "teams": "Times",
     "new": "Nova Sessão",
     "projects": "Projetos",
     "reports": "Relatórios"
@@ -21,6 +25,269 @@
     "user": "Usuário",
     "profile": "Perfil",
     "settings": "Configurações"
+  },
+  "users": {
+    "title": "Usuários",
+    "description": "Gerencie os usuários da sua organização",
+    "new": "Novo Usuário",
+    "edit": "Editar Usuário",
+    "delete": "Desativar Usuário",
+    "activate": "Ativar Usuário",
+    "view": "Ver Usuário",
+    "viewAll": "Ver Todos",
+    "noUsers": "Nenhum usuário encontrado",
+    "createFirst": "Comece adicionando o primeiro usuário à sua organização",
+    "createUser": "Adicionar Usuário",
+    "searchPlaceholder": "Buscar por nome ou email...",
+    "filters": {
+      "allRoles": "Todas as Roles",
+      "allStatuses": "Todos os Status",
+      "active": "Ativos",
+      "inactive": "Inativos"
+    },
+    "table": {
+      "name": "Nome",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "lastLogin": "Último Login",
+      "createdAt": "Criado em",
+      "actions": "Ações"
+    },
+    "form": {
+      "name": "Nome",
+      "namePlaceholder": "Nome completo do usuário",
+      "email": "Email",
+      "emailPlaceholder": "email@exemplo.com",
+      "role": "Role",
+      "rolePlaceholder": "Selecione uma role",
+      "isActive": "Usuário Ativo",
+      "create": "Adicionar Usuário",
+      "creating": "Adicionando...",
+      "update": "Atualizar Usuário",
+      "updating": "Atualizando...",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "roles": {
+      "SUPER_ADMIN": "Super Administrador",
+      "ADMIN": "Administrador",
+      "MEMBER": "Membro",
+      "VIEWER": "Visualizador"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Desativar",
+      "activate": "Ativar",
+      "view": "Ver",
+      "confirmDelete": "Tem certeza que deseja desativar este usuário?",
+      "confirmActivate": "Tem certeza que deseja ativar este usuário?"
+    },
+    "errors": {
+      "loadUsers": "Erro ao carregar usuários",
+      "loadUser": "Erro ao carregar usuário",
+      "createUser": "Erro ao criar usuário",
+      "updateUser": "Erro ao atualizar usuário",
+      "deleteUser": "Erro ao desativar usuário",
+      "activateUser": "Erro ao ativar usuário",
+      "nameRequired": "Nome é obrigatório",
+      "emailRequired": "Email é obrigatório",
+      "emailInvalid": "Email inválido",
+      "roleRequired": "Role é obrigatória",
+      "userExists": "Usuário já existe na organização",
+      "insufficientPermissions": "Permissões insuficientes",
+      "cannotDeleteSelf": "Você não pode desativar sua própria conta",
+      "cannotChangeRole": "Você não tem permissão para alterar a role deste usuário",
+      "unknown": "Erro desconhecido",
+      "notFound": "Usuário não encontrado"
+    },
+    "success": {
+      "created": "Usuário criado com sucesso",
+      "updated": "Usuário atualizado com sucesso",
+      "deleted": "Usuário desativado com sucesso",
+      "activated": "Usuário ativado com sucesso"
+    }
+  },
+  "teams": {
+    "title": "Times",
+    "description": "Gerencie os times da sua organização",
+    "new": "Novo Time",
+    "edit": "Editar Time",
+    "delete": "Desativar Time",
+    "activate": "Ativar Time",
+    "view": "Ver Time",
+    "viewAll": "Ver Todos",
+    "noTeams": "Nenhum time encontrado",
+    "createFirst": "Comece criando o primeiro time da sua organização",
+    "createTeam": "Criar Time",
+    "searchPlaceholder": "Buscar por nome ou descrição...",
+    "filters": {
+      "allStatuses": "Todos os Status",
+      "active": "Ativos",
+      "inactive": "Inativos"
+    },
+    "table": {
+      "name": "Nome",
+      "description": "Descrição",
+      "members": "Membros",
+      "projects": "Projetos",
+      "status": "Status",
+      "createdAt": "Criado em",
+      "actions": "Ações"
+    },
+    "form": {
+      "name": "Nome",
+      "namePlaceholder": "Nome do time",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descreva o propósito deste time...",
+      "color": "Cor",
+      "colorPlaceholder": "#3B82F6",
+      "isActive": "Time Ativo",
+      "create": "Criar Time",
+      "creating": "Criando...",
+      "update": "Atualizar Time",
+      "updating": "Atualizando...",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Desativar",
+      "activate": "Ativar",
+      "view": "Ver",
+      "manageMembers": "Gerenciar Membros",
+      "confirmDelete": "Tem certeza que deseja desativar este time?",
+      "confirmActivate": "Tem certeza que deseja ativar este time?"
+    },
+    "members": {
+      "title": "Membros do Time",
+      "addMember": "Adicionar Membro",
+      "removeMember": "Remover Membro",
+      "changeRole": "Alterar Role",
+      "noMembers": "Nenhum membro encontrado",
+      "roles": {
+        "ADMIN": "Administrador",
+        "MEMBER": "Membro",
+        "VIEWER": "Visualizador"
+      }
+    },
+    "errors": {
+      "loadTeams": "Erro ao carregar times",
+      "loadTeam": "Erro ao carregar time",
+      "createTeam": "Erro ao criar time",
+      "updateTeam": "Erro ao atualizar time",
+      "deleteTeam": "Erro ao desativar time",
+      "activateTeam": "Erro ao ativar time",
+      "nameRequired": "Nome é obrigatório",
+      "teamExists": "Já existe um time com este nome na organização",
+      "insufficientPermissions": "Permissões insuficientes",
+      "unknown": "Erro desconhecido",
+      "notFound": "Time não encontrado"
+    },
+    "success": {
+      "created": "Time criado com sucesso",
+      "updated": "Time atualizado com sucesso",
+      "deleted": "Time desativado com sucesso",
+      "activated": "Time ativado com sucesso"
+    }
+  },
+  "projects": {
+    "title": "Projetos",
+    "description": "Gerencie os projetos da sua organização",
+    "new": "Novo Projeto",
+    "edit": "Editar Projeto",
+    "delete": "Desativar Projeto",
+    "activate": "Ativar Projeto",
+    "view": "Ver Projeto",
+    "viewAll": "Ver Todos",
+    "noProjects": "Nenhum projeto encontrado",
+    "createFirst": "Comece criando o primeiro projeto da sua organização",
+    "createProject": "Criar Projeto",
+    "searchPlaceholder": "Buscar por nome ou descrição...",
+    "filters": {
+      "allStatuses": "Todos os Status",
+      "active": "Ativos",
+      "inactive": "Inativos"
+    },
+    "table": {
+      "name": "Nome",
+      "description": "Descrição",
+      "members": "Membros",
+      "sessions": "Sessões",
+      "status": "Status",
+      "createdAt": "Criado em",
+      "actions": "Ações"
+    },
+    "form": {
+      "name": "Nome",
+      "namePlaceholder": "Nome do projeto",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descreva o propósito deste projeto...",
+      "color": "Cor",
+      "colorPlaceholder": "#3B82F6",
+      "isActive": "Projeto Ativo",
+      "create": "Criar Projeto",
+      "creating": "Criando...",
+      "update": "Atualizar Projeto",
+      "updating": "Atualizando...",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Desativar",
+      "activate": "Ativar",
+      "view": "Ver",
+      "manageMembers": "Gerenciar Membros",
+      "confirmDelete": "Tem certeza que deseja desativar este projeto?",
+      "confirmActivate": "Tem certeza que deseja ativar este projeto?"
+    },
+    "members": {
+      "title": "Membros do Projeto",
+      "addMember": "Adicionar Membro",
+      "removeMember": "Remover Membro",
+      "changeRole": "Alterar Role",
+      "noMembers": "Nenhum membro encontrado",
+      "roles": {
+        "ADMIN": "Administrador",
+        "MEMBER": "Membro",
+        "VIEWER": "Visualizador"
+      }
+    },
+    "errors": {
+      "loadProjects": "Erro ao carregar projetos",
+      "loadProject": "Erro ao carregar projeto",
+      "createProject": "Erro ao criar projeto",
+      "updateProject": "Erro ao atualizar projeto",
+      "deleteProject": "Erro ao desativar projeto",
+      "activateProject": "Erro ao ativar projeto",
+      "nameRequired": "Nome é obrigatório",
+      "projectExists": "Já existe um projeto com este nome na organização",
+      "insufficientPermissions": "Permissões insuficientes",
+      "unknown": "Erro desconhecido",
+      "notFound": "Projeto não encontrado"
+    },
+    "success": {
+      "created": "Projeto criado com sucesso",
+      "updated": "Projeto atualizado com sucesso",
+      "deleted": "Projeto desativado com sucesso",
+      "activated": "Projeto ativado com sucesso"
+    }
   },
   "newSession": {
     "title": "Nova Sessão",
@@ -51,7 +318,8 @@
     "title": "Estatísticas",
     "sessions": "Sessões",
     "participants": "Participantes",
-    "tickets": "Tickets"
+    "tickets": "Tickets",
+    "users": "Usuários"
   },
   "sessions": {
     "title": "Sessões",
@@ -84,7 +352,8 @@
     "disabled": "Desabilitado",
     "enabled": "Habilitado",
     "allowed": "Permitido",
-    "blocked": "Bloqueado"
+    "blocked": "Bloqueado",
+    "noParticipants": "Nenhum participante encontrado"
   },
   "status": {
     "active": "Ativa",
@@ -188,8 +457,5 @@
     "showing": "Mostrando {{from}} a {{to}} de {{total}} resultados",
     "previous": "Anterior",
     "next": "Próxima"
-  },
-  "session": {
-    "noParticipants": "Nenhum participante encontrado"
   }
 }
