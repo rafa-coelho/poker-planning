@@ -5,10 +5,11 @@
 ```
 🏗️  FASE 1: Fundação & Infraestrutura     [x] 43/43 tarefas
 💾 FASE 2: Persistência & Core Features   [x] 40/40 tarefas  
-🏢 FASE 3: Features Empresariais          [ ] 0/24 tarefas
+👥 FASE 2.5: Gestão de Usuários e Times   [ ] 0/48 tarefas
+🏢 FASE 3: Features Empresariais          [ ] 0/60 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [x] 83/127 tarefas concluídas
+Total: [x] 83/211 tarefas concluídas
 ```
 
 ---
@@ -292,9 +293,153 @@ Total: [x] 83/127 tarefas concluídas
 
 ---
 
+## 👥 FASE 2.5: Gestão de Usuários e Times (Semana 4.5)
+
+### 🎯 Visão Geral do Fluxo Empresarial
+
+**Fluxo de Cadastro e Gestão:**
+1. **Criação de Organização**: Primeiro usuário cria organização (torna-se SUPER_ADMIN)
+2. **Gestão de Usuários**: SUPER_ADMIN e ADMINS podem convidar/gerenciar usuários
+3. **Estrutura Hierárquica**: 
+   - SUPER_ADMIN: Controle total da organização
+   - ADMIN: Gestão de usuários, times e projetos
+   - MEMBER: Participação em sessões e projetos
+   - VIEWER: Apenas visualização
+
+**Hierarquia de Dados:**
+```
+Organization
+├── Users (com roles)
+├── Teams
+│   └── TeamMembers
+└── Projects
+    └── ProjectMembers
+```
+
+### 2.5.1 Estrutura de Roles e Permissões (Dia 20-21)
+- [ ] Implementar enum UserRole no Prisma (SUPER_ADMIN, ADMIN, MEMBER, VIEWER)
+- [ ] Adicionar campo role ao model User
+- [ ] Criar middleware de autorização por role
+- [ ] Implementar validação de permissões por ação
+- [ ] Criar utility para verificação de roles
+- [ ] Testar isolamento de permissões por organização
+- [ ] Documentar hierarquia de roles e permissões
+
+### 2.5.2 Gestão de Usuários (Dia 22-23)
+- [ ] Criar API `/api/users` (CRUD) para gestão de usuários
+- [ ] Implementar endpoint GET `/api/users` (listar usuários da organização)
+- [ ] Implementar endpoint POST `/api/users` (criar usuário)
+- [ ] Implementar endpoint PUT `/api/users/[id]` (atualizar usuário)
+- [ ] Implementar endpoint DELETE `/api/users/[id]` (desativar usuário)
+- [ ] Criar página de gestão de usuários no dashboard
+- [ ] Implementar interface para listar usuários
+- [ ] Criar formulário para adicionar/editar usuários
+- [ ] Implementar sistema de ativação/desativação
+- [ ] Adicionar validação de permissões (apenas admins)
+- [ ] Testar CRUD completo de usuários
+- [ ] Implementar auditoria de ações administrativas
+
+### 2.5.3 Sistema de Times (Dia 24-25)
+- [ ] Criar model Team no Prisma
+- [ ] Criar model TeamMember no Prisma
+- [ ] Implementar API `/api/teams` (CRUD)
+- [ ] Criar associação Teams ↔ Users
+- [ ] Implementar permissões por time
+- [ ] Criar interface de gestão de times
+- [ ] Criar links de convite para times
+- [ ] Criar filtros por time no dashboard
+- [ ] Testar isolamento de dados por time
+- [ ] Implementar auditoria de membros de time
+- [ ] Criar estatísticas por time
+- [ ] Documentar estrutura de times
+
+### 2.5.4 Sistema de Projetos (Dia 26-27)
+- [ ] Criar model Project no Prisma
+- [ ] Criar model ProjectMember no Prisma
+- [ ] Implementar API `/api/projects` (CRUD)
+- [ ] Criar associação Projects ↔ Teams
+- [ ] Implementar permissões por projeto
+- [ ] Criar interface de gestão de projetos
+- [ ] Criar links de convite para projetos
+- [ ] Criar filtros por projeto no dashboard
+- [ ] Testar isolamento de dados por projeto
+- [ ] Implementar auditoria de membros de projeto
+- [ ] Criar estatísticas por projeto
+- [ ] Documentar estrutura de projetos
+
+### ✅ Critérios de Aceitação - Fase 2.5
+- [ ] Sistema de roles e permissões implementado
+- [ ] CRUD completo de usuários funcionando
+- [ ] Gestão de times implementada
+- [ ] Gestão de projetos implementada
+- [ ] Isolamento de dados por organização/time/projeto
+- [ ] Auditoria de ações administrativas
+- [ ] Interface de gestão polida
+- [ ] Permissões granulares funcionando
+
+---
+
 ## 🏢 FASE 3: Features Empresariais (Semanas 5-6)
 
-### 3.1 Múltiplos Modos de Votação (Dia 23-25)
+### 3.1 Gestão de Usuários e Permissões (Dia 23-25)
+- [ ] Implementar roles granulares (SUPER_ADMIN, ADMIN, MEMBER, VIEWER)
+- [ ] Criar API `/api/users` (CRUD) para gestão de usuários
+- [ ] Implementar middleware de autorização por role
+- [ ] Criar página de gestão de usuários no dashboard
+- [ ] Implementar convite de usuários por admins
+- [ ] Criar sistema de ativação/desativação de usuários
+- [ ] Implementar mudança de roles por admins
+- [ ] Criar validação de permissões por ação
+- [ ] Implementar auditoria de ações administrativas
+- [ ] Criar interface para gestão de permissões
+- [ ] Testar isolamento de permissões por organização
+- [ ] Documentar hierarquia de roles
+
+### 3.2 Sistema de Times e Projetos (Dia 26-28)
+- [ ] Criar model Team no Prisma
+- [ ] Criar model Project no Prisma
+- [ ] Criar model TeamMember no Prisma
+- [ ] Criar model ProjectMember no Prisma
+- [ ] Implementar API `/api/teams` (CRUD)
+- [ ] Implementar API `/api/projects` (CRUD)
+- [ ] Criar associação Teams ↔ Projects
+- [ ] Implementar permissões por time/projeto
+- [ ] Criar interface de gestão de times
+- [ ] Implementar convites específicos por time
+- [ ] Criar filtros por time no dashboard
+- [ ] Testar isolamento de dados por time
+
+### 3.3 Sistema de Convites Simplificado (Dia 29-31)
+
+#### 🎯 Fluxo Simplificado de Convites
+**Como funciona:**
+1. **Criador da sessão** gera link público para a sessão
+2. **Participante** acessa o link → página de entrada
+3. **Registro automático** com nome + email (sem senha)
+4. **Associação automática** à organização da sessão
+5. **Entrada direta** na sessão de poker
+
+**Vantagens:**
+- ✅ Zero atrito para participantes
+- ✅ Sem necessidade de criar conta
+- ✅ Registro automático na organização
+- ✅ Links fáceis de compartilhar
+- ✅ Controle de acesso por link
+
+- [ ] Criar links de convite para sessões (URL pública)
+- [ ] Implementar página de entrada na sessão com registro automático
+- [ ] Criar fluxo de registro simplificado (nome + email)
+- [ ] Implementar associação automática à organização da sessão
+- [ ] Criar validação de acesso por link de convite
+- [ ] Implementar expiração de links de convite
+- [ ] Adicionar contador de participantes por sessão
+- [ ] Criar interface para gerar/compartilhar links
+- [ ] Implementar notificação de novos participantes
+- [ ] Testar fluxo completo de convite por link
+- [ ] Documentar processo de convite simplificado
+- [ ] Implementar rate limiting para registros por link
+
+### 3.4 Múltiplos Modos de Votação (Dia 32-34)
 - [ ] Implementar enum VotingMode no Prisma
 - [ ] Criar configuração para modo T-shirt
 - [ ] Criar configuração para modo Linear
@@ -308,21 +453,7 @@ Total: [x] 83/127 tarefas concluídas
 - [ ] Implementar salvamento de configurações
 - [ ] Documentar cada modo de votação
 
-### 3.2 Sistema de Convites (Dia 26-28)
-- [ ] Criar model Invite no Prisma
-- [ ] Implementar API `/api/invites` (CRUD)
-- [ ] Criar geração de tokens de convite
-- [ ] Implementar expiração de convites
-- [ ] Criar endpoint público para aceitar convites
-- [ ] Implementar envio de emails (mock inicial)
-- [ ] Criar página de aceitação de convite
-- [ ] Implementar gestão de convites pendentes
-- [ ] Adicionar permissões por nível de usuário
-- [ ] Criar onboarding para novos usuários
-- [ ] Implementar notificações de convites
-- [ ] Testar fluxo completo de convites
-
-### 3.3 Relatórios e Analytics (Dia 29-31)
+### 3.5 Relatórios e Analytics (Dia 35-37)
 - [ ] Criar queries para relatórios de consenso
 - [ ] Implementar métricas de tempo de votação
 - [ ] Adicionar estatísticas de participação
@@ -331,32 +462,20 @@ Total: [x] 83/127 tarefas concluídas
 - [ ] Criar dashboard de analytics
 - [ ] Adicionar gráficos com Chart.js ou similar
 - [ ] Implementar filtros de período
-- [ ] Criar relatórios por projeto
+- [ ] Criar relatórios por projeto/time
 - [ ] Adicionar comparações temporais
 - [ ] Implementar cache de relatórios
 - [ ] Testar performance de relatórios
 
-### 3.4 Gestão de Times (Dia 32-34)
-- [ ] Criar model Project no Prisma
-- [ ] Criar model ProjectMember no Prisma
-- [ ] Implementar API `/api/projects` (CRUD)
-- [ ] Implementar associação usuários ↔ projetos
-- [ ] Criar permissões por projeto
-- [ ] Implementar filtros por time no dashboard
-- [ ] Criar UI para gestão de projetos
-- [ ] Adicionar cores e categorização
-- [ ] Implementar convites específicos por projeto
-- [ ] Criar estatísticas por projeto
-- [ ] Testar isolamento de permissões
-- [ ] Documentar estrutura de times
-
 ### ✅ Critérios de Aceitação - Fase 3
+- [ ] Sistema de gestão de usuários completo
+- [ ] Roles e permissões granulares funcionando
+- [ ] Gestão de times e projetos implementada
+- [ ] Sistema de convites por link funcionando
 - [ ] Múltiplos modos de votação funcionando
-- [ ] Sistema de convites operacional
 - [ ] Relatórios básicos disponíveis
-- [ ] Gestão de times implementada
-- [ ] Permissões granulares funcionando
-- [ ] Export de dados funcionando
+- [ ] Isolamento de dados por organização/time
+- [ ] Auditoria de ações administrativas
 - [ ] UI empresarial polida
 - [ ] Performance mantida com novas features
 
@@ -464,12 +583,20 @@ Total: [x] 83/127 tarefas concluídas
 - [x] WebSocket integrado com persistência
 - [x] CRUD completo implementado
 
+### Marco 2.5 - Gestão de Usuários e Times (Fim Semana 4.5)
+**Critérios:**
+- [ ] Sistema de roles e permissões implementado
+- [ ] CRUD completo de usuários funcionando
+- [ ] Gestão de times implementada
+- [ ] Gestão de projetos implementada
+- [ ] Isolamento de dados por organização/time/projeto
+
 ### Marco 3 - Solução Empresarial (Fim Semana 6)
 **Critérios:**
+- [ ] Sistema de gestão de usuários completo
 - [ ] Múltiplos modos de votação
-- [ ] Sistema de convites funcionando
+- [ ] Sistema de convites por link funcionando
 - [ ] Relatórios básicos implementados
-- [ ] Gestão de times operacional
 - [ ] Permissões granulares funcionando
 
 ### Marco 4 - Pronto para Produção (Fim Semana 8)
