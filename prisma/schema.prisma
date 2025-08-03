@@ -247,6 +247,7 @@ enum Plan {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
   MEMBER
   VIEWER

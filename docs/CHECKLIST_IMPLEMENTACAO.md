@@ -316,14 +316,14 @@ Organization
     └── ProjectMembers
 ```
 
-### 2.5.1 Estrutura de Roles e Permissões (Dia 20-21)
-- [ ] Implementar enum UserRole no Prisma (SUPER_ADMIN, ADMIN, MEMBER, VIEWER)
-- [ ] Adicionar campo role ao model User
-- [ ] Criar middleware de autorização por role
-- [ ] Implementar validação de permissões por ação
-- [ ] Criar utility para verificação de roles
-- [ ] Testar isolamento de permissões por organização
-- [ ] Documentar hierarquia de roles e permissões
+### 2.5.1 Estrutura de Roles e Permissões (Dia 20-21) ✅ CONCLUÍDO
+- [x] Implementar enum UserRole no Prisma (SUPER_ADMIN, ADMIN, MEMBER, VIEWER)
+- [x] Adicionar campo role ao model User
+- [x] Criar middleware de autorização por role
+- [x] Implementar validação de permissões por ação
+- [x] Criar utility para verificação de roles
+- [x] Testar isolamento de permissões por organização
+- [x] Documentar hierarquia de roles e permissões
 
 ### 2.5.2 Gestão de Usuários (Dia 22-23)
 - [ ] Criar API `/api/users` (CRUD) para gestão de usuários
