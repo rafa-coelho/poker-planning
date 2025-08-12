@@ -25,6 +25,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigation = [
     { name: t('navigation.dashboard'), href: '/dashboard', icon: 'home' },
     { name: t('navigation.sessions'), href: '/dashboard/sessions', icon: 'sessions' },
+    { name: t('navigation.users'), href: '/dashboard/users', icon: 'users' },
+    { name: t('navigation.teams'), href: '/dashboard/teams', icon: 'teams' },
     { name: t('navigation.projects'), href: '/dashboard/projects', icon: 'projects' },
     { name: t('navigation.reports'), href: '/dashboard/reports', icon: 'reports' },
   ];
@@ -44,6 +46,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       currentPath += `/${paths[i]}`;
       const name = paths[i] === 'dashboard' ? t('breadcrumbs.dashboard') : 
                    paths[i] === 'sessions' ? t('breadcrumbs.sessions') :
+                   paths[i] === 'users' ? t('breadcrumbs.users') :
+                   paths[i] === 'teams' ? t('breadcrumbs.teams') :
                    paths[i] === 'new' ? t('breadcrumbs.new') :
                    paths[i] === 'projects' ? t('breadcrumbs.projects') :
                    paths[i] === 'reports' ? t('breadcrumbs.reports') :

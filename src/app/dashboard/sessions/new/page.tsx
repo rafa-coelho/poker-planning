@@ -1,7 +1,7 @@
 'use client';
 
 import "@/i18n/index";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -19,7 +19,9 @@ export default function NewSessionPage() {
     votingMode: 'FIBONACCI',
     autoReveal: false,
     allowObservers: true,
+    projectId: '',
   });
+  const [availableProjects, setAvailableProjects] = useState<any[]>([]);
 
   const votingModes = [
     { value: 'FIBONACCI', label: t('votingModes.fibonacci') },
@@ -27,15 +29,33 @@ export default function NewSessionPage() {
     { value: 'LINEAR', label: t('votingModes.linear') },
   ];
 
+  useEffect(() => {
+    fetchAvailableProjects();
+  }, []);
+
+  const fetchAvailableProjects = async () => {
+    try {
+      const response = await apiService.get('/api/projects');
+      if (response.success && response.data) {
+        setAvailableProjects((response.data as any).projects || []);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar projetos:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      const response = await apiService.createSession({
+      const sessionData = {
         ...formData,
-      });
+        projectId: formData.projectId || null, // Se vazio, enviar null
+      };
+      
+      const response = await apiService.createSession(sessionData);
 
       if (response.success && response.data) {
         // Redirecionar para a sessão criada
@@ -137,6 +157,27 @@ export default function NewSessionPage() {
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+
+          {/* Project */}
+          <div>
+            <label htmlFor="projectId" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('newSession.project')} <span className="text-gray-500">({t('newSession.optional')})</span>
+            </label>
+            <select
+              id="projectId"
+              name="projectId"
+              value={formData.projectId}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">{t('newSession.noProject')}</option>
+              {availableProjects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Voting Mode */}

@@ -335,9 +335,12 @@ export default function SessionsPage() {
                   <tr key={session.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <button
+                          onClick={() => handleViewSession(session.id)}
+                          className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline text-left"
+                        >
                           {session.name}
-                        </div>
+                        </button>
                         {session.description && (
                           <div className="text-sm text-gray-500">
                             {session.description}
@@ -366,12 +369,6 @@ export default function SessionsPage() {
                       {formatDate(session.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleViewSession(session.id)}
-                        className="text-blue-600 hover:text-blue-900 mr-3"
-                      >
-                        {t('sessions.view')}
-                      </button>
                       {session.status === 'ACTIVE' && (
                         <button
                           onClick={() => handleEditSession(session.id)}

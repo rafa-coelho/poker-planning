@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
+import TeamProjectModal from '@/components/TeamProjectModal';
 
 interface Team {
   id: string;
@@ -59,6 +60,8 @@ export default function TeamsPage() {
     isActive: true
   });
   const [submitting, setSubmitting] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
 
   useEffect(() => {
     fetchTeams();
@@ -156,6 +159,11 @@ export default function TeamsPage() {
       color: team.color || '#3B82F6',
       isActive: team.isActive
     });
+  };
+
+  const handleManageProjects = (team: Team) => {
+    setSelectedTeam(team);
+    setShowProjectModal(true);
   };
 
   const handlePageChange = (page: number) => {
@@ -300,7 +308,12 @@ export default function TeamsPage() {
                             </div>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{team.name}</div>
+                            <button
+                              onClick={() => router.push(`/dashboard/teams/${team.id}`)}
+                              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline text-left"
+                            >
+                              {team.name}
+                            </button>
                             <div className="text-sm text-gray-500">Criado por {team.createdBy.name}</div>
                           </div>
                         </div>
@@ -321,6 +334,12 @@ export default function TeamsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleManageProjects(team)}
+                            className="text-green-600 hover:text-green-900"
+                          >
+                            {t('teams.actions.manageProjects')}
+                          </button>
                           <button
                             onClick={() => handleEditTeam(team)}
                             className="text-blue-600 hover:text-blue-900"
@@ -519,6 +538,19 @@ export default function TeamsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Team Projects Modal */}
+      {showProjectModal && selectedTeam && (
+        <TeamProjectModal
+          isOpen={showProjectModal}
+          onClose={() => {
+            setShowProjectModal(false);
+            setSelectedTeam(null);
+          }}
+          teamId={selectedTeam.id}
+          teamName={selectedTeam.name}
+        />
       )}
     </div>
   );

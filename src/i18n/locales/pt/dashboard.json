@@ -26,93 +26,6 @@
     "profile": "Perfil",
     "settings": "Configurações"
   },
-  "users": {
-    "title": "Usuários",
-    "description": "Gerencie os usuários da sua organização",
-    "new": "Novo Usuário",
-    "edit": "Editar Usuário",
-    "delete": "Desativar Usuário",
-    "activate": "Ativar Usuário",
-    "view": "Ver Usuário",
-    "viewAll": "Ver Todos",
-    "noUsers": "Nenhum usuário encontrado",
-    "createFirst": "Comece adicionando o primeiro usuário à sua organização",
-    "createUser": "Adicionar Usuário",
-    "searchPlaceholder": "Buscar por nome ou email...",
-    "filters": {
-      "allRoles": "Todas as Roles",
-      "allStatuses": "Todos os Status",
-      "active": "Ativos",
-      "inactive": "Inativos"
-    },
-    "table": {
-      "name": "Nome",
-      "email": "Email",
-      "role": "Role",
-      "status": "Status",
-      "lastLogin": "Último Login",
-      "createdAt": "Criado em",
-      "actions": "Ações"
-    },
-    "form": {
-      "name": "Nome",
-      "namePlaceholder": "Nome completo do usuário",
-      "email": "Email",
-      "emailPlaceholder": "email@exemplo.com",
-      "role": "Role",
-      "rolePlaceholder": "Selecione uma role",
-      "isActive": "Usuário Ativo",
-      "create": "Adicionar Usuário",
-      "creating": "Adicionando...",
-      "update": "Atualizar Usuário",
-      "updating": "Atualizando...",
-      "cancel": "Cancelar",
-      "save": "Salvar",
-      "saving": "Salvando..."
-    },
-    "roles": {
-      "SUPER_ADMIN": "Super Administrador",
-      "ADMIN": "Administrador",
-      "MEMBER": "Membro",
-      "VIEWER": "Visualizador"
-    },
-    "status": {
-      "active": "Ativo",
-      "inactive": "Inativo"
-    },
-    "actions": {
-      "edit": "Editar",
-      "delete": "Desativar",
-      "activate": "Ativar",
-      "view": "Ver",
-      "confirmDelete": "Tem certeza que deseja desativar este usuário?",
-      "confirmActivate": "Tem certeza que deseja ativar este usuário?"
-    },
-    "errors": {
-      "loadUsers": "Erro ao carregar usuários",
-      "loadUser": "Erro ao carregar usuário",
-      "createUser": "Erro ao criar usuário",
-      "updateUser": "Erro ao atualizar usuário",
-      "deleteUser": "Erro ao desativar usuário",
-      "activateUser": "Erro ao ativar usuário",
-      "nameRequired": "Nome é obrigatório",
-      "emailRequired": "Email é obrigatório",
-      "emailInvalid": "Email inválido",
-      "roleRequired": "Role é obrigatória",
-      "userExists": "Usuário já existe na organização",
-      "insufficientPermissions": "Permissões insuficientes",
-      "cannotDeleteSelf": "Você não pode desativar sua própria conta",
-      "cannotChangeRole": "Você não tem permissão para alterar a role deste usuário",
-      "unknown": "Erro desconhecido",
-      "notFound": "Usuário não encontrado"
-    },
-    "success": {
-      "created": "Usuário criado com sucesso",
-      "updated": "Usuário atualizado com sucesso",
-      "deleted": "Usuário desativado com sucesso",
-      "activated": "Usuário ativado com sucesso"
-    }
-  },
   "teams": {
     "title": "Times",
     "description": "Gerencie os times da sua organização",
@@ -166,6 +79,10 @@
       "activate": "Ativar",
       "view": "Ver",
       "manageMembers": "Gerenciar Membros",
+      "manageProjects": "Gerenciar Projetos",
+      "createProject": "Criar Projeto",
+      "createSession": "Criar Sessão",
+      "addUser": "Adicionar Usuário",
       "confirmDelete": "Tem certeza que deseja desativar este time?",
       "confirmActivate": "Tem certeza que deseja ativar este time?"
     },
@@ -199,12 +116,43 @@
       "updated": "Time atualizado com sucesso",
       "deleted": "Time desativado com sucesso",
       "activated": "Time ativado com sucesso"
+    },
+    "projects": {
+      "title": "Projetos do Time",
+      "description": "Gerencie os projetos associados a este time",
+      "associated": "Projetos Associados",
+      "addNew": "Adicionar Projeto",
+      "search": "Buscar Projetos",
+      "searchPlaceholder": "Digite o nome do projeto...",
+      "members": "membros",
+      "sessions": "sessões",
+      "remove": "Remover",
+      "add": "Adicionar",
+      "adding": "Adicionando...",
+      "noAssociated": "Nenhum projeto associado",
+      "noAvailable": "Nenhum projeto disponível",
+      "noResults": "Nenhum projeto encontrado"
+    },
+    "details": {
+      "createdAt": "Criado em",
+      "createdBy": "Criado por",
+      "tabs": {
+        "overview": "Visão Geral",
+        "members": "Membros",
+        "projects": "Projetos"
+      },
+      "overview": {
+        "info": "Informações do Time"
+      }
     }
   },
   "projects": {
     "title": "Projetos",
     "description": "Gerencie os projetos da sua organização",
     "new": "Novo Projeto",
+    "newForTeam": "Novo Projeto para {{teamName}}",
+    "newDescription": "Crie um novo projeto para sua organização",
+    "newForTeamDescription": "Crie um novo projeto para o time {{teamName}}",
     "edit": "Editar Projeto",
     "delete": "Desativar Projeto",
     "activate": "Ativar Projeto",
@@ -235,6 +183,9 @@
       "descriptionPlaceholder": "Descreva o propósito deste projeto...",
       "color": "Cor",
       "colorPlaceholder": "#3B82F6",
+      "teams": "Times",
+      "noTeams": "Nenhum time disponível",
+      "preSelected": "pré-selecionado",
       "isActive": "Projeto Ativo",
       "create": "Criar Projeto",
       "creating": "Criando...",
@@ -296,6 +247,9 @@
     "namePlaceholder": "Ex: Sprint Planning - API Backend",
     "descriptionLabel": "Descrição",
     "descriptionPlaceholder": "Descreva o objetivo desta sessão...",
+    "project": "Projeto",
+    "optional": "opcional",
+    "noProject": "Nenhum projeto selecionado",
     "votingMode": "Modo de Votação",
     "autoReveal": "Revelar votos automaticamente",
     "allowObservers": "Permitir observadores",
@@ -457,5 +411,90 @@
     "showing": "Mostrando {{from}} a {{to}} de {{total}} resultados",
     "previous": "Anterior",
     "next": "Próxima"
+  },
+  "reports": {
+    "title": "Relatórios",
+    "description": "Analise métricas e relatórios da sua organização",
+    "comingSoon": "Relatórios em breve",
+    "comingSoonDescription": "Esta funcionalidade está sendo desenvolvida e estará disponível em breve."
+  },
+  "users": {
+    "title": "Usuários",
+    "description": "Gerencie os usuários da sua organização",
+    "new": "Novo Usuário",
+    "edit": "Editar Usuário",
+    "table": {
+      "name": "Nome",
+      "email": "Email",
+      "role": "Função",
+      "status": "Status",
+      "lastLogin": "Último Login",
+      "actions": "Ações"
+    },
+    "form": {
+      "name": "Nome",
+      "email": "Email",
+      "role": "Função",
+      "teams": "Times",
+      "isActive": "Usuário Ativo"
+    },
+    "roles": {
+      "SUPER_ADMIN": "Super Administrador",
+      "ADMIN": "Administrador",
+      "MEMBER": "Membro",
+      "VIEWER": "Visualizador"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Desativar",
+      "activate": "Ativar",
+      "view": "Ver",
+      "addToTeam": "Adicionar ao Time",
+      "resetPassword": "Resetar Senha",
+      "deactivate": "Desativar",
+      "confirmDeactivate": "Tem certeza que deseja desativar este usuário?",
+      "confirmActivate": "Tem certeza que deseja ativar este usuário?"
+    },
+    "labels": {
+      "you": "Você",
+      "never": "Nunca"
+    },
+    "details": {
+      "totalTeams": "Times",
+      "projectsCreated": "Projetos Criados",
+      "sessionsCreated": "Sessões Criadas",
+      "lastLogin": "Último Login",
+      "memberSince": "Membro desde",
+      "organization": "Organização",
+      "noTeams": "Usuário não pertence a nenhum time",
+      "joinedOn": "ingressou em",
+      "tabs": {
+        "overview": "Visão Geral",
+        "teams": "Times",
+        "activity": "Atividade"
+      },
+      "overview": {
+        "personalInfo": "Informações Pessoais"
+      },
+      "activity": {
+        "comingSoon": "Atividade em breve",
+        "description": "Histórico de atividades do usuário estará disponível em breve."
+      }
+    },
+    "messages": {
+      "passwordResetSent": "Email de reset de senha enviado com sucesso"
+    },
+    "resetPassword": {
+      "confirmSelf": "Você receberá um email com instruções para resetar sua senha.",
+      "confirmOther": "{{name}} receberá um email com instruções para resetar a senha."
+    },
+    "errors": {
+      "loadUser": "Erro ao carregar usuário",
+      "notFound": "Usuário não encontrado"
+    }
   }
 }

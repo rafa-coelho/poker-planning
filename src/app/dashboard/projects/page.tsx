@@ -56,13 +56,21 @@ export default function ProjectsPage() {
     name: '',
     description: '',
     color: '#3B82F6',
-    isActive: true
+    isActive: true,
+    teamIds: [] as string[]
   });
   const [submitting, setSubmitting] = useState(false);
+  const [availableTeams, setAvailableTeams] = useState<any[]>([]);
 
   useEffect(() => {
     fetchProjects();
   }, [pagination.page, search, statusFilter]);
+
+  useEffect(() => {
+    if (showCreateModal || editingProject) {
+      fetchAvailableTeams();
+    }
+  }, [showCreateModal, editingProject]);
 
   const fetchProjects = async () => {
     try {
@@ -90,15 +98,36 @@ export default function ProjectsPage() {
     }
   };
 
+  const fetchAvailableTeams = async () => {
+    try {
+      const response = await apiService.get('/api/teams');
+      if (response.success && response.data) {
+        setAvailableTeams((response.data as any).teams || []);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar times:', error);
+    }
+  };
+
   const handleCreateProject = async () => {
     try {
       setSubmitting(true);
       
-      const response = await apiService.post('/api/projects', formData);
+      const { teamIds, ...projectData } = formData;
+      const response = await apiService.post('/api/projects', projectData);
       
-      if (response.success) {
+      if (response.success && response.data) {
+        const projectId = (response.data as any).project?.id;
+        
+        // Associar times ao projeto
+        if (teamIds.length > 0) {
+          for (const teamId of teamIds) {
+            await apiService.post(`/api/projects/${projectId}/teams`, { teamId });
+          }
+        }
+        
         setShowCreateModal(false);
-        setFormData({ name: '', description: '', color: '#3B82F6', isActive: true });
+        setFormData({ name: '', description: '', color: '#3B82F6', isActive: true, teamIds: [] });
         fetchProjects();
       } else {
         console.error('Erro ao criar projeto:', response.error);
@@ -116,11 +145,31 @@ export default function ProjectsPage() {
     try {
       setSubmitting(true);
       
-      const response = await apiService.patch(`/api/projects/${editingProject.id}`, formData);
+      const { teamIds, ...projectData } = formData;
+      const response = await apiService.patch(`/api/projects/${editingProject.id}`, projectData);
       
       if (response.success) {
+        // Primeiro, obter times atuais do projeto
+        const currentTeamsResponse = await apiService.get(`/api/projects/${editingProject.id}/teams`);
+        const currentTeamIds = currentTeamsResponse.success ? 
+          ((currentTeamsResponse.data as any)?.teams || []).map((t: any) => t.id) : [];
+        
+        // Remover times que não estão mais selecionados
+        for (const teamId of currentTeamIds) {
+          if (!teamIds.includes(teamId)) {
+            await apiService.delete(`/api/projects/${editingProject.id}/teams?teamId=${teamId}`);
+          }
+        }
+        
+        // Adicionar novos times
+        for (const teamId of teamIds) {
+          if (!currentTeamIds.includes(teamId)) {
+            await apiService.post(`/api/projects/${editingProject.id}/teams`, { teamId });
+          }
+        }
+        
         setEditingProject(null);
-        setFormData({ name: '', description: '', color: '#3B82F6', isActive: true });
+        setFormData({ name: '', description: '', color: '#3B82F6', isActive: true, teamIds: [] });
         fetchProjects();
       } else {
         console.error('Erro ao atualizar projeto:', response.error);
@@ -148,14 +197,26 @@ export default function ProjectsPage() {
     }
   };
 
-  const handleEditProject = (project: Project) => {
+  const handleEditProject = async (project: Project) => {
     setEditingProject(project);
     setFormData({
       name: project.name,
       description: project.description || '',
       color: project.color || '#3B82F6',
-      isActive: project.isActive
+      isActive: project.isActive,
+      teamIds: []
     });
+
+    // Carregar times do projeto
+    try {
+      const response = await apiService.get(`/api/projects/${project.id}/teams`);
+      if (response.success && response.data) {
+        const projectTeamIds = ((response.data as any)?.teams || []).map((team: any) => team.id);
+        setFormData(prev => ({ ...prev, teamIds: projectTeamIds }));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar times do projeto:', error);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -300,7 +361,12 @@ export default function ProjectsPage() {
                             </div>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{project.name}</div>
+                            <button
+                              onClick={() => router.push(`/dashboard/projects/${project.id}`)}
+                              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline text-left"
+                            >
+                              {project.name}
+                            </button>
                             <div className="text-sm text-gray-500">Criado por {project.createdBy.name}</div>
                           </div>
                         </div>
@@ -478,6 +544,42 @@ export default function ProjectsPage() {
                     </div>
                   </div>
 
+                  {/* Teams */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('projects.form.teams')}
+                    </label>
+                    <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-md p-2">
+                      {availableTeams.length === 0 ? (
+                        <p className="text-sm text-gray-500">{t('projects.form.noTeams')}</p>
+                      ) : (
+                        availableTeams.map((team) => (
+                          <div key={team.id} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={`team-${team.id}`}
+                              checked={formData.teamIds.includes(team.id)}
+                              onChange={(e) => {
+                                const teamIds = e.target.checked
+                                  ? [...formData.teamIds, team.id]
+                                  : formData.teamIds.filter(id => id !== team.id);
+                                setFormData({ ...formData, teamIds });
+                              }}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor={`team-${team.id}`} className="ml-2 text-sm text-gray-900 flex items-center">
+                              <div 
+                                className="w-3 h-3 rounded-full mr-2"
+                                style={{ backgroundColor: team.color || '#3B82F6' }}
+                              />
+                              {team.name}
+                            </label>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
                   {/* Active Status */}
                   <div className="flex items-center">
                     <input
@@ -498,7 +600,7 @@ export default function ProjectsPage() {
                     onClick={() => {
                       setShowCreateModal(false);
                       setEditingProject(null);
-                      setFormData({ name: '', description: '', color: '#3B82F6', isActive: true });
+                      setFormData({ name: '', description: '', color: '#3B82F6', isActive: true, teamIds: [] });
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
