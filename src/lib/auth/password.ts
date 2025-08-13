@@ -129,20 +129,16 @@ export function generateTemporaryPassword(length: number = 12): string {
  * @returns Promise com token de reset
  */
 export async function generatePasswordResetToken(userId: string): Promise<string> {
-  // Gerar token aleatório seguro
+  // Gera token aleatório (retornado ao usuário via email)
   const token = crypto.randomBytes(32).toString('hex')
-  
-  // Hash do token para armazenamento seguro
-  const hashedToken = await hashPassword(token)
-  
-  // TODO: Armazenar o hash do token no banco com expiração
-  // Por enquanto, apenas retornamos o token
-  // Em produção, você deve:
-  // 1. Salvar o hash no banco com userId e expiração
-  // 2. Enviar o token original por email
-  // 3. Verificar o hash ao resetar a senha
-  
   return token
+}
+
+/**
+ * Calcula um digest determinístico (sha256) do token de reset, para armazenar no banco
+ */
+export function computeResetTokenDigest(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex')
 }
 
 /**
@@ -151,6 +147,12 @@ export async function generatePasswordResetToken(userId: string): Promise<string
  * @param hashedToken Hash armazenado no banco
  * @returns Promise com resultado da verificação
  */
-export async function verifyPasswordResetToken(token: string, hashedToken: string): Promise<boolean> {
-  return verifyPassword(token, hashedToken)
-} 
+export async function verifyPasswordResetToken(token: string, digest: string): Promise<boolean> {
+  // Para compatibilidade, aceita comparação direta com digest sha256
+  try {
+    const computed = computeResetTokenDigest(token)
+    return computed === digest
+  } catch {
+    return false
+  }
+}

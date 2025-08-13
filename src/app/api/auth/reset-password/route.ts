@@ -34,10 +34,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar usuário pelo token
-    const user = await prisma.user.findUnique({
-      where: { resetToken: token },
-      include: { organization: true }
-    });
+    // Buscar usuário por token: agora com digest sha256, não dá para usar igualdade direta
+    // Então buscamos usuários com resetToken não nulo e comparamos via verifyPasswordResetToken
+    const candidate = await prisma.user.findFirst({
+      where: { resetToken: { not: null } },
+      select: { id: true, email: true, resetToken: true, resetTokenExpiresAt: true }
+    })
+    let user = null as any
+    if (candidate && candidate.resetToken && await verifyPasswordResetToken(token, candidate.resetToken)) {
+      user = await prisma.user.findUnique({ where: { id: candidate.id }, include: { organization: true } })
+    }
 
     if (!user) {
       return NextResponse.json(

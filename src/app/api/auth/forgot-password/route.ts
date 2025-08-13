@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { generatePasswordResetToken } from '@/lib/auth/password';
+import { generatePasswordResetToken, computeResetTokenDigest } from '@/lib/auth/password';
 import { emailService } from '@/lib/email/service';
 
 export async function POST(request: NextRequest) {
@@ -67,6 +67,17 @@ export async function POST(request: NextRequest) {
 
     // Gerar token de reset de senha
     const resetToken = await generatePasswordResetToken(user.id);
+
+    // Persistir token (hash) e expiração (1h)
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    const hashed = computeResetTokenDigest(resetToken);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetToken: hashed,
+        resetTokenExpiresAt: expiresAt
+      }
+    });
 
     // Enviar email de reset
     const emailResult = await emailService.sendPasswordResetEmail(

@@ -27,6 +27,13 @@ export const GET = withTenantIsolation(async (req, context) => {
         isActive: true,
         createdAt: true,
         updatedAt: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
         members: {
           select: {
             id: true,

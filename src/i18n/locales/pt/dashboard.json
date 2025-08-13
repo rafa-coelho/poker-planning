@@ -204,6 +204,7 @@
       "delete": "Desativar",
       "activate": "Ativar",
       "view": "Ver",
+      "manageTeams": "Gerenciar Times",
       "manageMembers": "Gerenciar Membros",
       "confirmDelete": "Tem certeza que deseja desativar este projeto?",
       "confirmActivate": "Tem certeza que deseja ativar este projeto?"

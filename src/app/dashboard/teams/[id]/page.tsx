@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useBreadcrumbs } from '@/lib/context/breadcrumbContext';
+import PageHeader from '@/components/PageHeader';
 
 interface Team {
   id: string;
@@ -65,6 +66,12 @@ export default function TeamDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'projects'>('overview');
   const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedUserRole, setSelectedUserRole] = useState<'ADMIN' | 'MEMBER' | 'VIEWER'>('MEMBER');
+  const [canManageMembers, setCanManageMembers] = useState<boolean>(false);
 
   const teamId = params.id as string;
 
@@ -75,6 +82,14 @@ export default function TeamDetailsPage() {
       fetchTeamProjects();
     }
   }, [teamId]);
+
+  useEffect(() => {
+    // simples verificação por role para exibir ações (admins)
+    try {
+      const role = (localStorage.getItem('userRole') || '').toUpperCase();
+      setCanManageMembers(role === 'SUPER_ADMIN' || role === 'ADMIN');
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (team) {
@@ -164,6 +179,50 @@ export default function TeamDetailsPage() {
     setShowAddUserModal(true);
   };
 
+  // Carregar usuários disponíveis quando o modal abrir ou ao buscar
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (!showAddUserModal) return;
+      try {
+        setUsersLoading(true);
+        const params = new URLSearchParams({ limit: '100', isActive: 'true' });
+        if (userSearch) params.append('search', userSearch);
+        const response = await apiService.get(`/api/users?${params.toString()}`);
+        if (response.success && response.data) {
+          const existingIds = new Set(members.map(m => m.user.id));
+          const list = (response.data as any).users || [];
+          setAvailableUsers(list.filter((u: any) => !existingIds.has(u.id)));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar usuários disponíveis:', error);
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+    loadUsers();
+  }, [showAddUserModal, userSearch, members, apiService]);
+
+  const handleConfirmAddUser = async () => {
+    if (!selectedUserId) return;
+    try {
+      setUsersLoading(true);
+      const response = await apiService.post(`/api/teams/${teamId}/members`, {
+        userId: selectedUserId,
+        role: selectedUserRole,
+      });
+      if (response.success) {
+        setShowAddUserModal(false);
+        setSelectedUserId('');
+        setSelectedUserRole('MEMBER');
+        fetchTeamMembers();
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar usuário ao time:', error);
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -193,76 +252,26 @@ export default function TeamDetailsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div 
-                className="h-12 w-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: team.color || '#3B82F6' }}
-              >
-                <span className="text-lg font-medium text-white">
-                  {team.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{team.name}</h1>
-                <p className="text-sm text-gray-500">
-                  {t('teams.table.createdAt')}: {formatDate(team.createdAt)} • 
-                  {t('teams.table.createdBy')}: {team.createdBy.name}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(team.isActive)}`}>
-                {getStatusLabel(team.isActive)}
-              </span>
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleCreateProject}
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {t('teams.actions.createProject')}
-                </button>
-                <button
-                  onClick={handleCreateSession}
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {t('teams.actions.createSession')}
-                </button>
-                <button
-                  onClick={handleAddUser}
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {t('teams.actions.addUser')}
-                </button>
-                <button
-                  onClick={() => router.push('/dashboard/teams')}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  {t('quickActions.backToList')}
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          {team.description && (
-            <div className="mt-4">
-              <p className="text-gray-700">{team.description}</p>
-            </div>
-          )}
-        </div>
-      </div>
+      <PageHeader
+        title={team.name}
+        subtitle={`${t('teams.table.createdAt')}: ${formatDate(team.createdAt)} • ${t('teams.table.createdBy')}: ${team.createdBy.name}`}
+        iconText={team.name.charAt(0)}
+        iconBg={team.color || '#3B82F6'}
+        badges={[
+          <span key="status" className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(team.isActive)}`}>
+            {getStatusLabel(team.isActive)}
+          </span>
+        ]}
+        primaryAction={{
+          label: t('teams.actions.createSession'),
+          onClick: handleCreateSession,
+        }}
+        menuActions={[
+          { label: t('teams.actions.createProject'), onClick: handleCreateProject },
+          ...(canManageMembers ? [{ label: t('teams.actions.addUser'), onClick: handleAddUser }] : []),
+          { label: t('quickActions.backToList'), onClick: () => router.push('/dashboard/teams') },
+        ]}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -511,14 +520,7 @@ export default function TeamDetailsPage() {
                             <p className="text-sm text-gray-600 line-clamp-2">{project.description}</p>
                           </div>
                         )}
-                        <div className="mt-3">
-                          <button
-                            onClick={() => router.push(`/dashboard/projects/${project.id}`)}
-                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            {t('projects.actions.view')} →
-                          </button>
-                        </div>
+                        {/* Nome do projeto já é clicável na listagem principal de projetos. Removido botão "ver". */}
                       </div>
                     </div>
                   ))}
@@ -528,6 +530,104 @@ export default function TeamDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Add User Modal */}
+      {showAddUserModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+            <div className="mt-1">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {t('teams.members.addMember')}
+              </h3>
+
+              <div className="space-y-4">
+                {/* Busca */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('filters.search')}
+                  </label>
+                  <input
+                    type="text"
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    placeholder={t('filters.searchPlaceholder')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Lista de usuários */}
+                <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-md divide-y">
+                  {usersLoading ? (
+                    <div className="p-4 text-center text-sm text-gray-500">{t('common.loading') || 'Carregando...'}</div>
+                  ) : availableUsers.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-gray-500">{t('users.noUsers')}</div>
+                  ) : (
+                    availableUsers.map((u: any) => (
+                      <button
+                        type="button"
+                        key={u.id}
+                        onClick={() => setSelectedUserId(u.id)}
+                        className={`w-full text-left p-3 flex items-center justify-between hover:bg-gray-50 ${selectedUserId === u.id ? 'bg-blue-50' : ''}`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span className="text-xs font-medium text-gray-700">{u.name?.charAt(0)?.toUpperCase()}</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{u.name}</p>
+                            <p className="text-xs text-gray-500">{u.email}</p>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">{t(`users.roles.${u.role}`)}</div>
+                      </button>
+                    ))
+                  )}
+                </div>
+
+                {/* Role no time */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('teams.members.role')}
+                  </label>
+                  <select
+                    value={selectedUserRole}
+                    onChange={(e) => setSelectedUserRole(e.target.value as any)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="ADMIN">{t('teams.members.roles.ADMIN')}</option>
+                    <option value="MEMBER">{t('teams.members.roles.MEMBER')}</option>
+                    <option value="VIEWER">{t('teams.members.roles.VIEWER')}</option>
+                  </select>
+                </div>
+
+                {/* Ações */}
+                <div className="flex justify-end space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddUserModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    {t('teams.form.cancel')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!selectedUserId || usersLoading}
+                    onClick={handleConfirmAddUser}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {usersLoading ? t('teams.form.saving') : t('teams.members.addMember')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+// Modal Adicionar Usuário ao Time
+/* Render modal after component to keep file cohesion */
+// eslint-disable-next-line
+export function AddUserToTeamModalPlaceholder() { return null }

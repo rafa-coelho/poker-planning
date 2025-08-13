@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useBreadcrumbs } from '@/lib/context/breadcrumbContext';
+import PageHeader from '@/components/PageHeader';
 import { UserRole } from '@/lib/auth/roles';
 
 interface User {
@@ -57,6 +58,11 @@ export default function UserDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'activity'>('overview');
   const [showAddToTeamModal, setShowAddToTeamModal] = useState(false);
+  const [availableTeams, setAvailableTeams] = useState<any[]>([]);
+  const [teamsLoading, setTeamsLoading] = useState(false);
+  const [teamSearch, setTeamSearch] = useState('');
+  const [selectedTeamId, setSelectedTeamId] = useState<string>('');
+  const [selectedTeamRole, setSelectedTeamRole] = useState<'ADMIN' | 'MEMBER' | 'VIEWER'>('MEMBER');
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
 
   const userId = params.id as string;
@@ -109,6 +115,50 @@ export default function UserDetailsPage() {
     }
   };
 
+  // Carregar times disponíveis ao abrir o modal
+  useEffect(() => {
+    const loadTeams = async () => {
+      if (!showAddToTeamModal) return;
+      try {
+        setTeamsLoading(true);
+        const params = new URLSearchParams({ limit: '100' });
+        if (teamSearch) params.append('search', teamSearch);
+        const response = await apiService.get(`/api/teams?${params.toString()}`);
+        if (response.success && response.data) {
+          const existingIds = new Set(userTeams.map(ut => ut.team.id));
+          const list = (response.data as any).teams || [];
+          setAvailableTeams(list.filter((t: any) => !existingIds.has(t.id)));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar times disponíveis:', error);
+      } finally {
+        setTeamsLoading(false);
+      }
+    };
+    loadTeams();
+  }, [showAddToTeamModal, teamSearch, apiService, userTeams]);
+
+  const handleConfirmAddToTeam = async () => {
+    if (!selectedTeamId) return;
+    try {
+      setTeamsLoading(true);
+      const response = await apiService.post(`/api/teams/${selectedTeamId}/members`, {
+        userId: userId,
+        role: selectedTeamRole,
+      });
+      if (response.success) {
+        setShowAddToTeamModal(false);
+        setSelectedTeamId('');
+        setSelectedTeamRole('MEMBER');
+        fetchUserTeams();
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar usuário ao time:', error);
+    } finally {
+      setTeamsLoading(false);
+    }
+  };
+
   const handleToggleStatus = async () => {
     if (!user || !canManageUser || isCurrentUser) return;
 
@@ -136,7 +186,7 @@ export default function UserDetailsPage() {
     if (!user || (!canManageUser && !isCurrentUser)) return;
 
     try {
-      const response = await apiService.post(`/api/users/${userId}/reset-password`, {});
+      const response = await apiService.sendUserPasswordReset(userId);
       
       if (response.success) {
         alert(t('users.messages.passwordResetSent'));
@@ -217,83 +267,23 @@ export default function UserDetailsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="h-16 w-16">
-                {user.avatar ? (
-                  <img className="h-16 w-16 rounded-full" src={user.avatar} alt="" />
-                ) : (
-                  <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center">
-                    <span className="text-2xl font-medium text-gray-700">
-                      {user.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
-                <p className="text-sm text-gray-500">{user.email}</p>
-                <div className="flex items-center space-x-2 mt-1">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>
-                    {getRoleLabel(user.role)}
-                  </span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(user.isActive)}`}>
-                    {getStatusLabel(user.isActive)}
-                  </span>
-                  {isCurrentUser && (
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-blue-600 bg-blue-100">
-                      {t('users.labels.you')}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              {canManageUser && (
-                <button
-                  onClick={() => setShowAddToTeamModal(true)}
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {t('users.actions.addToTeam')}
-                </button>
-              )}
-              {(canManageUser || isCurrentUser) && (
-                <button
-                  onClick={() => setShowResetPasswordModal(true)}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-3a1 1 0 011-1h2.586l6.414-6.414A6 6 0 0121 9z" />
-                  </svg>
-                  {t('users.actions.resetPassword')}
-                </button>
-              )}
-              {canManageUser && !isCurrentUser && (
-                <button
-                  onClick={handleToggleStatus}
-                  className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white ${
-                    user.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-                  }`}
-                >
-                  {user.isActive ? t('users.actions.deactivate') : t('users.actions.activate')}
-                </button>
-              )}
-              <button
-                onClick={() => router.push('/dashboard/users')}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                {t('quickActions.backToList')}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={user.name}
+        subtitle={user.email}
+        iconText={user.name.charAt(0)}
+        iconBg={user.avatar ? undefined : '#9CA3AF'}
+        badges={[
+          <span key="role" className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>,
+          <span key="status" className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(user.isActive)}`}>{getStatusLabel(user.isActive)}</span>,
+          ...(isCurrentUser ? [<span key="you" className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-blue-600 bg-blue-100">{t('users.labels.you')}</span>] : [])
+        ]}
+        primaryAction={canManageUser ? { label: t('users.actions.addToTeam'), onClick: () => setShowAddToTeamModal(true), variant: 'primary' } : undefined}
+        menuActions={[
+          ...(canManageUser || isCurrentUser ? [{ label: t('users.actions.resetPassword'), onClick: () => setShowResetPasswordModal(true) }] : []),
+          ...(canManageUser && !isCurrentUser ? [{ label: user.isActive ? t('users.actions.deactivate') : t('users.actions.activate'), onClick: handleToggleStatus }] : []),
+          { label: t('quickActions.backToList'), onClick: () => router.push('/dashboard/users') },
+        ]}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -501,14 +491,7 @@ export default function UserDetailsPage() {
                             <p className="text-sm text-gray-600 line-clamp-2">{userTeam.team.description}</p>
                           </div>
                         )}
-                        <div className="mt-3">
-                          <button
-                            onClick={() => router.push(`/dashboard/teams/${userTeam.team.id}`)}
-                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            {t('teams.actions.view')} →
-                          </button>
-                        </div>
+                        {/* Removido botão "visualizar" para seguir o padrão de nome clicável nas listagens */}
                       </div>
                     </div>
                   ))}
@@ -530,6 +513,97 @@ export default function UserDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Add to Team Modal */}
+      {showAddToTeamModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+            <div className="mt-1">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {t('users.actions.addToTeam')}
+              </h3>
+
+              <div className="space-y-4">
+                {/* Busca */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('filters.search')}
+                  </label>
+                  <input
+                    type="text"
+                    value={teamSearch}
+                    onChange={(e) => setTeamSearch(e.target.value)}
+                    placeholder={t('teams.searchPlaceholder')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Lista de times */}
+                <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-md divide-y">
+                  {teamsLoading ? (
+                    <div className="p-4 text-center text-sm text-gray-500">{t('common.loading') || 'Carregando...'}</div>
+                  ) : availableTeams.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-gray-500">{t('teams.noTeams')}</div>
+                  ) : (
+                    availableTeams.map((team: any) => (
+                      <button
+                        type="button"
+                        key={team.id}
+                        onClick={() => setSelectedTeamId(team.id)}
+                        className={`w-full text-left p-3 flex items-center justify-between hover:bg-gray-50 ${selectedTeamId === team.id ? 'bg-blue-50' : ''}`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: team.color || '#3B82F6' }} />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{team.name}</p>
+                            <p className="text-xs text-gray-500">{team.description || '-'}</p>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">{t('teams.table.members')}: {team._count?.members ?? 0}</div>
+                      </button>
+                    ))
+                  )}
+                </div>
+
+                {/* Role no time */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('teams.members.role')}
+                  </label>
+                  <select
+                    value={selectedTeamRole}
+                    onChange={(e) => setSelectedTeamRole(e.target.value as any)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="ADMIN">{t('teams.members.roles.ADMIN')}</option>
+                    <option value="MEMBER">{t('teams.members.roles.MEMBER')}</option>
+                    <option value="VIEWER">{t('teams.members.roles.VIEWER')}</option>
+                  </select>
+                </div>
+
+                {/* Ações */}
+                <div className="flex justify-end space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddToTeamModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    {t('teams.form.cancel')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!selectedTeamId || teamsLoading}
+                    onClick={handleConfirmAddToTeam}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {teamsLoading ? t('teams.form.saving') : t('users.actions.addToTeam')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Reset Password Modal */}
       {showResetPasswordModal && (

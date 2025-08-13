@@ -751,6 +751,16 @@ class ApiService {
     });
   }
 
+  /**
+   * Dispara email de reset de senha para um usuário
+   */
+  async sendUserPasswordReset(userId: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(`/api/users/${userId}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({})
+    });
+  }
+
   // ===== MÉTODOS GENÉRICOS =====
 
   /**

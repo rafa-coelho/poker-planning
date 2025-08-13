@@ -18,7 +18,7 @@ export const GET = withTenantIsolation(async (req, context) => {
       return NextResponse.json({ error: 'ID do usuário é obrigatório' }, { status: 400 });
     }
 
-    const user = await prisma.user.findFirst({
+    const baseUser = await prisma.user.findFirst({
       where: { id, organizationId: context.organizationId },
       select: {
         id: true,
@@ -30,12 +30,33 @@ export const GET = withTenantIsolation(async (req, context) => {
         createdAt: true,
         avatar: true,
         locale: true,
-        timezone: true
+        timezone: true,
+        organization: {
+          select: { id: true, name: true, slug: true }
+        }
       }
     });
 
-    if (!user) {
+    if (!baseUser) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    }
+
+    // Contagens adicionais para tela de detalhes
+    const [teamsAsLeader, teamsAsMember, createdProjects, createdSessions] = await Promise.all([
+      prisma.teamMember.count({ where: { userId: id, role: 'ADMIN' as any } }),
+      prisma.teamMember.count({ where: { userId: id, role: { in: ['MEMBER', 'VIEWER'] as any } } }),
+      prisma.project.count({ where: { createdById: id, organizationId: context.organizationId } }),
+      prisma.session.count({ where: { createdById: id, organizationId: context.organizationId } })
+    ])
+
+    const user = {
+      ...baseUser,
+      _count: {
+        teamsAsLeader,
+        teamsAsMember,
+        createdProjects,
+        createdSessions,
+      }
     }
 
     return NextResponse.json({ user });

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import TeamProjectModal from '@/components/TeamProjectModal';
+import PageHeader from '@/components/PageHeader';
 
 interface Team {
   id: string;
@@ -184,26 +185,13 @@ export default function TeamsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t('teams.title')}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {t('teams.description')}
-          </p>
-        </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          {t('teams.new')}
-        </button>
-      </div>
+      <PageHeader
+        title={t('teams.title')}
+        subtitle={t('teams.description')}
+        iconText="T"
+        iconBg="#10B981"
+        primaryAction={{ label: t('teams.new'), onClick: () => setShowCreateModal(true) }}
+      />
 
       {/* Filters */}
       <div className="bg-white shadow rounded-lg p-6">
@@ -339,6 +327,18 @@ export default function TeamsPage() {
                             className="text-green-600 hover:text-green-900"
                           >
                             {t('teams.actions.manageProjects')}
+                          </button>
+                          <button
+                            onClick={() => router.push(`/dashboard/projects/new?${new URLSearchParams({ teamId: team.id, teamName: team.name }).toString()}`)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            {t('teams.actions.createProject')}
+                          </button>
+                          <button
+                            onClick={() => router.push(`/dashboard/sessions/new?${new URLSearchParams({ teamId: team.id, teamName: team.name }).toString()}`)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            {t('teams.actions.createSession')}
                           </button>
                           <button
                             onClick={() => handleEditTeam(team)}

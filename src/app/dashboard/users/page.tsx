@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
+import PageHeader from '@/components/PageHeader';
 import { UserRole } from '@/lib/auth/roles';
 
 interface User {
@@ -194,26 +195,13 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t('users.title')}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {t('users.description')}
-          </p>
-        </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          {t('users.new')}
-        </button>
-      </div>
+      <PageHeader
+        title={t('users.title')}
+        subtitle={t('users.description')}
+        iconText="U"
+        iconBg="#6366F1"
+        primaryAction={{ label: t('users.new'), onClick: () => setShowCreateModal(true) }}
+      />
 
       {/* Filters */}
       <div className="bg-white shadow rounded-lg p-6">

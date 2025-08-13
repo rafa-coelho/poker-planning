@@ -142,6 +142,8 @@ export class SessionService {
       status?: SessionStatus
       search?: string
       projectId?: string
+      userId?: string
+      userRole?: string
     } = {}
   ): Promise<{
     sessions: SessionWithRelations[]
@@ -149,15 +151,10 @@ export class SessionService {
     page: number
     totalPages: number
   }> {
-    const { page = 1, limit = 10, status, search, projectId } = options
+    const { page = 1, limit = 10, status, search, projectId, userId, userRole } = options
     const skip = (page - 1) * limit
 
-    const where: {
-      organizationId: string
-      status?: SessionStatus
-      projectId?: string
-      OR?: Array<{ name?: { contains: string; mode: 'insensitive' }; description?: { contains: string; mode: 'insensitive' } }>
-    } = {
+    const where: any = {
       organizationId,
       ...(status && { status }),
       ...(projectId && { projectId }),
@@ -167,6 +164,24 @@ export class SessionService {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+
+    // Restringe membros/viewers a sessões de projetos aos quais têm acesso
+    if (userRole && ['MEMBER', 'VIEWER'].includes(userRole) && userId) {
+      where.AND = [
+        {
+          OR: [
+            // Participante da sessão
+            { participants: { some: { userId } } },
+            // Criador da sessão
+            { createdById: userId },
+            // Membro do projeto associado
+            { project: { members: { some: { userId } } } },
+            // Membro de algum time associado ao projeto
+            { project: { teams: { some: { members: { some: { userId } } } } } },
+          ]
+        }
       ]
     }
 

@@ -23,6 +23,8 @@ async function listSessions(req: NextRequest, context: TenantContext) {
       status,
       search,
       projectId,
+      userId: context.userId,
+      userRole: context.userRole,
     })
 
     return NextResponse.json({

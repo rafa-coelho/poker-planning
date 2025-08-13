@@ -27,14 +27,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Buscar usuário com organização
-    const user = await prisma.user.findUnique({
-      where: { 
-        email: email.toLowerCase() 
+    // Buscar usuário com organização (case-insensitive para compatibilidade)
+    const user = await prisma.user.findFirst({
+      where: {
+        email: { equals: email, mode: 'insensitive' }
       },
-      include: {
-        organization: true
-      }
+      include: { organization: true }
     })
 
     if (!user) {

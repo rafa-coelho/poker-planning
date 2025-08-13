@@ -252,9 +252,12 @@ export default function DashboardPage() {
                 <div key={session.id} className="px-6 py-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <button
+                        onClick={() => handleViewSession(session.id)}
+                        className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline text-left truncate"
+                      >
                         {session.name}
-                      </p>
+                      </button>
                       <div className="flex items-center mt-1">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(session.status)}`}>
                           {getStatusText(session.status)}
@@ -264,14 +267,7 @@ export default function DashboardPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="ml-4 flex-shrink-0">
-                      <button
-                        onClick={() => handleViewSession(session.id)}
-                        className="text-blue-600 hover:text-blue-900 text-sm font-medium"
-                      >
-                        {t('sessions.view')}
-                      </button>
-                    </div>
+                    {/* Removido botão "ver"; nome acima agora é clicável */}
                   </div>
                 </div>
               ))
