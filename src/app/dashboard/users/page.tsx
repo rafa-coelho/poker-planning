@@ -32,7 +32,7 @@ interface UsersResponse {
 export default function UsersPage() {
   const { t } = useTranslation("dashboard");
   const router = useRouter();
-  const { apiService } = useAuth();
+  const { apiService, user: currentUser } = useAuth();
   
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +46,6 @@ export default function UsersPage() {
     pages: 0
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -55,7 +54,6 @@ export default function UsersPage() {
     teamIds: [] as string[]
   });
   const [submitting, setSubmitting] = useState(false);
-  const [availableTeams, setAvailableTeams] = useState<any[]>([]);
 
   useEffect(() => {
     fetchUsers();
@@ -109,31 +107,7 @@ export default function UsersPage() {
     }
   };
 
-  const handleUpdateUser = async () => {
-    if (!editingUser) return;
 
-    try {
-      setSubmitting(true);
-      
-      const response = await apiService.updateUser(editingUser.id, {
-        name: formData.name,
-        role: formData.role,
-        isActive: formData.isActive
-      });
-      
-      if (response.success) {
-        setEditingUser(null);
-        setFormData({ name: '', email: '', role: UserRole.MEMBER, isActive: true, teamIds: [] });
-        fetchUsers();
-      } else {
-        console.error('Erro ao atualizar usuário:', response.error);
-      }
-    } catch (err) {
-      console.error('Erro ao atualizar usuário:', err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleDeleteUser = async (userId: string) => {
     if (!confirm(t('users.actions.confirmDelete'))) return;
@@ -151,16 +125,7 @@ export default function UsersPage() {
     }
   };
 
-  const handleEditUser = (user: User) => {
-    setEditingUser(user);
-    setFormData({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      teamIds: []
-    });
-  };
+
 
   const handlePageChange = (page: number) => {
     setPagination(prev => ({ ...prev, page }));
@@ -351,19 +316,41 @@ export default function UsersPage() {
                         {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
+                        <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => handleEditUser(user)}
-                            className="text-blue-600 hover:text-blue-900"
+                            onClick={() => router.push(`/dashboard/users/${user.id}`)}
+                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors"
+                            title={t('users.actions.view')}
                           >
-                            {t('users.actions.edit')}
+                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Ver
                           </button>
-                          {user.isActive && (
+                          {/* Não mostrar botões de editar/deletar para o próprio usuário */}
+                          {user.id !== currentUser?.id && (
+                            <button
+                              onClick={() => router.push(`/dashboard/users/${user.id}/edit`)}
+                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full text-amber-700 bg-amber-100 hover:bg-amber-200 transition-colors"
+                              title={t('users.actions.edit')}
+                            >
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                              Editar
+                            </button>
+                          )}
+                          {user.id !== currentUser?.id && user.isActive && (
                             <button
                               onClick={() => handleDeleteUser(user.id)}
-                              className="text-red-600 hover:text-red-900"
+                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 transition-colors"
+                              title={t('users.actions.delete')}
                             >
-                              {t('users.actions.delete')}
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Desativar
                             </button>
                           )}
                         </div>
@@ -447,16 +434,16 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
-      {(showCreateModal || editingUser) && (
+      {/* Create Modal */}
+      {showCreateModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingUser ? t('users.edit') : t('users.new')}
+                {t('users.new')}
               </h3>
               
-              <form onSubmit={(e) => { e.preventDefault(); editingUser ? handleUpdateUser() : handleCreateUser(); }}>
+              <form onSubmit={(e) => { e.preventDefault(); handleCreateUser(); }}>
                 <div className="space-y-4">
                   {/* Name */}
                   <div>
@@ -485,7 +472,6 @@ export default function UsersPage() {
                       placeholder={t('users.form.emailPlaceholder')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       required
-                      disabled={!!editingUser}
                     />
                   </div>
 
@@ -525,7 +511,6 @@ export default function UsersPage() {
                     type="button"
                     onClick={() => {
                       setShowCreateModal(false);
-                      setEditingUser(null);
                       setFormData({ name: '', email: '', role: UserRole.MEMBER, isActive: true, teamIds: [] });
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -537,10 +522,7 @@ export default function UsersPage() {
                     disabled={submitting}
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    {submitting 
-                      ? (editingUser ? t('users.form.updating') : t('users.form.creating'))
-                      : (editingUser ? t('users.form.update') : t('users.form.create'))
-                    }
+                    {submitting ? t('users.form.creating') : t('users.form.create')}
                   </button>
                 </div>
               </form>

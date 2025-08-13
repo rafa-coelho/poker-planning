@@ -130,6 +130,31 @@
         "tokenExpired": "Token expired",
         "serverError": "Internal server error"
       }
+    },
+    "invite": {
+      "title": "Accept Invitation",
+      "subtitle": "Set a password for your account",
+      "newPassword": "Your Password",
+      "newPasswordPlaceholder": "Enter a secure password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "submit": "Accept Invitation",
+      "backToLogin": "Back to login",
+      "passwordRequirements": "Minimum 6 characters",
+      "passwordsMatch": "Passwords match",
+      "success": "Invitation accepted! Your account has been set up successfully.",
+      "invalidToken": "Invalid or expired invitation",
+      "passwordTooShort": "Password must have at least 6 characters",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "error": "Error accepting invitation",
+      "errors": {
+        "invalidToken": "Invalid or expired invitation",
+        "passwordTooShort": "Password must have at least 6 characters",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "tokenExpired": "Invitation expired",
+        "inviteAlreadyUsed": "Invitation already used",
+        "serverError": "Internal server error"
+      }
     }
   },
   "logs": {

@@ -184,4 +184,13 @@ export function isWithinFeatureLimit(
 ): boolean {
   const limit = payload.features[feature]
   return limit === -1 || currentUsage < limit // -1 = unlimited
+}
+
+/**
+ * Gera token seguro para convites/reset de senha
+ * @returns Token seguro de 32 caracteres
+ */
+export function generateSecureToken(): string {
+  const crypto = require('crypto')
+  return crypto.randomBytes(32).toString('hex')
 } 

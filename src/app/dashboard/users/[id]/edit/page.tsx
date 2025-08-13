@@ -129,7 +129,7 @@ export default function EditUserPage() {
               required
             >
               <option value={UserRole.MEMBER}>{t('users.roles.MEMBER')}</option>
-              <option value={UserRole.ADMIN}>{t('users.roles.ADMIN')}</)}</option>
+              <option value={UserRole.ADMIN}>{t('users.roles.ADMIN')}</option>
               <option value={UserRole.VIEWER}>{t('users.roles.VIEWER')}</option>
             </select>
           </div>

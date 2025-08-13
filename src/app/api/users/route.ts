@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db'
 import { withTenantIsolation } from '@/lib/middleware/tenant'
 import { requirePermission } from '@/lib/middleware/authorization'
 import { UserRole } from '@/lib/auth/roles'
+import { generateSecureToken } from '@/lib/auth/jwt'
+import { emailService } from '@/lib/email/service'
 
 // GET /api/users - Lista usuários da organização do usuário autenticado
 export const GET = withTenantIsolation(async (req, context) => {
@@ -114,28 +116,92 @@ export const POST = withTenantIsolation(async (req, context) => {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
-    // Criar usuário (sem senha - será convidado por email)
-    const user = await prisma.user.create({
-      data: {
-        email,
-        name,
-        role: role as UserRole,
-        organizationId: context.organizationId,
-        isActive: true
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-        createdAt: true
-      }
+    // Gerar token de convite
+    const inviteToken = generateSecureToken();
+    const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72 horas
+
+    // Transação para criar usuário e convite
+    const result = await prisma.$transaction(async (tx) => {
+      // Criar usuário (sem senha - será definida via convite)
+      const user = await tx.user.create({
+        data: {
+          email,
+          name,
+          role: role as UserRole,
+          organizationId: context.organizationId,
+          isActive: true
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          createdAt: true
+        }
+      });
+
+      // Criar convite
+      const invite = await tx.invite.create({
+        data: {
+          email,
+          role: role as UserRole,
+          token: inviteToken,
+          expiresAt,
+          organizationId: context.organizationId,
+          createdById: context.userId,
+          metadata: {
+            userId: user.id,
+            isNewUser: true
+          }
+        }
+      });
+
+      return { user, invite };
     });
 
-    // TODO: Enviar email de convite com link para definir senha
+    // Buscar dados para o email
+    const [inviterUser, organization] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: context.userId },
+        select: { name: true }
+      }),
+      prisma.organization.findUnique({
+        where: { id: context.organizationId },
+        select: { name: true }
+      })
+    ]);
 
-    return NextResponse.json({ user }, { status: 201 });
+    if (!inviterUser || !organization) {
+      return NextResponse.json({ error: 'Dados não encontrados' }, { status: 500 });
+    }
+
+    // Enviar email de convite
+    if (emailService.isConfigured()) {
+      const emailResult = await emailService.sendInviteEmail(
+        email,
+        name,
+        inviteToken,
+        organization.name,
+        inviterUser.name
+      );
+
+      if (!emailResult.success) {
+        console.error('Erro ao enviar email de convite:', emailResult.error);
+        // Não falha a operação, apenas loga o erro
+      }
+    } else {
+      console.warn('Email não configurado. Convite criado mas email não enviado.');
+    }
+
+    return NextResponse.json({ 
+      user: result.user,
+      invite: {
+        token: result.invite.token,
+        expiresAt: result.invite.expiresAt,
+        status: result.invite.status
+      }
+    }, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar usuário:', error);
     return NextResponse.json({ error: 'Erro ao criar usuário', details: String(error) }, { status: 500 });

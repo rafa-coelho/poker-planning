@@ -18,18 +18,67 @@ export const GET = withTenantIsolation(async (req, context) => {
 
     const skip = (page - 1) * limit;
 
-    // Construir filtros
-    const where: any = { organizationId: context.organizationId };
+    // Buscar dados do usuário para verificar role
+    const currentUser = await prisma.user.findUnique({
+      where: { id: context.userId },
+      select: { role: true }
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    }
+
+    // Construir filtros baseados no role
+    const where: any = { 
+      organizationId: context.organizationId,
+      AND: [] // Array para combinar múltiplas condições
+    };
+    
+    // Se o usuário é MEMBER ou VIEWER, mostrar apenas projetos onde é membro direto OU membro de um time associado
+    if (currentUser.role === 'MEMBER' || currentUser.role === 'VIEWER') {
+      where.AND.push({
+        OR: [
+          // Membro direto do projeto
+          {
+            members: {
+              some: {
+                userId: context.userId
+              }
+            }
+          },
+          // Membro de um time associado ao projeto
+          {
+            teams: {
+              some: {
+                members: {
+                  some: {
+                    userId: context.userId
+                  }
+                }
+              }
+            }
+          }
+        ]
+      });
+    }
+    // ADMIN e SUPER_ADMIN podem ver todos os projetos da organização
     
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } }
-      ];
+      where.AND.push({
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } }
+        ]
+      });
     }
     
     if (isActive !== null) {
       where.isActive = isActive === 'true';
+    }
+
+    // Limpar array AND se estiver vazio
+    if (where.AND.length === 0) {
+      delete where.AND;
     }
 
     // Buscar projetos com paginação
@@ -54,12 +103,23 @@ export const GET = withTenantIsolation(async (req, context) => {
               email: true
             }
           },
+          // Incluir membros diretos e teams para calcular total de membros
+          members: {
+            select: { userId: true }
+          },
+          teams: {
+            select: {
+              members: {
+                select: { userId: true }
+              }
+            }
+          },
           _count: {
             select: {
-              members: true,
               sessions: true
             }
-          }
+          },
+
         }
       }),
       prisma.project.count({ where })
@@ -67,8 +127,36 @@ export const GET = withTenantIsolation(async (req, context) => {
 
     const pages = Math.ceil(total / limit);
 
+    // Processar projetos para calcular total de membros únicos (diretos + via teams)
+    const processedProjects = projects.map(project => {
+      const directMembers = new Set(project.members.map(m => m.userId));
+      const teamMembers = new Set();
+      
+      project.teams.forEach(team => {
+        team.members.forEach(member => {
+          teamMembers.add(member.userId);
+        });
+      });
+      
+      // Combinar membros diretos e via teams (únicos)
+      const allMembers = new Set([...directMembers, ...teamMembers]);
+      
+      return {
+        ...project,
+        _count: {
+          ...project._count,
+          members: allMembers.size // Total de membros únicos
+        },
+        // Para MEMBERs e VIEWERs, manter apenas seus próprios dados de membro
+        members: currentUser.role === 'MEMBER' || currentUser.role === 'VIEWER' 
+          ? project.members.filter(m => m.userId === context.userId)
+          : undefined,
+        teams: undefined
+      };
+    });
+
     return NextResponse.json({ 
-      projects,
+      projects: processedProjects,
       pagination: {
         page,
         limit,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { JWTPayload } from '@/types/auth'
 import { APP_CONFIG } from '@/lib/config'
+import { ensureSystemHealth } from '@/lib/utils/healthCheck'
 
 export interface TenantContext {
   organizationId: string
@@ -19,6 +20,16 @@ export function withTenantIsolation(
 ) {
   return async (req: NextRequest) => {
     try {
+      // Verificação de saúde do sistema antes de processar
+      const healthCheck = await ensureSystemHealth()
+      if (!healthCheck.isHealthy) {
+        console.error('System health check failed:', healthCheck.error)
+        return NextResponse.json(
+          { error: { code: 'SYSTEM_UNHEALTHY', message: 'Sistema temporariamente indisponível. Tente novamente.' } },
+          { status: 503 }
+        )
+      }
+
       // Extrair token do header Authorization
       const authHeader = req.headers.get('authorization')
       if (!authHeader) {
@@ -38,22 +49,53 @@ export function withTenantIsolation(
 
       // Verificar token e extrair dados do usuário
       const jwt = require('jsonwebtoken')
+      
+      if (!APP_CONFIG.JWT_SECRET) {
+        console.error('JWT_SECRET não configurado')
+        return NextResponse.json(
+          { error: { code: 'SERVER_MISCONFIGURATION', message: 'Configuração do servidor incorreta' } },
+          { status: 500 }
+        )
+      }
+      
       const decoded = jwt.verify(token, APP_CONFIG.JWT_SECRET) as JWTPayload
 
-      if (!decoded.organizationId) {
+      // Validações mais rigorosas do token
+      if (!decoded || typeof decoded !== 'object') {
         return NextResponse.json(
-          { error: { code: 'INVALID_TENANT', message: 'Organização não encontrada no token' } },
+          { error: { code: 'INVALID_TOKEN_PAYLOAD', message: 'Conteúdo do token inválido' } },
+          { status: 401 }
+        )
+      }
+
+      if (!decoded.organizationId || !decoded.userId) {
+        console.error('Token missing required fields:', {
+          hasOrganizationId: !!decoded.organizationId,
+          hasUserId: !!decoded.userId
+        })
+        return NextResponse.json(
+          { error: { code: 'INVALID_TENANT', message: 'Token não contém informações de organização ou usuário' } },
           { status: 400 }
         )
       }
 
       // Verificar se a organização existe e está ativa
-      const organization = await prisma.organization.findUnique({
-        where: { id: decoded.organizationId },
-        select: { id: true, slug: true, isActive: true }
-      })
+      let organization
+      try {
+        organization = await prisma.organization.findUnique({
+          where: { id: decoded.organizationId },
+          select: { id: true, slug: true, isActive: true }
+        })
+      } catch (dbError) {
+        console.error('Database error fetching organization:', dbError)
+        return NextResponse.json(
+          { error: { code: 'DATABASE_ERROR', message: 'Erro temporário de conexão. Tente novamente.' } },
+          { status: 503 }
+        )
+      }
 
       if (!organization) {
+        console.error('Organization not found:', { organizationId: decoded.organizationId })
         return NextResponse.json(
           { error: { code: 'ORGANIZATION_NOT_FOUND', message: 'Organização não encontrada' } },
           { status: 404 }
@@ -61,6 +103,7 @@ export function withTenantIsolation(
       }
 
       if (!organization.isActive) {
+        console.error('Organization inactive:', { organizationId: decoded.organizationId })
         return NextResponse.json(
           { error: { code: 'ORGANIZATION_INACTIVE', message: 'Organização inativa' } },
           { status: 403 }
@@ -68,18 +111,31 @@ export function withTenantIsolation(
       }
 
       // Verificar se o usuário pertence à organização
-      const user = await prisma.user.findFirst({
-        where: {
-          id: decoded.userId,
-          organizationId: decoded.organizationId,
-          isActive: true
-        },
-        select: { id: true, role: true }
-      })
+      let user
+      try {
+        user = await prisma.user.findFirst({
+          where: {
+            id: decoded.userId,
+            organizationId: decoded.organizationId,
+            isActive: true
+          },
+          select: { id: true, role: true }
+        })
+      } catch (dbError) {
+        console.error('Database error fetching user:', dbError)
+        return NextResponse.json(
+          { error: { code: 'DATABASE_ERROR', message: 'Erro temporário de conexão. Tente novamente.' } },
+          { status: 503 }
+        )
+      }
 
       if (!user) {
+        console.error('User not found in organization:', { 
+          userId: decoded.userId, 
+          organizationId: decoded.organizationId 
+        })
         return NextResponse.json(
-          { error: { code: 'USER_NOT_IN_ORGANIZATION', message: 'Usuário não pertence à organização' } },
+          { error: { code: 'USER_NOT_IN_ORGANIZATION', message: 'Usuário não pertence à organização ou está inativo' } },
           { status: 403 }
         )
       }
@@ -94,6 +150,39 @@ export function withTenantIsolation(
       return handler(req, context)
     } catch (error) {
       console.error('Tenant isolation error:', error)
+      
+      // Se for erro de JWT, retornar erro específico
+      if (error instanceof Error) {
+        if (error.name === 'JsonWebTokenError') {
+          return NextResponse.json(
+            { error: { code: 'INVALID_TOKEN', message: 'Token inválido ou corrompido' } },
+            { status: 401 }
+          )
+        }
+        
+        if (error.name === 'TokenExpiredError') {
+          return NextResponse.json(
+            { error: { code: 'TOKEN_EXPIRED', message: 'Token expirado' } },
+            { status: 401 }
+          )
+        }
+        
+        if (error.message?.includes('Database')) {
+          console.error('Database error in tenant isolation:', error)
+          return NextResponse.json(
+            { error: { code: 'DATABASE_ERROR', message: 'Erro temporário de conexão. Tente novamente.' } },
+            { status: 503 }
+          )
+        }
+      }
+      
+      // Log detalhado para debugging
+      console.error('Unexpected tenant isolation error:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString()
+      })
+      
       return NextResponse.json(
         { error: { code: 'TENANT_ISOLATION_ERROR', message: 'Erro no isolamento de tenant' } },
         { status: 500 }

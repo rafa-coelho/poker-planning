@@ -34,11 +34,13 @@ export const GET = withTenantIsolation(async (req, context) => {
             email: true
           }
         },
+        // Buscar membros diretos e via teams para cálculo correto
         members: {
           select: {
             id: true,
             role: true,
             joinedAt: true,
+            userId: true,
             user: {
               select: {
                 id: true,
@@ -49,9 +51,31 @@ export const GET = withTenantIsolation(async (req, context) => {
             }
           }
         },
+        teams: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            members: {
+              select: {
+                id: true,
+                role: true,
+                joinedAt: true,
+                userId: true,
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    avatar: true
+                  }
+                }
+              }
+            }
+          }
+        },
         _count: {
           select: {
-            members: true,
             sessions: true
           }
         }
@@ -62,7 +86,41 @@ export const GET = withTenantIsolation(async (req, context) => {
       return NextResponse.json({ error: 'Projeto não encontrado' }, { status: 404 });
     }
 
-    return NextResponse.json({ project });
+    // Processar para calcular total de membros únicos (diretos + via teams)
+    const directMembers = new Set(project.members.map(m => m.userId));
+    const teamMembers = new Set();
+    const allMembersData = [...project.members];
+    
+    project.teams.forEach(team => {
+      team.members.forEach(member => {
+        teamMembers.add(member.userId);
+        // Adicionar dados do membro do time se não for membro direto
+        if (!directMembers.has(member.userId)) {
+          allMembersData.push({
+            id: member.id,
+            role: 'MEMBER' as any, // Role padrão para membros via team
+            joinedAt: member.joinedAt,
+            userId: member.userId,
+            user: member.user
+          });
+        }
+      });
+    });
+    
+    // Combinar membros diretos e via teams (únicos)
+    const allMembers = new Set([...directMembers, ...teamMembers]);
+    
+    const processedProject = {
+      ...project,
+      _count: {
+        ...project._count,
+        members: allMembers.size // Total de membros únicos
+      },
+      members: allMembersData, // Todos os membros com informação da fonte
+      teams: project.teams // Manter teams para exibição
+    };
+
+    return NextResponse.json({ project: processedProject });
   } catch (error) {
     console.error('Erro ao buscar projeto:', error);
     return NextResponse.json({ error: 'Erro ao buscar projeto', details: String(error) }, { status: 500 });

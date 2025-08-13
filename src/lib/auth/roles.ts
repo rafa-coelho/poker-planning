@@ -32,7 +32,7 @@ export const PERMISSIONS = {
   'users:change_role': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
 
   // Gestão de Times
-  'teams:read': [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MEMBER],
+  'teams:read': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   'teams:create': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   'teams:update': [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   'teams:delete': [UserRole.SUPER_ADMIN, UserRole.ADMIN],

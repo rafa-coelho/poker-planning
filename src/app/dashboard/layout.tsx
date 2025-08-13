@@ -9,6 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { APP_CONFIG } from '@/lib/config';
 import { useBreadcrumbs } from '@/lib/context/breadcrumbContext';
+import { Toaster } from 'react-hot-toast';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -22,14 +23,32 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false); // Fechado por padrão
   const { customBreadcrumbs } = useBreadcrumbs();
 
-  const navigation = [
-    { name: t('navigation.dashboard'), href: '/dashboard', icon: 'home' },
-    { name: t('navigation.sessions'), href: '/dashboard/sessions', icon: 'sessions' },
-    { name: t('navigation.users'), href: '/dashboard/users', icon: 'users' },
-    { name: t('navigation.teams'), href: '/dashboard/teams', icon: 'teams' },
-    { name: t('navigation.projects'), href: '/dashboard/projects', icon: 'projects' },
-    { name: t('navigation.reports'), href: '/dashboard/reports', icon: 'reports' },
-  ];
+  // Navegação condicional baseada no role do usuário
+  const getNavigation = () => {
+    const baseNavigation = [
+      { name: t('navigation.dashboard'), href: '/dashboard', icon: 'home' },
+      { name: t('navigation.sessions'), href: '/dashboard/sessions', icon: 'sessions' },
+    ];
+
+    // Adicionar itens baseados no role
+    if (user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN') {
+      baseNavigation.push(
+        { name: t('navigation.users'), href: '/dashboard/users', icon: 'users' },
+        { name: t('navigation.teams'), href: '/dashboard/teams', icon: 'teams' },
+        { name: t('navigation.projects'), href: '/dashboard/projects', icon: 'projects' },
+        { name: t('navigation.reports'), href: '/dashboard/reports', icon: 'reports' }
+      );
+    } else if (user?.role === 'MEMBER' || user?.role === 'VIEWER') {
+      // MEMBERs e VIEWERs só veem projetos (não times)
+      baseNavigation.push(
+        { name: t('navigation.projects'), href: '/dashboard/projects', icon: 'projects' }
+      );
+    }
+
+    return baseNavigation;
+  };
+
+  const navigation = getNavigation();
 
   const getBreadcrumbs = () => {
     // Se há breadcrumbs customizados, use-os
@@ -110,6 +129,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
+        {/* Toast notifications */}
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+          gutter={8}
+          containerClassName=""
+          containerStyle={{}}
+          toastOptions={{
+            // Define configurações globais dos toasts
+            className: '',
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            // Configurações específicas por tipo
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            },
+          }}
+        />
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div 

@@ -171,10 +171,63 @@ class ApiService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      const errorCode = errorData.error?.code || 'API_ERROR';
+      
+      // Tratamento especial para erros críticos de tenant
+      if (response.status === 503 && errorCode === 'DATABASE_ERROR') {
+        return {
+          success: false,
+          error: {
+            code: errorCode,
+            message: 'Erro temporário de conexão. Recarregue a página em alguns segundos.',
+            timestamp: new Date().toISOString()
+          }
+        };
+      }
+      
+      if (response.status === 403 && errorCode === 'USER_NOT_IN_ORGANIZATION') {
+        // Logout automaticamente se o usuário não pertence mais à organização
+        this.onAuthFailure?.();
+        return {
+          success: false,
+          error: {
+            code: errorCode,
+            message: 'Sua conta foi removida desta organização. Faça login novamente.',
+            timestamp: new Date().toISOString()
+          }
+        };
+      }
+      
+      if (response.status === 404 && errorCode === 'ORGANIZATION_NOT_FOUND') {
+        // Logout automaticamente se a organização não existe mais
+        this.onAuthFailure?.();
+        return {
+          success: false,
+          error: {
+            code: errorCode,
+            message: 'Esta organização não existe mais. Faça login novamente.',
+            timestamp: new Date().toISOString()
+          }
+        };
+      }
+      
+      if (response.status === 403 && errorCode === 'ORGANIZATION_INACTIVE') {
+        // Logout automaticamente se a organização foi desativada
+        this.onAuthFailure?.();
+        return {
+          success: false,
+          error: {
+            code: errorCode,
+            message: 'Esta organização foi desativada. Entre em contato com o administrador.',
+            timestamp: new Date().toISOString()
+          }
+        };
+      }
+      
       return {
         success: false,
         error: {
-          code: errorData.error?.code || 'API_ERROR',
+          code: errorCode,
           message: errorData.error?.message || i18next.t('api.errors.generic', { status: response.status, statusText: response.statusText }),
           timestamp: new Date().toISOString()
         }

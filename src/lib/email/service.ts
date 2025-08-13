@@ -187,6 +187,123 @@ Este email foi enviado automaticamente. Não responda a este email.
   }
 
   /**
+   * Envia email de convite para definir senha
+   */
+  async sendInviteEmail(
+    email: string, 
+    userName: string, 
+    inviteToken: string, 
+    organizationName: string,
+    inviterName: string
+  ): Promise<{ success: boolean; error?: string }> {
+    const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${inviteToken}&type=invite`;
+    
+    const template: EmailTemplate = {
+      subject: `Convite para ${organizationName} - Poker Planning 🃏`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Convite para ${organizationName}</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #3b82f6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+            .highlight { background: #ecfdf5; border: 1px solid #10b981; padding: 15px; border-radius: 6px; margin: 20px 0; }
+            .warning { background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🃏 Poker Planning</h1>
+              <p>Você foi convidado!</p>
+            </div>
+            <div class="content">
+              <h2>Olá, ${userName}! 👋</h2>
+              <p><strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong> no Poker Planning.</p>
+              
+              <div class="highlight">
+                <h3>🎯 O que é o Poker Planning?</h3>
+                <p>Uma ferramenta colaborativa para estimativa ágil de projetos usando cartas do planning poker. Ajude sua equipe a estimar tarefas de forma mais precisa e consensual.</p>
+              </div>
+              
+              <p><strong>Para aceitar o convite e definir sua senha:</strong></p>
+              
+              <div style="text-align: center;">
+                <a href="${inviteUrl}" class="button">Aceitar Convite e Definir Senha</a>
+              </div>
+              
+              <div class="warning">
+                <strong>⚠️ Importante:</strong>
+                <ul>
+                  <li>Este convite expira em 72 horas</li>
+                  <li>Você precisará criar uma senha para acessar sua conta</li>
+                  <li>Não compartilhe este link com outras pessoas</li>
+                </ul>
+              </div>
+              
+              <p><strong>Após criar sua conta, você poderá:</strong></p>
+              <ul>
+                <li>📊 Participar de sessões de estimativa</li>
+                <li>👥 Colaborar com sua equipe em tempo real</li>
+                <li>📈 Visualizar histórico de estimativas</li>
+                <li>⚡ Usar diferentes tipos de cartas (Fibonacci, T-shirt, etc.)</li>
+              </ul>
+              
+              <p>Se o botão não funcionar, copie e cole este link no seu navegador:</p>
+              <p style="word-break: break-all; color: #6b7280; font-size: 12px;">${inviteUrl}</p>
+            </div>
+            <div class="footer">
+              <p>Este email foi enviado automaticamente. Não responda a este email.</p>
+              <p>© 2024 Poker Planning. Todos os direitos reservados.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+Convite para ${organizationName} - Poker Planning 🃏
+
+Olá, ${userName}! 👋
+
+${inviterName} convidou você para fazer parte da organização ${organizationName} no Poker Planning.
+
+🎯 O que é o Poker Planning?
+Uma ferramenta colaborativa para estimativa ágil de projetos usando cartas do planning poker. Ajude sua equipe a estimar tarefas de forma mais precisa e consensual.
+
+Para aceitar o convite e definir sua senha, acesse:
+${inviteUrl}
+
+⚠️ IMPORTANTE:
+- Este convite expira em 72 horas
+- Você precisará criar uma senha para acessar sua conta
+- Não compartilhe este link com outras pessoas
+
+Após criar sua conta, você poderá:
+📊 Participar de sessões de estimativa
+👥 Colaborar com sua equipe em tempo real
+📈 Visualizar histórico de estimativas
+⚡ Usar diferentes tipos de cartas (Fibonacci, T-shirt, etc.)
+
+Se o link não funcionar, copie e cole no seu navegador:
+${inviteUrl}
+
+Este email foi enviado automaticamente. Não responda a este email.
+
+© 2024 Poker Planning. Todos os direitos reservados.
+      `,
+    };
+
+    return this.sendEmail({ to: email, template });
+  }
+
+  /**
    * Envia email de boas-vindas
    */
   async sendWelcomeEmail(email: string, userName: string): Promise<{ success: boolean; error?: string }> {

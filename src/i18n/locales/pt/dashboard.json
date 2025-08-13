@@ -456,6 +456,7 @@
       "view": "Ver",
       "addToTeam": "Adicionar ao Time",
       "resetPassword": "Resetar Senha",
+      "resettingPassword": "Resetando...",
       "deactivate": "Desativar",
       "confirmDeactivate": "Tem certeza que deseja desativar este usuário?",
       "confirmActivate": "Tem certeza que deseja ativar este usuário?"
@@ -487,7 +488,8 @@
       }
     },
     "messages": {
-      "passwordResetSent": "Email de reset de senha enviado com sucesso"
+      "passwordResetSent": "Email de reset de senha enviado para {{name}} com sucesso",
+      "passwordResetSentSelf": "Email de reset de senha enviado para o seu email com sucesso"
     },
     "resetPassword": {
       "confirmSelf": "Você receberá um email com instruções para resetar sua senha.",
@@ -495,7 +497,13 @@
     },
     "errors": {
       "loadUser": "Erro ao carregar usuário",
-      "notFound": "Usuário não encontrado"
+      "notFound": "Usuário não encontrado",
+      "passwordResetFailed": "Erro ao enviar email de reset de senha. Tente novamente.",
+      "emailServiceNotConfigured": "Serviço de email não está configurado no servidor. Contate o administrador.",
+      "userNotFound": "Usuário não encontrado nesta organização.",
+      "resetTokenAlreadyExists": "Já existe um link de recuperação válido. Aguarde alguns minutos antes de tentar novamente.",
+      "emailSendFailed": "Erro ao enviar email. Verifique se o endereço de email está correto.",
+      "networkError": "Erro de conexão. Verifique sua internet e tente novamente."
     }
   }
 }

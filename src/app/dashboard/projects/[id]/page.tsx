@@ -42,10 +42,11 @@ export default function ProjectDetailsPage() {
   const { t } = useTranslation('dashboard');
   const params = useParams();
   const router = useRouter();
-  const { apiService } = useAuth();
+  const { apiService, user } = useAuth();
   const { setBreadcrumbs } = useBreadcrumbs();
 
   const projectId = params.id as string;
+  const canManageProject = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
 
   const [project, setProject] = useState<Project | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -228,8 +229,10 @@ export default function ProjectDetailsPage() {
           variant: 'primary'
         }}
         menuActions={[
-          { label: t('projects.actions.manageTeams') || 'Gerenciar Times', onClick: () => setShowManageTeams(true) },
-          { label: t('projects.edit'), onClick: () => setShowEditModal(true) },
+          ...(canManageProject ? [
+            { label: t('projects.actions.manageTeams') || 'Gerenciar Times', onClick: () => setShowManageTeams(true) },
+            { label: t('projects.edit'), onClick: () => setShowEditModal(true) }
+          ] : []),
           { label: t('quickActions.backToList'), onClick: () => router.push('/dashboard/projects') }
         ]}
       />
@@ -367,11 +370,13 @@ export default function ProjectDetailsPage() {
                             {team.description && <p className="text-sm text-gray-500">{team.description}</p>}
                           </div>
                         </div>
-                        <div className="mt-3 flex justify-end">
-                          <button onClick={() => handleRemoveTeam(team.id)} className="text-red-600 hover:text-red-800 text-sm font-medium">
-                            {t('projects.members.removeMember') || t('teams.projects.remove')}
-                          </button>
-                        </div>
+                        {canManageProject && (
+                          <div className="mt-3 flex justify-end">
+                            <button onClick={() => handleRemoveTeam(team.id)} className="text-red-600 hover:text-red-800 text-sm font-medium">
+                              {t('projects.members.removeMember') || t('teams.projects.remove')}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -455,9 +460,11 @@ export default function ProjectDetailsPage() {
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: team.color || '#3B82F6' }} />
                             <span className="text-sm text-gray-900">{team.name}</span>
                           </div>
-                          <button onClick={() => handleRemoveTeam(team.id)} className="text-red-600 hover:text-red-800 text-sm font-medium">
-                            {t('teams.projects.remove')}
-                          </button>
+                          {canManageProject && (
+                            <button onClick={() => handleRemoveTeam(team.id)} className="text-red-600 hover:text-red-800 text-sm font-medium">
+                              {t('teams.projects.remove')}
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>

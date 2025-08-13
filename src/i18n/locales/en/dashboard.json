@@ -85,6 +85,8 @@
       "delete": "Deactivate",
       "activate": "Activate",
       "view": "View",
+      "resetPassword": "Reset Password",
+      "resettingPassword": "Resetting...",
       "confirmDelete": "Are you sure you want to deactivate this user?",
       "confirmActivate": "Are you sure you want to activate this user?"
     },
@@ -104,13 +106,27 @@
       "cannotDeleteSelf": "You cannot deactivate your own account",
       "cannotChangeRole": "You don't have permission to change this user's role",
       "unknown": "Unknown error",
-      "notFound": "User not found"
+      "notFound": "User not found",
+      "passwordResetFailed": "Error sending password reset email. Please try again.",
+      "emailServiceNotConfigured": "Email service is not configured on the server. Please contact the administrator.",
+      "userNotFound": "User not found in this organization.",
+      "resetTokenAlreadyExists": "A recovery link already exists. Please wait a few minutes before trying again.",
+      "emailSendFailed": "Error sending email. Please check if the email address is correct.",
+      "networkError": "Connection error. Please check your internet and try again."
     },
     "success": {
       "created": "User created successfully",
       "updated": "User updated successfully",
       "deleted": "User deactivated successfully",
       "activated": "User activated successfully"
+    },
+    "messages": {
+      "passwordResetSent": "Password reset email sent to {{name}} successfully",
+      "passwordResetSentSelf": "Password reset email sent to your email successfully"
+    },
+    "resetPassword": {
+      "confirmSelf": "You will receive an email with instructions to reset your password.",
+      "confirmOther": "{{name}} will receive an email with instructions to reset their password."
     }
   },
   "teams": {

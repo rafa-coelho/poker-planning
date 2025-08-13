@@ -18,8 +18,28 @@ export const GET = withTenantIsolation(async (req, context) => {
 
     const skip = (page - 1) * limit;
 
-    // Construir filtros
+    // Buscar dados do usuário para verificar role
+    const currentUser = await prisma.user.findUnique({
+      where: { id: context.userId },
+      select: { role: true }
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    }
+
+    // Construir filtros baseados no role
     const where: any = { organizationId: context.organizationId };
+    
+    // Se o usuário é MEMBER ou VIEWER, mostrar apenas times onde é membro
+    if (currentUser.role === 'MEMBER' || currentUser.role === 'VIEWER') {
+      where.members = {
+        some: {
+          userId: context.userId
+        }
+      };
+    }
+    // ADMIN e SUPER_ADMIN podem ver todos os times da organização
     
     if (search) {
       where.OR = [
@@ -59,7 +79,17 @@ export const GET = withTenantIsolation(async (req, context) => {
               members: true,
               projects: true
             }
-          }
+          },
+          // Para MEMBERs e VIEWERs, incluir informação sobre seu papel no time
+          ...(currentUser.role === 'MEMBER' || currentUser.role === 'VIEWER' ? {
+            members: {
+              where: { userId: context.userId },
+              select: {
+                role: true,
+                joinedAt: true
+              }
+            }
+          } : {})
         }
       }),
       prisma.team.count({ where })

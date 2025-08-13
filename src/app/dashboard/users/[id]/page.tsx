@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useBreadcrumbs } from '@/lib/context/breadcrumbContext';
 import PageHeader from '@/components/PageHeader';
 import { UserRole } from '@/lib/auth/roles';
+import toast from 'react-hot-toast';
 
 interface User {
   id: string;
@@ -64,6 +65,7 @@ export default function UserDetailsPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string>('');
   const [selectedTeamRole, setSelectedTeamRole] = useState<'ADMIN' | 'MEMBER' | 'VIEWER'>('MEMBER');
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
 
   const userId = params.id as string;
   const isCurrentUser = currentUser?.id === userId;
@@ -185,15 +187,46 @@ export default function UserDetailsPage() {
   const handleResetPassword = async () => {
     if (!user || (!canManageUser && !isCurrentUser)) return;
 
+    setResetPasswordLoading(true);
+
     try {
       const response = await apiService.sendUserPasswordReset(userId);
       
       if (response.success) {
-        alert(t('users.messages.passwordResetSent'));
+        toast.success(
+          isCurrentUser 
+            ? t('users.messages.passwordResetSentSelf')
+            : t('users.messages.passwordResetSent', { name: user.name })
+        );
         setShowResetPasswordModal(false);
+      } else {
+        // Tratar erros específicos baseados no status HTTP
+        let errorMessage = t('users.errors.passwordResetFailed');
+        
+        if (response.error?.message) {
+          const apiError = response.error.message;
+          
+          // Mapear erros específicos para mensagens mais claras
+          if (apiError.includes('Serviço de email não configurado')) {
+            errorMessage = t('users.errors.emailServiceNotConfigured');
+          } else if (apiError.includes('Usuário não encontrado')) {
+            errorMessage = t('users.errors.userNotFound');
+          } else if (apiError.includes('Já existe um link de recuperação válido')) {
+            errorMessage = t('users.errors.resetTokenAlreadyExists');
+          } else if (apiError.includes('Erro ao enviar email')) {
+            errorMessage = t('users.errors.emailSendFailed');
+          } else {
+            errorMessage = apiError; // Usar a mensagem da API se for específica
+          }
+        }
+        
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error('Erro ao resetar senha:', error);
+      toast.error(t('users.errors.networkError'));
+    } finally {
+      setResetPasswordLoading(false);
     }
   };
 
@@ -272,21 +305,61 @@ export default function UserDetailsPage() {
         subtitle={user.email}
         iconText={user.name.charAt(0)}
         iconBg={user.avatar ? undefined : '#9CA3AF'}
-        badges={[
-          <span key="role" className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>,
-          <span key="status" className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(user.isActive)}`}>{getStatusLabel(user.isActive)}</span>,
-          ...(isCurrentUser ? [<span key="you" className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-blue-600 bg-blue-100">{t('users.labels.you')}</span>] : [])
-        ]}
         primaryAction={canManageUser ? { label: t('users.actions.addToTeam'), onClick: () => setShowAddToTeamModal(true), variant: 'primary' } : undefined}
         menuActions={[
-          ...(canManageUser || isCurrentUser ? [{ label: t('users.actions.resetPassword'), onClick: () => setShowResetPasswordModal(true) }] : []),
+          ...(canManageUser && !isCurrentUser ? [{ label: t('users.actions.edit'), onClick: () => router.push(`/dashboard/users/${userId}/edit`) }] : []),
+          ...(canManageUser || isCurrentUser ? [{ label: t('users.actions.resetPassword'), onClick: () => {
+            setShowResetPasswordModal(true);
+          }}] : []),
           ...(canManageUser && !isCurrentUser ? [{ label: user.isActive ? t('users.actions.deactivate') : t('users.actions.activate'), onClick: handleToggleStatus }] : []),
           { label: t('quickActions.backToList'), onClick: () => router.push('/dashboard/users') },
         ]}
       />
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* User Info & Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+        {/* Role Card */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div className="ml-5 w-0 flex-1">
+              <dl>
+                <dt className="text-sm font-medium text-gray-500 truncate">
+                  {t('users.form.role')}
+                </dt>
+                <dd className="text-lg font-medium text-gray-900">
+                  {getRoleLabel(user.role)}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Card */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-5 w-0 flex-1">
+              <dl>
+                <dt className="text-sm font-medium text-gray-500 truncate">
+                  Status
+                </dt>
+                <dd className="text-lg font-medium text-gray-900">
+                  {getStatusLabel(user.isActive)}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -607,30 +680,62 @@ export default function UserDetailsPage() {
 
       {/* Reset Password Modal */}
       {showResetPasswordModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {t('users.actions.resetPassword')}
-              </h3>
-              <p className="text-sm text-gray-500 mb-4">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="ml-3 text-lg font-medium text-gray-900">
+                  {t('users.actions.resetPassword')}
+                </h3>
+              </div>
+              {!resetPasswordLoading && (
+                <button
+                  onClick={() => setShowResetPasswordModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              <p className="text-sm text-gray-600 mb-6">
                 {isCurrentUser 
                   ? t('users.resetPassword.confirmSelf')
                   : t('users.resetPassword.confirmOther', { name: user.name })
                 }
               </p>
+
+              {/* Modal Actions */}
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowResetPasswordModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  disabled={resetPasswordLoading}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {t('quickActions.cancel')}
+                  {t('users.form.cancel')}
                 </button>
                 <button
                   onClick={handleResetPassword}
-                  className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                  disabled={resetPasswordLoading}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {t('users.actions.resetPassword')}
+                  {resetPasswordLoading && (
+                    <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  )}
+                  {resetPasswordLoading ? t('users.actions.resettingPassword') : t('users.actions.resetPassword')}
                 </button>
               </div>
             </div>
