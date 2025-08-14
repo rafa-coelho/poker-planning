@@ -513,6 +513,7 @@ io.on("connection", (socket) => {
     if (session) {
       session.currentTicketId = data.ticketId || null;
     }
+    // Emitir apenas o evento específico - não updateSession para evitar condição de corrida
     io.to(data.sessionId).emit("ticket_selected", { ticketId: data.ticketId });
   });
 

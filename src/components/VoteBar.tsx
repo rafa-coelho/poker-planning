@@ -14,7 +14,7 @@ export default function VoteBar({ cards, selectedCard, onSelectCard, disabled }:
   const { t } = useTranslation("common");
   return (
     <div className="w-full bg-white border-t py-2 flex flex-col items-center z-50">
-      <p className="text-gray-600 text-sm mb-1">{t("session.voteBar.chooseYourCard")}</p>
+      <p className="text-gray-600 text-sm mb-1">{t("chooseYourCard")}</p>
       <div className="flex space-x-2">
         {cards.map((card) => (
           <button

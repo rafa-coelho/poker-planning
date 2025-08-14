@@ -19,10 +19,12 @@ interface TicketManagerProps {
   onTicketSelect: (ticket: Ticket) => void;
   onOpenFinalEstimateModal?: (ticket: Ticket) => void;
   registerTicketUpdateCallback?: (callback: (ticket: Ticket) => void) => void;
+  emitTicketSelected?: (ticketId: string | null) => void;
   emitTicketCreated?: (ticket: Ticket) => void;
   emitTicketUpdated?: (ticket: Ticket) => void;
   emitTicketDeleted?: (ticketId: string) => void;
   reloadCurrentTicket?: () => Promise<void>;
+  selectTicketDirectly?: (ticketId: string | null) => void;
 }
 
 interface CreateTicketData {
@@ -38,10 +40,12 @@ export default function TicketManager({
   onTicketSelect,
   onOpenFinalEstimateModal,
   registerTicketUpdateCallback,
+  emitTicketSelected,
   emitTicketCreated,
   emitTicketUpdated,
   emitTicketDeleted,
   reloadCurrentTicket,
+  selectTicketDirectly,
 }: TicketManagerProps) {
   const { t } = useTranslation("common");
   const { apiService } = useAuth();
@@ -50,6 +54,12 @@ export default function TicketManager({
   const [showModal, setShowModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | null>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentTicketIdRef = useRef<string | null>(currentTicketId ?? null);
+
+  // Manter o currentTicketId mais recente disponível para handlers sem refazer efeitos
+  useEffect(() => {
+    currentTicketIdRef.current = currentTicketId ?? null;
+  }, [currentTicketId]);
 
   // Debounce para atualizações de tickets
   const debouncedUpdate = useCallback((updater: (prev: Ticket[]) => Ticket[]) => {
@@ -86,14 +96,18 @@ export default function TicketManager({
       debouncedUpdate(prev => prev.filter(t => t.id !== data.ticketId));
       
       // Se o ticket deletado era o selecionado, notificar o useSession
-      if (currentTicketId === data.ticketId) {
-        // Emitir evento para desselecionar o ticket
-        const socket = typeof window !== 'undefined' ? (window as any).socket : null;
-        if (socket) {
-          socket.emit("ticket_selected", { 
-            sessionId, 
-            ticketId: null 
-          });
+      if (currentTicketIdRef.current === data.ticketId) {
+        if (emitTicketSelected) {
+          emitTicketSelected(null);
+        } else {
+          // Fallback direto no socket
+          const socket = typeof window !== 'undefined' ? (window as any).socket : null;
+          if (socket) {
+            socket.emit("ticket_selected", { 
+              sessionId, 
+              ticketId: null 
+            });
+          }
         }
       }
     };
@@ -125,16 +139,9 @@ export default function TicketManager({
         });
       });
       
-      // Se o ticket atualizado era o selecionado, atualizar o currentTicket
-      if (currentTicketId === data.ticket.id) {
-        // Notificar o useSession sobre a atualização
-        const socket = typeof window !== 'undefined' ? (window as any).socket : null;
-        if (socket) {
-          socket.emit("ticket_updated", { 
-            sessionId, 
-            ticket: data.ticket 
-          });
-        }
+      // Se o ticket atualizado era o selecionado, recarregar currentTicket via prop
+      if (currentTicketIdRef.current === data.ticket.id && reloadCurrentTicket) {
+        reloadCurrentTicket();
       }
     };
 
@@ -177,6 +184,12 @@ export default function TicketManager({
       const socket = typeof window !== 'undefined' ? (window as any).socket : null;
       if (socket) {
         // Registrar listeners
+        socket.off('ticket_updated', handleTicketUpdate);
+        socket.off('ticket_deleted', handleTicketDelete);
+        socket.off('ticket_created', handleTicketCreate);
+        socket.off('final_estimate_set', handleFinalEstimateSet);
+        socket.off('ticket_selected', handleTicketSelected);
+
         socket.on('ticket_updated', handleTicketUpdate);
         socket.on('ticket_deleted', handleTicketDelete);
         socket.on('ticket_created', handleTicketCreate);
@@ -218,7 +231,7 @@ export default function TicketManager({
     }
     
     return cleanup;
-  }, [sessionId, currentTicketId]); // Removed debouncedUpdate from dependencies
+  }, [sessionId]); // Evitar refazer efeito ao alterar seleção para não gerar flicker
 
   // Cleanup do timeout quando componente desmontar
   useEffect(() => {
@@ -234,8 +247,14 @@ export default function TicketManager({
     // Se não for o criador, não permitir seleção
     if (!isCreator) return;
     
-    // Chamar o callback de seleção
-    onTicketSelect(ticket);
+    // Usar a função centralizada do hook se disponível
+    if (selectTicketDirectly) {
+      const isSameTicket = currentTicketId === ticket.id;
+      selectTicketDirectly(isSameTicket ? null : ticket.id);
+    } else {
+      // Fallback para o callback antigo
+      onTicketSelect(ticket);
+    }
   };
 
   const loadTickets = async () => {
@@ -344,14 +363,17 @@ export default function TicketManager({
         }
         
         // Se o ticket deletado era o selecionado, desselecionar
-        if (currentTicketId === ticketId) {
-          // Emitir evento para desselecionar o ticket
-          const socket = typeof window !== 'undefined' ? (window as any).socket : null;
-          if (socket) {
-            socket.emit("ticket_selected", { 
-              sessionId, 
-              ticketId: null 
-            });
+        if (currentTicketIdRef.current === ticketId) {
+          if (emitTicketSelected) {
+            emitTicketSelected(null);
+          } else {
+            const socket = typeof window !== 'undefined' ? (window as any).socket : null;
+            if (socket) {
+              socket.emit("ticket_selected", { 
+                sessionId, 
+                ticketId: null 
+              });
+            }
           }
         }
       }

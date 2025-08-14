@@ -227,15 +227,23 @@
       "confirm": "Confirmar Estimativa"
     },
     "buttons": {
-      "edit": "✏️ Editar ticket",
-      "delete": "🗑️ Excluir ticket",
-      "updateEstimate": "📊 Atualizar estimativa"
+      "edit": "Editar ticket",
+      "delete": "Excluir ticket",
+      "updateEstimate": "Atualizar estimativa"
     },
     "hints": {
       "selectToVote": "Clique para selecionar e votar",
       "waitingForCreator": "Aguardando seleção do criador",
       "estimated": "Ticket já estimado",
-      "voting": "Votação em andamento"
+      "voting": "Votação em andamento",
+      "selectedForVoting": "Selecionado para votação",
+      "pendingCreator": "Clique para iniciar votação",
+      "pendingParticipant": "Aguardando seleção do criador",
+      "votingCreator": "Votação em andamento",
+      "votingParticipant": "Vote agora!",
+      "estimatedCreator": "Estimado - clique para re-votar",
+      "estimatedParticipant": "Ticket já estimado",
+      "currentEstimated": "Re-votando ticket estimado"
     }
   },
   "session": {
@@ -249,7 +257,11 @@
     },
     "table": {
       "disabled": "Selecione um ticket para começar a votar",
-      "noTicketSelected": "Nenhum ticket selecionado"
+      "noTicketSelected": "Nenhum ticket selecionado",
+      "noTicketSelectedCreator": "Nenhum ticket selecionado",
+      "noTicketSelectedParticipant": "Aguardando seleção de ticket",
+      "selectTicketHintCreator": "Selecione um ticket para iniciar a votação",
+      "selectTicketHintParticipant": "O criador precisa selecionar um ticket primeiro"
     },
     "participantLeft": {
       "title": "Participante saiu",

@@ -227,15 +227,23 @@
       "confirm": "Confirm Estimate"
     },
     "buttons": {
-      "edit": "✏️ Edit ticket",
-      "delete": "🗑️ Delete ticket",
-      "updateEstimate": "📊 Update estimate"
+      "edit": "Edit ticket",
+      "delete": "Delete ticket",
+      "updateEstimate": "Update estimate"
     },
     "hints": {
       "selectToVote": "Click to select and vote",
       "waitingForCreator": "Waiting for creator selection",
       "estimated": "Ticket already estimated",
-      "voting": "Voting in progress"
+      "voting": "Voting in progress",
+      "selectedForVoting": "Selected for voting",
+      "pendingCreator": "Click to start voting",
+      "pendingParticipant": "Waiting for creator selection",
+      "votingCreator": "Voting in progress",
+      "votingParticipant": "Vote now!",
+      "estimatedCreator": "Estimated - click to re-vote",
+      "estimatedParticipant": "Ticket already estimated",
+      "currentEstimated": "Re-voting estimated ticket"
     }
   },
   "session": {
@@ -249,7 +257,11 @@
     },
     "table": {
       "disabled": "Select a ticket to start voting",
-      "noTicketSelected": "No ticket selected"
+      "noTicketSelected": "No ticket selected",
+      "noTicketSelectedCreator": "No ticket selected",
+      "noTicketSelectedParticipant": "Waiting for ticket selection",
+      "selectTicketHintCreator": "Select a ticket to start voting",
+      "selectTicketHintParticipant": "The creator needs to select a ticket first"
     },
     "participantLeft": {
       "title": "Participant left",

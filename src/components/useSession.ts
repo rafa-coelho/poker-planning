@@ -54,6 +54,10 @@ export function useSession () {
   const [participantNotification, setParticipantNotification] = useState<{ userName: string; type: 'left' | 'joined' } | null>(null);
 
   const socketRef = useRef<Socket | null>(null);
+  const isCreatorRef = useRef<boolean>(false);
+  const currentTicketRef = useRef<Ticket | null>(null);
+  const optimisticTicketIdRef = useRef<string | null>(null);
+  const lastSelectedTicketIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -149,12 +153,45 @@ export function useSession () {
     }
   };
 
+  // Carregamento protegido contra respostas fora de ordem vindas de seleção via WS
+  const loadTicketFromSelection = useCallback(async (ticketId: string) => {
+    lastSelectedTicketIdRef.current = ticketId;
+    try {
+      const response = await apiService.getTicket(ticketId);
+      if (response.success && response.data) {
+        // Garantir que esta resposta ainda é a mais recente
+        if (lastSelectedTicketIdRef.current !== ticketId) {
+          return;
+        }
+        const ticket = response.data as any;
+        setCurrentTicket(ticket);
+        if (ticket.status === "ESTIMATED") {
+          setAverageVote((ticket as any).averageVote || 0);
+        } else {
+          setAverageVote(null);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar ticket:', error);
+      // Ignorar erros transitórios
+    }
+  }, [apiService]);
+
   // Função para recarregar currentTicket quando necessário
   const reloadCurrentTicket = useCallback(async () => {
     if (currentTicket?.id) {
       await loadCurrentTicket(currentTicket.id);
     }
   }, [currentTicket?.id]);
+
+  // Manter refs sincronizadas
+  useEffect(() => {
+    isCreatorRef.current = isCreator;
+  }, [isCreator]);
+
+  useEffect(() => {
+    currentTicketRef.current = currentTicket;
+  }, [currentTicket]);
 
   /** 🔹 Inicializa a conexão com o WebSocket */
   function initializeSocketConnection(storedUserId: string, storedUserName: string, sessionName?: string): () => void {
@@ -186,6 +223,9 @@ export function useSession () {
         sessionName: sessionName || sessionData.sessionName || t("session.defaultName"),
         organizationId: authUser?.organizationId || null
       });
+
+      // 🎫 Registrar listeners de tickets APÓS conectar
+      setupTicketListeners(socket);
     });
 
     socket.on("heartbeat_ack", () => {
@@ -204,7 +244,6 @@ export function useSession () {
     socket.on("flip_cards", () => {
       startCountdownBeforeReveal();
     });
-    socket.on("ticket_update", handleTicketUpdate);
     socket.on("voting_started", handleVotingStarted);
     socket.on("voting_finished", handleVotingFinished);
     socket.on("participant_left", handleParticipantLeft);
@@ -213,6 +252,55 @@ export function useSession () {
       clearInterval(heartbeatInterval);
       socket.disconnect();
     };
+  }
+
+  /** 🔹 Configura listeners de tickets após conexão */
+  function setupTicketListeners(socket: Socket) {
+    // 🎫 Listeners para tickets usando refs para evitar closures obsoletas
+    const onTicketUpdated = (data: { ticket: Ticket }) => {
+      const current = currentTicketRef.current;
+      if (current && current.id === data.ticket.id) {
+        setCurrentTicket(data.ticket);
+      }
+    };
+
+    const onTicketSelected = (data: { ticketId: string | null }) => {
+      if (isCreatorRef.current) {
+        // CRIADOR: Ignorar eventos WS para manter controle local
+        // Apenas confirmar se foi nossa seleção otimista
+        if (data.ticketId && optimisticTicketIdRef.current === data.ticketId) {
+          optimisticTicketIdRef.current = null;
+        }
+        return;
+      }
+
+      // PARTICIPANTES: Sempre seguir o servidor
+      if (data.ticketId) {
+        loadTicketFromSelection(data.ticketId);
+      } else {
+        setCurrentTicket(null);
+        setAverageVote(null);
+        setShowFinalEstimateModal(false);
+        resetTable();
+        lastSelectedTicketIdRef.current = null;
+        optimisticTicketIdRef.current = null;
+      }
+    };
+
+    const onTicketDeleted = (data: { ticketId: string }) => {
+      const current = currentTicketRef.current;
+      if (current && current.id === data.ticketId) {
+        setCurrentTicket(null);
+        setAverageVote(null);
+        setShowFinalEstimateModal(false);
+        resetTable();
+      }
+    };
+
+    socket.on("ticket_updated", onTicketUpdated);
+    socket.on("ticket_selected", onTicketSelected);
+    socket.on("ticket_deleted", onTicketDeleted);
+    socket.on("ticket_created", () => {});
   }
 
   /** 🔹 Atualiza os dados da sessão */
@@ -234,14 +322,34 @@ export function useSession () {
       setSelectedCard(currentUser.selectedCard);
     }
     
-    // Se há um currentTicketId e não temos um currentTicket carregado, carregar
-    if (data.currentTicketId && !currentTicket) {
-      loadCurrentTicket(data.currentTicketId);
-    } else if (!data.currentTicketId && currentTicket) {
-      // Se não há currentTicketId mas temos um currentTicket, limpar
-      setCurrentTicket(null);
-      setAverageVote(null);
-      setShowFinalEstimateModal(false);
+    // Sincronização do ticket atual via session_update
+    // IMPORTANTE: Dar prioridade aos eventos específicos de ticket_selected
+    // session_update só deve sincronizar quando não há eventos específicos pendentes
+    
+    if (isCreatorRef.current) {
+      // Para o criador: apenas sincronizar na entrada inicial (sem seleção otimista)
+      // NUNCA sobrescrever quando há ações otimistas pendentes ou já tem qualquer ticket (mesmo null)
+      const hasLocalControl = optimisticTicketIdRef.current !== null || 
+                             lastSelectedTicketIdRef.current !== null || 
+                             currentTicketRef.current !== undefined; // undefined = nunca carregou, null = desselecionado
+      
+      if (!hasLocalControl && data.currentTicketId) {
+        loadTicketFromSelection(data.currentTicketId);
+      }
+      // ⚠️ CRIADOR: Ignorar completamente updates de session_update se já tem controle local
+    } else {
+      // Para participantes: sincronizar apenas se for primeira entrada e não conflitar com ticket_selected
+      if (!currentTicketRef.current && data.currentTicketId && lastSelectedTicketIdRef.current !== data.currentTicketId) {
+        loadTicketFromSelection(data.currentTicketId);
+      }
+      // ⚠️ Para participantes desseleção via session_update
+      else if (!data.currentTicketId && currentTicketRef.current) {
+        setCurrentTicket(null);
+        setAverageVote(null);
+        setShowFinalEstimateModal(false);
+        resetTable();
+        lastSelectedTicketIdRef.current = null;
+      }
     }
   }
 
@@ -347,38 +455,19 @@ export function useSession () {
 
   const handleTicketSelect = async (ticket: Ticket) => {
     // Só o criador pode selecionar tickets
-    if (!isCreator)
-       return;
+    if (!isCreator) return;
     
-    // Se clicar no mesmo ticket, desselecionar
-    if (currentTicket?.id === ticket.id) {
-      setCurrentTicket(null);
-      setAverageVote(null);
-      setShowFinalEstimateModal(false);
-      
-      // Resetar a mesa
-      resetTable();
-      
-      // Emitir evento para desselecionar para todos
-      socketRef.current?.emit("ticket_selected", { 
-        sessionId, 
-        ticketId: null,
-        organizationId: authUser?.organizationId || null
-      });
-      return; // IMPORTANTE: Retornar aqui para não executar o resto
+    // Verificar se é o mesmo ticket (desseleção)
+    const isSameTicket = currentTicket?.id === ticket.id;
+    
+    if (isSameTicket) {
+      // Desseleção - apenas desselecionar
+      selectTicketDirectly(null);
+      return;
     }
     
-    // Resetar a mesa antes de selecionar novo ticket
-    resetTable();
-    
-    setCurrentTicket(ticket);
-    
-    // Emitir evento para compartilhar seleção com todos
-    socketRef.current?.emit("ticket_selected", { 
-      sessionId, 
-      ticketId: ticket.id,
-      organizationId: authUser?.organizationId || null
-    });
+    // Seleção de novo ticket
+    selectTicketDirectly(ticket.id);
     
     // Se o ticket já foi estimado, mostrar resultados mas permitir re-votar
     if (ticket.status === "ESTIMATED") {
@@ -442,6 +531,13 @@ export function useSession () {
       // NÃO atualizar status automaticamente - apenas mostrar modal
       // O status só será mudado para ESTIMATED após confirmar no modal
       setShowFinalEstimateModal(true);
+      
+      // Emitir evento para informar que a votação foi finalizada
+      socketRef.current?.emit("voting_finished", { 
+        sessionId, 
+        ticketId: currentTicket.id,
+        averageVote: average
+      });
     } catch (error) {
       console.error(t("session.errors.finishVoting"), error);
     }
@@ -495,11 +591,7 @@ export function useSession () {
     }
   };
 
-  const handleTicketUpdate = (data: { ticket: Ticket }) => {
-    if (currentTicket?.id === data.ticket.id) {
-      setCurrentTicket(data.ticket);
-    }
-  };
+
 
   const handleVotingStarted = (data: { ticketId: string }) => {
     // Limpar votos anteriores quando nova votação inicia
@@ -592,66 +684,7 @@ export function useSession () {
     }
   }, [sessionData.participants, currentTicket, sessionData.isRevealed, autoFinishVoting]);
 
-  // 🔹 Listeners do WebSocket
-  useEffect(() => {
-    if (!socketRef.current) return;
 
-    const socket = socketRef.current;
-
-    // 🎫 Listeners para tickets
-    socket.on("ticket_updated", (data: { ticket: any }) => {
-      // Atualizar o currentTicket se for o mesmo
-      if (currentTicket && currentTicket.id === data.ticket.id) {
-        setCurrentTicket(data.ticket);
-      }
-    });
-
-    socket.on("ticket_selected", (data: { ticketId: string | null }) => {
-      // Atualizar ticket selecionado para todos os participantes
-      if (data.ticketId) {
-        // Carregar dados do ticket selecionado
-        loadCurrentTicket(data.ticketId);
-      } else {
-        // Ticket foi desselecionado - resetar a mesa
-        setCurrentTicket(null);
-        setAverageVote(null);
-        setShowFinalEstimateModal(false);
-        
-        // Resetar a mesa para todos os participantes
-        resetTable();
-      }
-    });
-
-    socket.on("ticket_deleted", (data: { ticketId: string }) => {
-      // Se o ticket deletado era o atual, limpar e resetar a mesa
-      if (currentTicket && currentTicket.id === data.ticketId) {
-        setCurrentTicket(null);
-        setAverageVote(null);
-        setShowFinalEstimateModal(false);
-        
-        // Resetar a mesa para todos os participantes
-        resetTable();
-      }
-    });
-
-    socket.on("ticket_created", (data: { ticket: any }) => {
-      // Não precisamos fazer nada aqui, o TicketManager vai recarregar
-    });
-
-    socket.on("ticket_updated", (data: { ticket: any }) => {
-      // Atualizar o currentTicket se for o mesmo
-      if (currentTicket && currentTicket.id === data.ticket.id) {
-        setCurrentTicket(data.ticket);
-      }
-    });
-
-    return () => {
-      socket.off("ticket_updated");
-      socket.off("ticket_selected");
-      socket.off("ticket_deleted");
-      socket.off("ticket_created");
-    };
-  }, [currentTicket]);
 
   // 🔹 Otimizar re-renders com useMemo para dados computados
   const votingCards = useMemo(() => {
@@ -697,17 +730,63 @@ export function useSession () {
   }, []);
 
   // 🔹 Métodos para emitir eventos de tickets
+  const emitTicketSelected = useCallback((ticketId: string | null) => {
+    socketRef.current?.emit("ticket_selected", { 
+      sessionId, 
+      ticketId,
+      organizationId: authUser?.organizationId || null
+    });
+  }, [sessionId, authUser?.organizationId]);
+
   const emitTicketCreated = useCallback((ticket: Ticket) => {
-    socketRef.current?.emit("ticket_created", { sessionId, ticket });
-  }, [sessionId]);
+    socketRef.current?.emit("ticket_created", { 
+      sessionId, 
+      ticket,
+      organizationId: authUser?.organizationId || null
+    });
+  }, [sessionId, authUser?.organizationId]);
 
   const emitTicketUpdated = useCallback((ticket: Ticket) => {
-    socketRef.current?.emit("ticket_updated", { sessionId, ticket });
-  }, [sessionId]);
+    socketRef.current?.emit("ticket_updated", { 
+      sessionId, 
+      ticket,
+      organizationId: authUser?.organizationId || null
+    });
+  }, [sessionId, authUser?.organizationId]);
 
   const emitTicketDeleted = useCallback((ticketId: string) => {
-    socketRef.current?.emit("ticket_deleted", { sessionId, ticketId });
-  }, [sessionId]);
+    socketRef.current?.emit("ticket_deleted", { 
+      sessionId, 
+      ticketId,
+      organizationId: authUser?.organizationId || null
+    });
+  }, [sessionId, authUser?.organizationId]);
+
+  // 🎫 Gerenciamento direto de tickets no hook (APENAS PARA CRIADOR)
+  const selectTicketDirectly = useCallback((ticketId: string | null) => {
+    if (!ticketId) {
+      // Desseleção - aplicar localmente primeiro
+      setCurrentTicket(null);
+      setAverageVote(null);
+      setShowFinalEstimateModal(false);
+      resetTable();
+      optimisticTicketIdRef.current = null;
+      lastSelectedTicketIdRef.current = null;
+      // ⚠️ CRÍTICO: Atualizar ref imediatamente para evitar recarregamento por updateSessionData
+      currentTicketRef.current = null;
+    } else {
+      // Seleção - aplicar localmente primeiro (carregamento direto)
+      loadTicketFromSelection(ticketId);
+      optimisticTicketIdRef.current = ticketId;
+    }
+    
+    // Emitir para todos os OUTROS (participantes)
+    socketRef.current?.emit("ticket_selected", { 
+      sessionId, 
+      ticketId,
+      organizationId: authUser?.organizationId || null
+    });
+  }, [sessionId, authUser?.organizationId, loadTicketFromSelection, resetTable]);
 
   /** 🔹 Obtém estatísticas de votação */
   function getVotingStats() {
@@ -753,11 +832,13 @@ export function useSession () {
     setFinalEstimate,
     handleOpenFinalEstimateModal,
     registerTicketUpdateCallback,
+    emitTicketSelected,
     emitTicketCreated,
     emitTicketUpdated,
     emitTicketDeleted,
     reloadCurrentTicket,
     getVotingStats,
     createSession,
+    selectTicketDirectly,
   };
 }

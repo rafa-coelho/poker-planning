@@ -47,11 +47,13 @@ export default function SessionPage() {
     setFinalEstimate,
     handleOpenFinalEstimateModal,
     registerTicketUpdateCallback,
+    emitTicketSelected,
     emitTicketCreated,
     emitTicketUpdated,
     emitTicketDeleted,
     reloadCurrentTicket,
     getVotingStats,
+    selectTicketDirectly,
   } = useSession();
 
   const finalParticipants = ensureLocalUser(sessionData.participants, user.userId, user.userName);
@@ -114,10 +116,12 @@ export default function SessionPage() {
               onTicketSelect={handleTicketSelect}
               onOpenFinalEstimateModal={handleOpenFinalEstimateModal}
               registerTicketUpdateCallback={registerTicketUpdateCallback}
+              emitTicketSelected={emitTicketSelected}
               emitTicketCreated={emitTicketCreated}
               emitTicketUpdated={emitTicketUpdated}
               emitTicketDeleted={emitTicketDeleted}
               reloadCurrentTicket={reloadCurrentTicket}
+              selectTicketDirectly={selectTicketDirectly}
             />
           )}
         </div>
