@@ -286,19 +286,6 @@ export default function TicketManager({
       if (response.success && response.data) {
         const newTicket = response.data as any;
         
-        // Atualizar estado local
-        setTickets(prev => {
-          const newTickets = [newTicket, ...prev];
-          // Ordenar após adição
-          return newTickets.sort((a: Ticket, b: Ticket) => {
-            if ((a.status === "ESTIMATED") === (b.status === "ESTIMATED")) {
-              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            }
-            return a.status === "ESTIMATED" ? 1 : -1;
-          });
-        });
-        
-        // Emitir evento WebSocket via useSession
         if (emitTicketCreated) {
           emitTicketCreated(newTicket);
         }
@@ -317,17 +304,8 @@ export default function TicketManager({
       if (response.success && response.data) {
         const updatedTicket = response.data as any;
         
-        // Atualizar estado local
-        setTickets(prev => {
-          const updatedTickets = prev.map(t => t.id === editingTicket.id ? updatedTicket : t);
-          // Ordenar após atualização
-          return updatedTickets.sort((a: Ticket, b: Ticket) => {
-            if ((a.status === "ESTIMATED") === (b.status === "ESTIMATED")) {
-              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            }
-            return a.status === "ESTIMATED" ? 1 : -1;
-          });
-        });
+        // NÃO atualizar estado local aqui - deixar o WebSocket fazer isso
+        // para evitar duplicação quando o evento ticket_updated chegar
         
         // Emitir evento WebSocket via useSession
         if (emitTicketUpdated) {
@@ -354,8 +332,8 @@ export default function TicketManager({
     try {
       const response = await apiService.deleteTicket(ticketId);
       if (response.success) {
-        // Atualizar estado local
-        setTickets(prev => prev.filter(t => t.id !== ticketId));
+        // NÃO atualizar estado local aqui - deixar o WebSocket fazer isso
+        // para evitar duplicação quando o evento ticket_deleted chegar
         
         // Emitir evento WebSocket via useSession
         if (emitTicketDeleted) {

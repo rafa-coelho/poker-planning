@@ -300,7 +300,6 @@ export function useSession () {
     socket.on("ticket_updated", onTicketUpdated);
     socket.on("ticket_selected", onTicketSelected);
     socket.on("ticket_deleted", onTicketDeleted);
-    socket.on("ticket_created", () => {});
   }
 
   /** 🔹 Atualiza os dados da sessão */

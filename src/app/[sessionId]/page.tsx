@@ -5,13 +5,12 @@ import "../../i18n/index";
 import { useTranslation } from "react-i18next";
 
 import HeaderBar from "../../components/HeaderBar";
-import LonelyCard from "../../components/LonelyCard";
 import VoteBar from "../../components/VoteBar";
 import InviteModal from "../../components/InviteModal";
 import TicketManager from "../../components/TicketManager";
-import CurrentTicketDisplay from "../../components/CurrentTicketDisplay";
 import FinalEstimateModal from "../../components/FinalEstimateModal";
 import ParticipantNotification from "../../components/ParticipantNotification";
+import MobileMenu from "../../components/MobileMenu";
 import { useSession } from "@/components/useSession";
 import Table from "@/components/Table";
 import { ensureLocalUser } from "@/components/utils";
@@ -19,6 +18,7 @@ import VoteSummary from "@/components/VoteSummary";
 
 export default function SessionPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
 
   const {
@@ -28,12 +28,10 @@ export default function SessionPage() {
     countdown,
     inviteLink,
     currentTicket,
-    isCreator,
     averageVote,
     showFinalEstimateModal,
     setShowFinalEstimateModal,
     votingCards,
-    isVotingInProgress,
     canVote,
     canManageTickets,
     participantNotification,
@@ -42,7 +40,6 @@ export default function SessionPage() {
     handleFlipCards,
     handleNewVoting,
     handleTicketSelect,
-    startVoting,
     finishVoting,
     setFinalEstimate,
     handleOpenFinalEstimateModal,
@@ -61,12 +58,23 @@ export default function SessionPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
-      <HeaderBar sessionData={sessionData} userName={user.userName} onInviteOpen={() => setInviteOpen(true)} />
+      <HeaderBar 
+        sessionData={sessionData} 
+        userName={user.userName} 
+        onInviteOpen={() => setInviteOpen(true)}
+        onToggleSidebar={() => setMobileMenuOpen(true)}
+      />
 
       {/* Notificação de participante */}
       <ParticipantNotification 
         notification={participantNotification}
         onClose={() => setParticipantNotification(null)}
+      />
+
+      {/* Menu Mobile */}
+      <MobileMenu 
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
       />
 
       <main className="flex-1 flex">
