@@ -50,6 +50,13 @@ export type SessionWithRelations = Session & {
     status: string
     finalEstimate: string | null
   }>
+  currentTicket?: {
+    id: string
+    title: string
+    status: string
+    finalEstimate: string | null
+    averageVote: string | number | null
+  } | null
   _count: {
     participants: number
     tickets: number
@@ -118,6 +125,15 @@ export class SessionService {
             finalEstimate: true,
           },
           orderBy: { createdAt: 'asc' }
+        },
+        currentTicket: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            finalEstimate: true,
+            averageVote: true,
+          }
         },
         _count: {
           select: {

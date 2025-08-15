@@ -1,6 +1,7 @@
 const express = require('express')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
+const PrismaService = require('./src/lib/services/prismaService')
 
 // Configuração simplificada para o servidor
 const APP_CONFIG = {
@@ -24,11 +25,16 @@ const io = new Server(server, {
   pingTimeout: 60000,
   pingInterval: 25000,
   maxHttpBufferSize: 1e6, // 1MB
+  // Configurações de reconexão
+  allowEIO3: true,
+  // Configurações de rate limiting
+  connectTimeout: 45000,
+  // Configurações de rooms
+  maxHttpBufferSize: 1e6,
 });
 
 // Estruturas de dados melhoradas
 const sessions = {};
-const pendingRemovals = {};
 const userConnections = new Map(); // userId -> socketId
 const rateLimitMap = new Map(); // socketId -> { count: number, resetTime: number }
 const heartbeatMap = new Map(); // socketId -> lastHeartbeat
@@ -50,7 +56,7 @@ function logEvent(event, socketId, data = {}) {
 function checkRateLimit(socketId) {
   const now = Date.now();
   const userRateLimit = rateLimitMap.get(socketId);
-  
+
   if (!userRateLimit || now > userRateLimit.resetTime) {
     rateLimitMap.set(socketId, {
       count: 1,
@@ -58,11 +64,11 @@ function checkRateLimit(socketId) {
     });
     return true;
   }
-  
+
   if (userRateLimit.count >= RATE_LIMIT_CONFIG.MAX_EVENTS_PER_MINUTE) {
     return false;
   }
-  
+
   userRateLimit.count++;
   return true;
 }
@@ -87,14 +93,36 @@ setInterval(() => {
       if (now - lastActivity > 3600000) { // 1 hora
         console.log(`🗑️ Removendo sessão inativa: ${sessionId}`);
         delete sessions[sessionId];
-        delete pendingRemovals[sessionId];
       }
     }
   }
 }, 300000); // Verificar a cada 5 minutos
 
+// Monitoramento de conexões ativas
+setInterval(() => {
+  const activeConnections = io.engine.clientsCount;
+  const activeSessions = Object.keys(sessions).length;
+  const totalParticipants = Object.values(sessions).reduce((sum, session) => sum + session.participants.length, 0);
+
+  console.log(`📊 Status do servidor: ${activeConnections} conexões, ${activeSessions} sessões, ${totalParticipants} participantes`);
+
+  // Log de sessões com problemas
+  for (const [sessionId, session] of Object.entries(sessions)) {
+    if (session.participants.length > 0) {
+      const activeParticipants = session.participants.filter(p => {
+        const socket = io.sockets.sockets.get(p.socketId);
+        return socket && socket.connected;
+      });
+
+      if (activeParticipants.length !== session.participants.length) {
+        console.log(`⚠️ Sessão ${sessionId}: ${activeParticipants.length}/${session.participants.length} participantes ativos`);
+      }
+    }
+  }
+}, 60000); // Verificar a cada 1 minuto
+
 // 🔹 Criar ou obter uma sessão
-function getOrCreateSession (sessionId, sessionName = "", organizationId = null) {
+function getOrCreateSession(sessionId, sessionName = "", organizationId = null) {
   if (!sessions[sessionId]) {
     sessions[sessionId] = {
       sessionId,
@@ -105,14 +133,12 @@ function getOrCreateSession (sessionId, sessionName = "", organizationId = null)
       lastActivity: Date.now(),
     };
   }
-  if (!pendingRemovals[sessionId]) {
-    pendingRemovals[sessionId] = new Set();
-  }
+
   return sessions[sessionId];
 }
 
 // 🔹 Adicionar participante a uma sessão
-function addParticipant (sessionId, userId, userName, socketId, organizationId = null) {
+function addParticipant(sessionId, userId, userName, socketId, organizationId = null) {
   const session = getOrCreateSession(sessionId, "", organizationId);
   const existing = session.participants.find((p) => p.userId === userId);
   if (!existing) {
@@ -125,7 +151,7 @@ function addParticipant (sessionId, userId, userName, socketId, organizationId =
 }
 
 // 🔹 Atualizar sessão para todos os participantes
-function updateSession (sessionId) {
+function updateSession(sessionId) {
   const session = sessions[sessionId];
   if (session) {
     session.lastActivity = Date.now();
@@ -139,34 +165,77 @@ function updateSession (sessionId) {
 // 🔹 Verificar isolamento por organização
 function validateOrganizationAccess(socket, sessionId, organizationId) {
   const session = sessions[sessionId];
-  
+
   // Se a sessão não tem organizationId definido, permitir acesso
   if (!session || !session.organizationId) {
     return true;
   }
-  
+
   // Se o organizationId é null/undefined (convidado público), permitir acesso
   if (!organizationId) {
     return true;
   }
-  
+
   // Se ambos têm organizationId, verificar se são iguais
   if (session.organizationId !== organizationId) {
     logEvent('UNAUTHORIZED_ACCESS', socket.id, { sessionId, organizationId });
     socket.emit('error', { message: 'Unauthorized access to session' });
     return false;
   }
-  
+
   return true;
+}
+
+// 🔹 Verificar se o socket está conectado e ativo
+function isSocketActive(socket) {
+  return socket && socket.connected && socket.lastActivity &&
+    (Date.now() - socket.lastActivity) < 120000; // 2 minutos
 }
 
 io.on("connection", (socket) => {
   logEvent('CONNECTION', socket.id);
 
+  // Armazenar informações da conexão
+  socket.connectedAt = Date.now();
+  socket.lastActivity = Date.now();
+
+  // Middleware para capturar erros não tratados
+  socket.onAny((eventName, ...args) => {
+    try {
+      socket.lastActivity = Date.now();
+    } catch (error) {
+      console.error('Erro no evento:', eventName, error);
+    }
+  });
+
   // Heartbeat
   socket.on('heartbeat', () => {
     heartbeatMap.set(socket.id, Date.now());
+    socket.lastActivity = Date.now();
     socket.emit('heartbeat_ack');
+  });
+
+  // Desconexão
+  socket.on('disconnect', (reason) => {
+    logEvent('DISCONNECT', socket.id, { reason });
+
+    // Limpar dados do usuário
+    if (socket.userId) {
+      userConnections.delete(socket.userId);
+    }
+
+    // Remover de rate limiting
+    rateLimitMap.delete(socket.id);
+
+    // Remover de heartbeat
+    heartbeatMap.delete(socket.id);
+
+    // Remover de todas as salas
+    socket.rooms.forEach(room => {
+      if (room !== socket.id) {
+        socket.leave(room);
+      }
+    });
   });
 
   // 🎲 Criar sala
@@ -190,31 +259,90 @@ io.on("connection", (socket) => {
 
     logEvent('JOIN_ROOM', socket.id, { sessionId, userId, userName, organizationId });
 
+    // Armazenar informações do usuário no socket
+    socket.userId = userId;
+    socket.sessionId = sessionId;
+    socket.organizationId = organizationId;
+
     // Validar acesso por organização
     if (!validateOrganizationAccess(socket, sessionId, organizationId)) {
       return;
     }
 
+    // Sair de outras salas se estiver em alguma
+    socket.rooms.forEach(room => {
+      if (room !== socket.id && room !== sessionId) {
+        socket.leave(room);
+      }
+    });
+
     socket.join(sessionId);
 
     // Inicializar sessão se não existir
     if (!sessions[sessionId]) {
-      // Por enquanto, usar valores padrão até implementar acesso direto ao banco
-      sessions[sessionId] = {
-        sessionId,
-        sessionName: sessionName || "Sessão Poker Planning",
-        organizationId,
-        participants: [],
-        isRevealed: false,
-        currentTicketId: null,
-        votingMode: votingMode,
-        lastActivity: Date.now()
-      };
+      // Carregar dados do banco de dados
+      try {
+        const dbSession = await PrismaService.loadSession(sessionId);
+
+        if (dbSession) {
+          // Converter participantes do banco para o formato da sessão
+          const participants = dbSession.participants.map(p => ({
+            userId: p.userId,
+            userName: p.user?.name || 'Participante',
+            socketId: null, // Será definido quando o participante se conectar
+            isCurrentUser: false,
+            selectedCard: p.selectedCard
+          }));
+
+          sessions[sessionId] = {
+            sessionId: dbSession.id,
+            sessionName: dbSession.name || sessionName || "Sessão Poker Planning",
+            organizationId: dbSession.organizationId || organizationId,
+            participants: participants,
+            isRevealed: false,
+            currentTicketId: dbSession.currentTicketId,
+            votingMode: dbSession.votingMode || votingMode,
+            lastActivity: Date.now()
+          };
+          console.log(`📊 Sessão carregada do banco: ${sessionId}, currentTicketId: ${dbSession.currentTicketId}, participantes: ${participants.length}`);
+        } else {
+          // Fallback para sessão não encontrada no banco
+          sessions[sessionId] = {
+            sessionId,
+            sessionName: sessionName || "Sessão Poker Planning",
+            organizationId,
+            participants: [],
+            isRevealed: false,
+            currentTicketId: null,
+            votingMode: votingMode,
+            lastActivity: Date.now()
+          };
+        }
+      } catch (error) {
+        console.error('Erro ao carregar sessão do banco:', error);
+        // Fallback em caso de erro
+        sessions[sessionId] = {
+          sessionId,
+          sessionName: sessionName || "Sessão Poker Planning",
+          organizationId,
+          participants: [],
+          isRevealed: false,
+          currentTicketId: null,
+          votingMode: votingMode,
+          lastActivity: Date.now()
+        };
+      }
     }
 
-    // Adicionar participante se não existir ou atualizar socketId
+    // Atualizar participante existente ou adicionar novo
     const existingParticipant = sessions[sessionId].participants.find(p => p.userId === userId);
-    if (!existingParticipant) {
+    if (existingParticipant) {
+      // Atualizar socketId e userName do participante existente
+      existingParticipant.socketId = socket.id;
+      existingParticipant.userName = userName;
+      console.log(`🔄 Participante reconectado: ${userName} (${userId})`);
+    } else {
+      // Adicionar novo participante
       sessions[sessionId].participants.push({
         userId,
         userName,
@@ -222,16 +350,27 @@ io.on("connection", (socket) => {
         isCurrentUser: false,
         selectedCard: null
       });
-    } else {
-      // Atualizar socketId se o participante já existe
-      existingParticipant.socketId = socket.id;
+      console.log(`➕ Novo participante adicionado: ${userName} (${userId})`);
+    }
+
+    // Limpar participantes inativos (que não têm socketId) quando alguém se reconecta
+    const activeParticipants = sessions[sessionId].participants.filter(p => p.socketId !== null);
+    if (activeParticipants.length !== sessions[sessionId].participants.length) {
+      console.log(`🧹 Removendo ${sessions[sessionId].participants.length - activeParticipants.length} participantes inativos durante reconexão`);
+      sessions[sessionId].participants = activeParticipants;
     }
 
     // Registrar conexão do usuário
     userConnections.set(userId, socket.id);
 
+    // Atualizar atividade da sessão
+    sessions[sessionId].lastActivity = Date.now();
+
     // Enviar dados atualizados da sessão
     updateSession(sessionId);
+
+    // Confirmar entrada na sala
+    socket.emit('room_joined', { sessionId, success: true });
   });
 
   // 🚪 Participante público se juntando para receber notificações
@@ -241,24 +380,24 @@ io.on("connection", (socket) => {
       return;
     }
 
-    logEvent('JOIN_PUBLIC_PARTICIPANT', socket.id, { 
+    logEvent('JOIN_PUBLIC_PARTICIPANT', socket.id, {
       participantId,
-      sessionId 
+      sessionId
     });
-    
+
     // Juntar à sala específica do participante
     socket.join(`participant_${participantId}`);
-    
+
     // Armazenar informações do participante
     socket.participantId = participantId;
     socket.sessionId = sessionId;
-    
+
     // Juntar também à sala da sessão para receber atualizações gerais
     socket.join(sessionId);
   });
 
   // 🃏 Selecionar carta
-  socket.on("select_card", ({ sessionId, userId, cardValue, organizationId }) => {
+  socket.on("select_card", async ({ sessionId, userId, cardValue, organizationId }) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('error', { message: 'Rate limit exceeded' });
       return;
@@ -269,19 +408,27 @@ io.on("connection", (socket) => {
     }
 
     logEvent('SELECT_CARD', socket.id, { sessionId, userId, cardValue });
-    
+
     const session = sessions[sessionId];
     if (!session) return;
-    
+
     const participant = session.participants.find((p) => p.userId === userId);
     if (participant) {
       participant.selectedCard = cardValue;
+
+      // Persistir voto no banco de dados
+      try {
+        await PrismaService.persistVote(sessionId, userId, cardValue);
+      } catch (error) {
+        console.error('Erro ao persistir voto no banco:', error);
+      }
+
       updateSession(sessionId);
     }
   });
 
   // 🎯 Iniciar votação
-  socket.on("voting_started", ({ sessionId, ticketId, organizationId }) => {
+  socket.on("voting_started", async ({ sessionId, ticketId, organizationId }) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('error', { message: 'Rate limit exceeded' });
       return;
@@ -292,14 +439,21 @@ io.on("connection", (socket) => {
     }
 
     logEvent('VOTING_STARTED', socket.id, { sessionId, ticketId });
-    
+
     const session = sessions[sessionId];
     if (!session) return;
 
     // Resetar votos anteriores
     session.participants.forEach((p) => (p.selectedCard = null));
     session.isRevealed = false;
-    
+
+    // Limpar votos no banco de dados
+    try {
+      await PrismaService.clearVotes(sessionId);
+    } catch (error) {
+      console.error('Erro ao limpar votos no banco:', error);
+    }
+
     updateSession(sessionId);
   });
 
@@ -315,10 +469,10 @@ io.on("connection", (socket) => {
     }
 
     logEvent('VOTING_FINISHED', socket.id, { sessionId, ticketId, averageVote });
-    
+
     const session = sessions[sessionId];
     if (!session) return;
-    
+
     updateSession(sessionId);
   });
 
@@ -334,14 +488,14 @@ io.on("connection", (socket) => {
     }
 
     logEvent('FLIP_CARDS', socket.id, { sessionId });
-    
+
     if (!sessions[sessionId]) {
       return;
     }
 
     // Emitir evento para iniciar contador em todos os clientes
     io.to(sessionId).emit("flip_cards");
-    
+
     // Após 3 segundos, revelar as cartas
     setTimeout(() => {
       if (sessions[sessionId]) {
@@ -352,7 +506,7 @@ io.on("connection", (socket) => {
   });
 
   // 🔄 Resetar votação
-  socket.on("new_voting", ({ sessionId, organizationId }) => {
+  socket.on("new_voting", async ({ sessionId, organizationId }) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('error', { message: 'Rate limit exceeded' });
       return;
@@ -363,33 +517,24 @@ io.on("connection", (socket) => {
     }
 
     logEvent('NEW_VOTING', socket.id, { sessionId });
-    
+
     if (!sessions[sessionId]) return;
 
     sessions[sessionId].isRevealed = false;
     sessions[sessionId].participants.forEach((p) => (p.selectedCard = null));
 
-    // Remover participantes pendentes
-    if (pendingRemovals[sessionId] && pendingRemovals[sessionId].size > 0) {
-      console.log(`🗑️ Removendo ${pendingRemovals[sessionId].size} participantes pendentes`);
-      
-      // Notificar sobre cada participante que será removido
-      pendingRemovals[sessionId].forEach(userId => {
-        const participant = sessions[sessionId].participants.find(p => p.userId === userId);
-        if (participant) {
-          console.log(`👤 Removendo participante pendente: ${participant.userName}`);
-          io.to(sessionId).emit("participant_left", { 
-            userId: participant.userId, 
-            userName: participant.userName 
-          });
-        }
-      });
-      
-      // Remover os participantes da lista
-      sessions[sessionId].participants = sessions[sessionId].participants.filter(
-        (p) => !pendingRemovals[sessionId].has(p.userId)
-      );
-      pendingRemovals[sessionId].clear();
+    // Limpar votos no banco de dados
+    try {
+      await PrismaService.clearVotes(sessionId);
+    } catch (error) {
+      console.error('Erro ao limpar votos no banco:', error);
+    }
+
+    // Limpar participantes inativos (que não têm socketId)
+    const activeParticipants = sessions[sessionId].participants.filter(p => p.socketId !== null);
+    if (activeParticipants.length !== sessions[sessionId].participants.length) {
+      console.log(`🧹 Removendo ${sessions[sessionId].participants.length - activeParticipants.length} participantes inativos`);
+      sessions[sessionId].participants = activeParticipants;
     }
 
     updateSession(sessionId);
@@ -407,7 +552,7 @@ io.on("connection", (socket) => {
     }
 
     logEvent('SET_REVEALED', socket.id, { sessionId, isRevealed });
-    
+
     if (!sessions[sessionId]) return;
 
     sessions[sessionId].isRevealed = isRevealed;
@@ -426,26 +571,26 @@ io.on("connection", (socket) => {
     }
 
     logEvent('REMOVE_PARTICIPANT', socket.id, { sessionId, userId });
-    
+
     if (!sessions[sessionId]) return;
 
     const participant = sessions[sessionId].participants.find(p => p.userId === userId);
     if (participant) {
       console.log(`👤 Removendo participante manualmente: ${participant.userName}`);
       sessions[sessionId].participants = sessions[sessionId].participants.filter((p) => p.userId !== userId);
-      
+
       // Notificar todos os participantes sobre a saída
-      io.to(sessionId).emit("participant_left", { 
-        userId, 
-        userName: participant.userName 
+      io.to(sessionId).emit("participant_left", {
+        userId,
+        userName: participant.userName
       });
-      
+
       updateSession(sessionId);
     }
   });
 
   // 🚪 Tentativa de remover participante ao sair
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     logEvent('DISCONNECT', socket.id);
 
     // Encontrar a sessão e o participante que desconectou
@@ -478,29 +623,22 @@ io.on("connection", (socket) => {
     if (foundSession.participants.length === 1) {
       console.log(`🗑️ Último participante saiu, deletando sessão ${foundSession.sessionId}`);
       delete sessions[foundSession.sessionId];
-      delete pendingRemovals[foundSession.sessionId];
       return;
     }
 
-    // Se as cartas estão reveladas, adicionar à lista de remoção pendente
-    if (foundSession.isRevealed) {
-      console.log(`🕒 Adicionando ${foundParticipant.userName} à lista de remoção pendente`);
-      pendingRemovals[foundSession.sessionId].add(foundParticipant.userId);
-    } else {
-      // Remover imediatamente se as cartas não estão reveladas
-      console.log(`🗑️ Removendo ${foundParticipant.userName} imediatamente`);
-      foundSession.participants = foundSession.participants.filter(
-        (p) => p.userId !== foundParticipant.userId
-      );
-      
-      // Notificar todos os participantes sobre a saída
-      io.to(foundSession.sessionId).emit("participant_left", { 
-        userId: foundParticipant.userId, 
-        userName: foundParticipant.userName 
-      });
-      
-      updateSession(foundSession.sessionId);
+    // Marcar participante como desconectado (não remover da sessão)
+    console.log(`🔌 Participante ${foundParticipant.userName} desconectado (mantendo na sessão)`);
+
+    // Marcar como inativo no banco de dados
+    try {
+      await PrismaService.markParticipantInactive(foundSession.sessionId, foundParticipant.userId);
+    } catch (error) {
+      console.error('Erro ao marcar participante como inativo:', error);
     }
+
+    // Manter o participante na sessão, apenas marcar como desconectado
+    foundParticipant.socketId = null;
+    updateSession(foundSession.sessionId);
   });
 
   // 🎫 Eventos de tickets
@@ -534,7 +672,7 @@ io.on("connection", (socket) => {
     io.to(data.sessionId).emit("ticket_updated", { ticket: data.ticket });
   });
 
-  socket.on("ticket_selected", (data) => {
+  socket.on("ticket_selected", async (data) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('error', { message: 'Rate limit exceeded' });
       return;
@@ -545,11 +683,20 @@ io.on("connection", (socket) => {
     }
 
     logEvent('TICKET_SELECTED', socket.id, { sessionId: data.sessionId, ticketId: data.ticketId });
-    // Atualizar sessão com ticket selecionado
+
+    // Atualizar sessão em memória
     const session = sessions[data.sessionId];
     if (session) {
       session.currentTicketId = data.ticketId || null;
     }
+
+    // Persistir no banco de dados
+    try {
+      await PrismaService.updateCurrentTicket(data.sessionId, data.ticketId || null);
+    } catch (error) {
+      console.error('Erro ao persistir currentTicketId no banco:', error);
+    }
+
     // Emitir apenas o evento específico - não updateSession para evitar condição de corrida
     io.to(data.sessionId).emit("ticket_selected", { ticketId: data.ticketId });
   });
@@ -581,9 +728,9 @@ io.on("connection", (socket) => {
 
     logEvent('FINAL_ESTIMATE_SET', socket.id, { sessionId: data.sessionId, ticketId: data.ticketId });
     // Simplesmente re-emitir para todos na sala
-    io.to(data.sessionId).emit("final_estimate_set", { 
-      ticketId: data.ticketId, 
-      finalEstimate: data.finalEstimate 
+    io.to(data.sessionId).emit("final_estimate_set", {
+      ticketId: data.ticketId,
+      finalEstimate: data.finalEstimate
     });
   });
 
@@ -594,10 +741,10 @@ io.on("connection", (socket) => {
       return;
     }
 
-    logEvent('PUBLIC_ACCESS_REQUEST', socket.id, { 
-      sessionId: data.sessionId, 
+    logEvent('PUBLIC_ACCESS_REQUEST', socket.id, {
+      sessionId: data.sessionId,
       participantId: data.participantId,
-      participantName: data.participantName 
+      participantName: data.participantName
     });
 
     // Notificar o dono da sessão sobre a nova solicitação
@@ -618,10 +765,10 @@ io.on("connection", (socket) => {
       return;
     }
 
-    logEvent('PUBLIC_ACCESS_RESPONSE', socket.id, { 
-      sessionId: data.sessionId, 
+    logEvent('PUBLIC_ACCESS_RESPONSE', socket.id, {
+      sessionId: data.sessionId,
       participantId: data.participantId,
-      action: data.action 
+      action: data.action
     });
 
     // Notificar o participante sobre a resposta (aprovação/rejeição)
@@ -634,12 +781,40 @@ io.on("connection", (socket) => {
       timestamp: new Date().toISOString()
     });
   });
+
+  // Evento para encerrar sessão
+  socket.on("session_ended", (data) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('error', { message: 'Rate limit exceeded' });
+      return;
+    }
+
+    if (!validateOrganizationAccess(socket, data.sessionId, data.organizationId)) {
+      return;
+    }
+
+    logEvent('SESSION_ENDED', socket.id, {
+      sessionId: data.sessionId
+    });
+
+    // Notificar todos os participantes na sala que a sessão foi encerrada
+    io.to(data.sessionId).emit("session_ended", {
+      sessionId: data.sessionId,
+      timestamp: new Date().toISOString()
+    });
+
+    // Limpar a sessão da memória
+    if (sessions[data.sessionId]) {
+      delete sessions[data.sessionId];
+      console.log(`🗑️ Sessão ${data.sessionId} removida da memória após encerramento`);
+    }
+  });
 });
 
 // Rota de health check
 expressApp.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     port: port,
     sessions: Object.keys(sessions).length,
     connections: io.engine.clientsCount,
@@ -677,10 +852,49 @@ expressApp.get('/status', (req, res) => {
   });
 });
 
+// 🧹 Limpeza periódica de participantes inativos
+setInterval(() => {
+  let totalRemoved = 0;
+
+  for (const sessionId in sessions) {
+    const session = sessions[sessionId];
+    const initialCount = session.participants.length;
+    
+    // Remover participantes que não têm socketId (desconectados)
+    session.participants = session.participants.filter(p => p.socketId !== null);
+    
+    const removed = initialCount - session.participants.length;
+    if (removed > 0) {
+      console.log(`🧹 Sessão ${sessionId}: removidos ${removed} participantes inativos`);
+      totalRemoved += removed;
+      
+      // Atualizar a sessão para todos os participantes restantes
+      updateSession(sessionId);
+    }
+  }
+
+  if (totalRemoved > 0) {
+    console.log(`🧹 Limpeza periódica: ${totalRemoved} participantes inativos removidos no total`);
+  }
+}, 30000); // Executar a cada 30 segundos
+
 // 🚀 Iniciar servidor
 server.listen(port, () => {
   console.log(`🚀 Servidor WebSocket rodando na porta ${port}`);
   console.log(`🔌 Socket.io disponível em http://localhost:${port}`);
   console.log(`📊 Health check: http://localhost:${port}/health`);
   console.log(`📈 Status detalhado: http://localhost:${port}/status`);
+});
+
+// Cleanup quando o servidor for encerrado
+process.on('SIGINT', async () => {
+  console.log('🛑 Encerrando servidor WebSocket...');
+  await PrismaService.disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('🛑 Encerrando servidor WebSocket...');
+  await PrismaService.disconnect();
+  process.exit(0);
 });

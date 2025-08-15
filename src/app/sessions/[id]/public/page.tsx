@@ -77,6 +77,13 @@ export default function PublicSessionPage() {
       const resp = await apiService.getPublicAccess(sessionId);
 
       if (resp.success && resp.data) {
+        // Verificar se a sessão está encerrada
+        if (resp.data.status === 'COMPLETED' || resp.data.status === 'ARCHIVED' || resp.data.status === 'CANCELLED') {
+          console.log('Sessão encerrada detectada na página pública:', resp.data.status);
+          router.push(`/sessions/${sessionId}/ended`);
+          return;
+        }
+        
         setSessionData(resp.data);
         
         // Se o usuário já tem acesso, redirecionar para a sessão

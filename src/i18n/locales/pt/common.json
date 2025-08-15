@@ -333,6 +333,13 @@
     "endSession": {
       "confirm": "Tem certeza que deseja encerrar esta sessão? Esta ação não pode ser desfeita."
     },
+    "ended": {
+      "title": "Sessão Encerrada",
+      "message": "Esta sessão de Poker Planning foi encerrada pelo criador. Obrigado por participar!",
+      "sessionId": "ID da Sessão",
+      "closeTab": "Fechar Aba",
+      "goHome": "Ir para o Início"
+    },
     "defaultName": "Sessão Poker Planning",
     "anonymous": "Anônimo",
     "revoting": "Re-votação",

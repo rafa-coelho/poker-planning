@@ -5,28 +5,67 @@ import { useTranslation } from "react-i18next";
 
 interface VoteSummaryProps {
     votes: string[];
-    average?: number;
+    average?: number | string;
     totalParticipants?: number;
     votedCount?: number;
+    votingMode?: string;
 }
 
-export default function VoteSummary ({ votes, average: propAverage, totalParticipants, votedCount }: VoteSummaryProps) {
+export default function VoteSummary ({ votes, average: propAverage, totalParticipants, votedCount, votingMode }: VoteSummaryProps) {
     const { t } = useTranslation("common");
 
-    const validVotes = votes.filter(v => !isNaN(Number(v)) && Number(v) > 0).map(v => Number(v));
+    // Debug temporário
+    console.log('🔍 VoteSummary - propAverage:', propAverage, 'votingMode:', votingMode, 'votes:', votes);
+    console.log('🔍 VoteSummary - propAverage type:', typeof propAverage);
+    console.log('🔍 VoteSummary - propAverage === null:', propAverage === null);
+    console.log('🔍 VoteSummary - propAverage === undefined:', propAverage === undefined);
 
-    const average = propAverage !== undefined 
-        ? propAverage.toFixed(1)
-        : validVotes.length > 0
-            ? (validVotes.reduce((sum, val) => sum + val, 0) / validVotes.length).toFixed(1)
-            : "N/A";
+    // Filtrar votos válidos baseado no modo de votação
+    const isTshirtMode = votingMode === "TSHIRT" || votingMode === "T-SHIRT";
+    
+    const validTshirtVotes = isTshirtMode 
+        ? votes.filter(v => v && v !== "?" && v !== "☕") // Para TSHIRT, aceitar qualquer string válida
+        : [];
+    
+    const validNumericVotes = !isTshirtMode
+        ? votes.filter(v => !isNaN(Number(v)) && Number(v) > 0).map(v => Number(v)) // Para numéricos
+        : [];
 
-
+    // Calcular média baseada no modo de votação
+    let average: string | number;
+    
+    if (propAverage !== undefined && propAverage !== null && propAverage !== "") {
+        // Usar a média calculada pelo hook quando disponível
+        average = typeof propAverage === 'number' ? propAverage.toFixed(1) : propAverage;
+    } else if (isTshirtMode && validTshirtVotes.length > 0) {
+        // Calcular média TSHIRT localmente
+        const tshirtSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+        const validSizeVotes = validTshirtVotes
+            .map(vote => {
+                const index = tshirtSizes.indexOf(vote);
+                return index >= 0 ? index : null;
+            })
+            .filter(vote => vote !== null) as number[];
+        
+        if (validSizeVotes.length > 0) {
+            const averagePosition = validSizeVotes.reduce((acc, position) => acc + position, 0) / validSizeVotes.length;
+            const roundedPosition = Math.round(averagePosition);
+            const sizeIndex = Math.max(0, Math.min(roundedPosition, tshirtSizes.length - 1));
+            average = tshirtSizes[sizeIndex];
+        } else {
+            average = "N/A";
+        }
+    } else if (validNumericVotes.length > 0) {
+        // Calcular média numérica
+        average = (validNumericVotes.reduce((sum, val) => sum + val, 0) / validNumericVotes.length).toFixed(1);
+    } else {
+        average = "N/A";
+    }
 
     return (
         <div className="flex w-full border-t border-gray-300 pt-4 bg-gray-50 rounded-lg shadow-lg pb-4" style={{ height: "12em" }}>
 
-            <VoteSummary.VoteCount validVotes={validVotes} />
+            <VoteSummary.VoteCount validVotes={isTshirtMode ? validTshirtVotes : validNumericVotes} />
 
             <div className="w-1/2 flex items-center justify-start gap-6 pl-6">
 
@@ -34,7 +73,9 @@ export default function VoteSummary ({ votes, average: propAverage, totalPartici
                     <div className="text-gray-600 text-sm">{t("average")}:</div>
                     <div className="text-4xl font-bold text-gray-800">
                         {
-                            new Intl.NumberFormat().format(Number(average))
+                            typeof average === 'number' || !isNaN(Number(average))
+                                ? new Intl.NumberFormat().format(Number(average))
+                                : average
                         }
                     </div>
                 </div>
@@ -46,10 +87,11 @@ export default function VoteSummary ({ votes, average: propAverage, totalPartici
     );
 }
 
-VoteSummary.VoteCount = function VoteCount ({ validVotes }: { validVotes: number[] }) {
-    const voteCounts: { [key: number]: number } = {};
+VoteSummary.VoteCount = function VoteCount ({ validVotes }: { validVotes: (string | number)[] }) {
+    const voteCounts: { [key: string]: number } = {};
     validVotes.forEach(vote => {
-        voteCounts[vote] = (voteCounts[vote] || 0) + 1;
+        const key = String(vote);
+        voteCounts[key] = (voteCounts[key] || 0) + 1;
     });
     const maxVotes = Math.max(...Object.values(voteCounts));
 

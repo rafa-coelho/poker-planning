@@ -7,6 +7,7 @@ import { Ticket, Priority, TicketStatus } from "@prisma/client";
 interface CurrentTicketDisplayProps {
   ticket: Ticket | null;
   isCreator: boolean;
+  votingMode?: string;
   onStartVoting?: () => void;
   onFinishVoting?: () => void;
 }
@@ -14,10 +15,17 @@ interface CurrentTicketDisplayProps {
 export default function CurrentTicketDisplay({
   ticket,
   isCreator,
+  votingMode = "FIBONACCI",
   onStartVoting,
   onFinishVoting,
 }: CurrentTicketDisplayProps) {
   const { t } = useTranslation();
+
+  // Função para determinar o texto apropriado baseado no modo de votação
+  const getEstimateText = (value: string) => {
+    const isTshirtMode = votingMode === "TSHIRT" || votingMode === "T-SHIRT";
+    return isTshirtMode ? value : `${value} pts`;
+  };
 
   if (!ticket) {
     return (
@@ -114,7 +122,7 @@ export default function CurrentTicketDisplay({
             </span>
             {ticket.finalEstimate && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                {ticket.finalEstimate}pts
+                {getEstimateText(ticket.finalEstimate)}
               </span>
             )}
           </div>

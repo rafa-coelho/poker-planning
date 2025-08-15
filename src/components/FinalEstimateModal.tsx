@@ -10,7 +10,7 @@ interface FinalEstimateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (finalEstimate: string) => void;
-  averageVote: number;
+  averageVote: number | string;
 }
 
 export default function FinalEstimateModal({
@@ -26,7 +26,7 @@ export default function FinalEstimateModal({
   React.useEffect(() => {
     if (ticket && isOpen) {
       // Usar a média como valor padrão, ou o valor atual se existir
-      const defaultValue = ticket.finalEstimate || (averageVote && !isNaN(averageVote) ? averageVote.toString() : "");
+      const defaultValue = ticket.finalEstimate || (averageVote ? averageVote.toString() : "");
       setFinalEstimate(defaultValue);
     }
   }, [ticket, isOpen, averageVote]);
@@ -77,7 +77,7 @@ export default function FinalEstimateModal({
                   {t("tickets.finalEstimate.averageVote")}:
                 </span>
                 <span className="text-lg font-bold text-blue-900">
-                  {averageVote && !isNaN(averageVote) ? averageVote.toFixed(1) : "N/A"}
+                  {averageVote ? (typeof averageVote === 'number' ? averageVote.toFixed(1) : averageVote) : "N/A"}
                 </span>
               </div>
             </div>

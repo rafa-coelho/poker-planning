@@ -138,6 +138,7 @@ model SessionParticipant {
   // Participant data
   role      ParticipantRole @default(VOTER)
   isActive  Boolean         @default(true)
+  selectedCard String?      // Voto atual do participante
   
   // Audit fields
   joinedAt  DateTime @default(now())

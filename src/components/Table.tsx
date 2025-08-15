@@ -16,16 +16,16 @@ interface TableProps {
     hasSelectedTicket?: boolean; // Nova prop para verificar se há ticket selecionado
 }
 
-export default function Table({ 
-    participants, 
-    isRevealed, 
-    countdown, 
-    canFlip, 
-    onFlipCards, 
-    onNewVoting, 
-    onFinishVoting, 
+export default function Table({
+    participants,
+    isRevealed,
+    countdown,
+    canFlip,
+    onFlipCards,
+    onNewVoting,
+    onFinishVoting,
     canFinishVoting,
-    hasSelectedTicket = false 
+    hasSelectedTicket = false
 }: TableProps) {
     const { t } = useTranslation("common");
     const { topParticipants, leftParticipants, rightParticipants, bottomParticipants } = distributeParticipants(participants);
@@ -61,21 +61,21 @@ export default function Table({
                 {isTableDisabled ? (
                     <div className="text-center text-gray-500">
                         <div className="text-lg font-medium mb-2">
-                            {isCreator 
-                                ? t("session.table.noTicketSelectedCreator") 
+                            {isCreator
+                                ? t("session.table.noTicketSelectedCreator")
                                 : t("session.table.noTicketSelectedParticipant")
                             }
                         </div>
                         <div className="text-sm">
-                            {isCreator 
-                                ? t("session.table.selectTicketHintCreator") 
+                            {isCreator
+                                ? t("session.table.selectTicketHintCreator")
                                 : t("session.table.selectTicketHintParticipant")
                             }
                         </div>
                     </div>
                 ) : (
                     <>
-                        {isCreator && countdown == null && (
+                                                {isCreator && countdown == null && (
                             isRevealed 
                                 ? (
                                     <div className="flex gap-2 items-center">
@@ -87,7 +87,10 @@ export default function Table({
                                         </button>
                                         {onFinishVoting && (
                                             <button
-                                                onClick={onFinishVoting}
+                                                onClick={() => {
+                                                    console.log('🔍 Botão Finalizar Votação clicado!');
+                                                    onFinishVoting();
+                                                }}
                                                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                             >
                                                 Finalizar Votação

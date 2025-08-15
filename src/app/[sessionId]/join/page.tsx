@@ -35,28 +35,37 @@ export default function JoinSessionPage() {
 
   // Carregar status salvo do localStorage
   useEffect(() => {
+    console.log('🔍 Carregando status salvo do localStorage...');
     const savedStatus = localStorage.getItem(`publicAccess_${sessionId}`);
+    console.log('🔍 savedStatus:', savedStatus);
+    
     if (savedStatus) {
       try {
         const parsed = JSON.parse(savedStatus);
+        console.log('🔍 Status parseado:', parsed);
         setRequestStatus(parsed);
         
         // Se foi aprovado, redirecionar
         if (parsed.status === 'approved') {
+          console.log('✅ Status aprovado, redirecionando...');
           router.push(`/${sessionId}`);
           return;
         }
         
         // Se foi rejeitado, limpar do localStorage
         if (parsed.status === 'rejected') {
+          console.log('❌ Status rejeitado, limpando...');
           localStorage.removeItem(`publicAccess_${sessionId}`);
           setRequestStatus(null);
         }
       } catch (e) {
+        console.error('❌ Erro ao parsear status salvo:', e);
         localStorage.removeItem(`publicAccess_${sessionId}`);
       }
+    } else {
+      console.log('📭 Nenhum status salvo encontrado');
     }
-  }, [sessionId]);
+  }, [sessionId, router]);
 
   
 
@@ -69,6 +78,13 @@ export default function JoinSessionPage() {
       const dataResp = await apiService.getPublicAccess(sessionId);
 
       if (dataResp.success && dataResp.data) {
+        // Verificar se a sessão está encerrada
+        if (dataResp.data.status === 'COMPLETED' || dataResp.data.status === 'ARCHIVED' || dataResp.data.status === 'CANCELLED') {
+          console.log('Sessão encerrada detectada na verificação de permissão:', dataResp.data.status);
+          router.push(`/${sessionId}/ended`);
+          return;
+        }
+        
         if (dataResp.data.currentUser.hasAccess) {
           // Usuário tem acesso - redirecionar para a sessão
           router.push(`/${sessionId}`);
@@ -94,6 +110,13 @@ export default function JoinSessionPage() {
       const resp = await apiService.getPublicAccess(sessionId);
 
       if (resp.success && resp.data) {
+        // Verificar se a sessão está encerrada
+        if (resp.data.status === 'COMPLETED' || resp.data.status === 'ARCHIVED' || resp.data.status === 'CANCELLED') {
+          console.log('Sessão encerrada detectada na página de join:', resp.data.status);
+          router.push(`/${sessionId}/ended`);
+          return;
+        }
+        
         setSessionData(resp.data);
       } else {
         setError('sessionNotFound');
@@ -107,23 +130,40 @@ export default function JoinSessionPage() {
 
   // Verificar status da solicitação
   const checkRequestStatus = useCallback(async () => {
-    if (!requestStatus?.participantId) return;
+    console.log('🔍 checkRequestStatus executado');
+    console.log('🔍 requestStatus:', requestStatus);
+    
+    if (!requestStatus?.participantId) {
+      console.log('❌ checkRequestStatus: Sem participantId');
+      return;
+    }
 
     try {
-      setRequestStatus(prev => ({ ...prev!, status: 'checking' }));
+      console.log('🔄 Iniciando verificação de status...');
+      
+      // Só mudar para 'checking' se não estiver já 'checking'
+      if (requestStatus.status !== 'checking') {
+        setRequestStatus(prev => ({ ...prev!, status: 'checking' }));
+      }
 
       // Usar a nova API de status que aceita tokens de participantes públicos
       const tokenToUse = requestStatus.authToken || requestStatus.tempToken || '';
+      console.log('🔑 Token para usar:', tokenToUse ? 'SIM' : 'NÃO');
+      
       const resp = await apiService.getPublicParticipantStatus(
         sessionId,
         requestStatus.participantId,
         tokenToUse
       );
 
+      console.log('📡 Resposta da API:', resp);
+
       if (resp.success && resp.data) {
         const participant = resp.data;
+        console.log('👤 Status do participante:', participant.status);
         
         if (participant.status === 'APPROVED') {
+          console.log('✅ Guest foi aprovado!');
           const message = t('join.approvedRedirecting');
           const newStatus = {
             status: 'approved' as const,
@@ -143,9 +183,9 @@ export default function JoinSessionPage() {
             setPublicParticipant(participant.authToken);
           }
           
-          // Redirecionar imediatamente
-          setTimeout(() => router.push(`/${sessionId}`), 0);
+          // O redirecionamento será feito pelo useEffect separado
         } else if (participant.status === 'REJECTED') {
+          console.log('❌ Guest foi rejeitado!');
           const message = t('join.rejectedMessage');
           setRequestStatus({
             status: 'rejected',
@@ -156,25 +196,60 @@ export default function JoinSessionPage() {
           localStorage.removeItem(`publicAccess_${sessionId}`);
           
           toast.error(t('permissionRejected'));
+        } else {
+          console.log('⏳ Status ainda pendente:', participant.status);
+          // Voltar para 'pending' se ainda estiver pendente
+          if (requestStatus.status === 'checking') {
+            setRequestStatus(prev => ({ ...prev!, status: 'pending' }));
+          }
+        }
+      } else {
+        console.log('❌ Resposta da API não foi bem-sucedida:', resp);
+        // Voltar para 'pending' em caso de erro
+        if (requestStatus.status === 'checking') {
+          setRequestStatus(prev => ({ ...prev!, status: 'pending' }));
         }
       }
     } catch (err) {
-      console.error('Erro ao verificar status:', err);
+      console.error('❌ Erro ao verificar status:', err);
+      // Voltar para 'pending' em caso de erro
+      if (requestStatus.status === 'checking') {
+        setRequestStatus(prev => ({ ...prev!, status: 'pending' }));
+      }
     }
-  }, [requestStatus, sessionId, router]);
+  }, [requestStatus, sessionId, router, t, setPublicParticipant]);
 
   // Polling periódico para verificar status da solicitação (sem WebSocket)
   useEffect(() => {
-    if (requestStatus?.status === 'pending' && requestStatus.participantId) {
-      // Checa imediatamente uma vez, depois inicia o intervalo
-      checkRequestStatus();
-      const interval = setInterval(checkRequestStatus, 5000);
+    console.log('🔍 Polling useEffect executado');
+    console.log('🔍 requestStatus?.status:', requestStatus?.status);
+    console.log('🔍 requestStatus?.participantId:', requestStatus?.participantId);
+    
+    // Polling deve continuar enquanto status for 'pending' ou 'checking'
+    if ((requestStatus?.status === 'pending' || requestStatus?.status === 'checking') && requestStatus.participantId) {
+      console.log('✅ Iniciando polling para guest:', requestStatus.participantId);
+      
+      // Apenas configurar o intervalo, sem chamada imediata
+      const interval = setInterval(() => {
+        console.log('⏰ Executando polling...');
+        checkRequestStatus();
+      }, 3000); // Reduzido para 2 segundos para teste
 
       return () => {
+        console.log('🧹 Limpando intervalo de polling');
         clearInterval(interval);
       };
+    } else {
+      console.log('❌ Polling não iniciado - status:', requestStatus?.status, 'participantId:', requestStatus?.participantId);
     }
   }, [requestStatus?.status, requestStatus?.participantId, checkRequestStatus]);
+
+  // Efeito separado para redirecionamento quando aprovado
+  useEffect(() => {
+    if (requestStatus?.status === 'approved') {
+      router.push(`/${sessionId}`);
+    }
+  }, [requestStatus?.status, sessionId, router]);
 
   // Inicializar verificação de autenticação
   useEffect(() => {
@@ -196,16 +271,20 @@ export default function JoinSessionPage() {
 
   // Solicitar acesso como convidado
   const handleAccessRequest = async () => {
+    console.log('🔍 handleAccessRequest executado');
+    
     if (!accessForm.name.trim()) {
       setError(t('errorEnterName'));
       return;
     }
 
     try {
+      console.log('🔄 Enviando solicitação de acesso...');
       setSubmitting(true);
       setError(null);
 
       const resp = await apiService.requestPublicAccess(sessionId, accessForm);
+      console.log('📡 Resposta da solicitação:', resp);
 
       if (resp.success && resp.data) {
         const newStatus = {
@@ -215,17 +294,21 @@ export default function JoinSessionPage() {
           tempToken: (resp.data as any).tempToken
         };
         
+        console.log('✅ Status criado:', newStatus);
         setRequestStatus(newStatus);
         setShowAccessModal(false);
         
         // Salvar no localStorage
         localStorage.setItem(`publicAccess_${sessionId}`, JSON.stringify(newStatus));
+        console.log('💾 Status salvo no localStorage');
         
         toast.success(t('permissionRequested'));
       } else {
+        console.log('❌ Erro na solicitação:', resp.error);
         setError(resp.error?.message || 'errorEnterName');
       }
     } catch (err) {
+      console.error('❌ Erro ao solicitar acesso:', err);
       setError('errorEnterName');
     } finally {
       setSubmitting(false);

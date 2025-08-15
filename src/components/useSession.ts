@@ -33,7 +33,7 @@ export function useSession () {
   const router = useRouter();
   const sessionId = params.sessionId as string;
   const { user: authUser, isAuthenticated, isLoading: authLoading, apiService } = useAuth();
-  const { isPublicParticipant, publicParticipant, isInitialized: publicInitialized } = usePublicAuth();
+  const { isPublicParticipant, publicParticipant, isInitialized: publicInitialized, setPublicParticipant } = usePublicAuth();
   const { t } = useTranslation("common");
 
   const [sessionData, setSessionData] = useState<SessionState>({
@@ -50,12 +50,13 @@ export function useSession () {
   const [inviteLink, setInviteLink] = useState("");
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
   const [isCreator, setIsCreator] = useState(false);
-  const [averageVote, setAverageVote] = useState<number | null>(null);
+  const [averageVote, setAverageVote] = useState<number | string | null>(null);
   const [showFinalEstimateModal, setShowFinalEstimateModal] = useState(false);
   const [onTicketUpdate, setOnTicketUpdate] = useState<((ticket: Ticket) => void) | null>(null);
   const [participantNotification, setParticipantNotification] = useState<{ userName: string; type: 'left' | 'joined' } | null>(null);
   const [pendingRequests, setPendingRequests] = useState<Array<{ id: string; name: string; createdAt: string }>>([]);
   const [showPendingRequestsModal, setShowPendingRequestsModal] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'connecting' | 'disconnected'>('connecting');
 
   const socketRef = useRef<Socket | null>(null);
   const isCreatorRef = useRef<boolean>(false);
@@ -96,6 +97,99 @@ export function useSession () {
     loadSessionData();
   }, [sessionId, router, isAuthenticated, isPublicParticipant, authUser, authLoading, publicInitialized, t]);
 
+  // Polling para guests verificarem se foram aprovados
+  useEffect(() => {
+    console.log('🔍 Polling useEffect executado');
+    console.log('🔍 sessionId:', sessionId);
+    console.log('🔍 isPublicParticipant:', isPublicParticipant);
+    console.log('🔍 publicParticipant:', publicParticipant);
+    
+    // Só fazer polling se:
+    // 1. Tem sessionId
+    // 2. NÃO é um usuário autenticado (é um guest)
+    // 3. NÃO tem um publicParticipant válido ainda (não foi aprovado)
+    if (!sessionId || isAuthenticated) {
+      console.log('❌ Polling: Condições não atendidas - sessionId:', !!sessionId, 'isAuthenticated:', isAuthenticated);
+      return;
+    }
+
+    // Verificar se há status salvo
+    const savedStatus = localStorage.getItem(`publicAccess_${sessionId}`);
+    console.log('🔍 savedStatus:', savedStatus);
+    
+    if (!savedStatus) {
+      console.log('❌ Polling: Sem status salvo');
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedStatus);
+      console.log('🔍 parsed:', parsed);
+      
+      // Só fazer polling se o status ainda é 'pending'
+      if (parsed.status !== 'pending' || !parsed.participantId) {
+        console.log('❌ Polling: Status não é pending ou sem participantId - status:', parsed.status);
+        return;
+      }
+
+      console.log('🔄 Iniciando polling para guest:', parsed.participantId);
+      
+      const checkApprovalStatus = async () => {
+        console.log('🔍 Executando checkApprovalStatus...');
+        try {
+          const tokenToUse = parsed.authToken || parsed.tempToken || '';
+          console.log('🔑 Token:', tokenToUse ? 'SIM' : 'NÃO');
+          
+          const resp = await apiService.getPublicParticipantStatus(
+            sessionId,
+            parsed.participantId,
+            tokenToUse
+          );
+
+          console.log('📡 Resposta da API:', resp);
+
+          if (resp.success && resp.data) {
+            const participant = resp.data;
+            console.log('👤 Status do participante:', participant.status);
+            
+            if (participant.status === 'APPROVED') {
+              console.log('✅ Guest foi aprovado!');
+              if (participant.authToken) {
+                setPublicParticipant(participant.authToken);
+              }
+              localStorage.removeItem(`publicAccess_${sessionId}`);
+              window.location.reload();
+            } else if (participant.status === 'REJECTED') {
+              console.log('❌ Guest foi rejeitado!');
+              localStorage.removeItem(`publicAccess_${sessionId}`);
+              router.push(`/${sessionId}/join`);
+            } else {
+              console.log('⏳ Status ainda pendente:', participant.status);
+            }
+          } else {
+            console.log('❌ Resposta da API não foi bem-sucedida:', resp);
+          }
+        } catch (error) {
+          console.error('❌ Erro ao verificar status:', error);
+        }
+      };
+
+      // Verificar imediatamente
+      checkApprovalStatus();
+      
+      // Configurar intervalo
+      const interval = setInterval(checkApprovalStatus, 3000);
+      console.log('⏰ Intervalo configurado a cada 3 segundos');
+      
+      return () => {
+        console.log('🧹 Limpando intervalo de polling');
+        clearInterval(interval);
+      };
+    } catch (error) {
+      console.error('❌ Erro ao verificar status salvo:', error);
+    }
+  }, [sessionId, isAuthenticated, apiService, setPublicParticipant, router]);
+
 
 
   /** 🔹 Solicita permissão para notificações */
@@ -108,7 +202,9 @@ export function useSession () {
   };
 
   /** 🔹 Carrega dados da sessão do banco de dados */
-  const loadSessionData = async () => {
+  const loadSessionData = async (retryCount = 0) => {
+    const maxRetries = 3;
+    
     try {
       if (isAuthenticated) {
         const response = await apiService.getSession(sessionId);
@@ -122,13 +218,37 @@ export function useSession () {
             votingMode: session.votingMode,
           }));
 
+          // Verificar se a sessão está encerrada
+          if (session.status === 'COMPLETED' || session.status === 'ARCHIVED' || session.status === 'CANCELLED') {
+            console.log('Sessão encerrada detectada:', session.status);
+            // Redirecionar baseado no tipo de usuário
+            if (isPublicParticipant) {
+              router.push(`/${sessionId}/ended`);
+            } else {
+              router.push('/dashboard/sessions');
+            }
+            return;
+          }
+
           // Verificar se o usuário é o criador da sessão
-          const currentUser = session.participants.find(p => p.user?.id === authUser?.id);
-          const isUserCreator = currentUser && session.participants.indexOf(currentUser) === 0;
+          const isUserCreator = (session as any).createdBy?.id === authUser?.id;
           setIsCreator(!!isUserCreator);
 
           // Carregar ticket atual se existir (somente para usuários autenticados)
-          if (session.currentTicketId) {
+          const sessionWithCurrentTicket = session as any;
+          
+          if (sessionWithCurrentTicket.currentTicket) {
+            setCurrentTicket(sessionWithCurrentTicket.currentTicket);
+            // Se o ticket foi estimado, carregar a média
+            if (sessionWithCurrentTicket.currentTicket.status === "ESTIMATED") {
+              const avg = sessionWithCurrentTicket.currentTicket.averageVote;
+              setAverageVote(avg !== undefined && avg !== null ? avg : 0);
+            }
+            // Marcar que já carregou o ticket para evitar conflitos com WebSocket
+            lastSelectedTicketIdRef.current = sessionWithCurrentTicket.currentTicket.id;
+            currentTicketRef.current = sessionWithCurrentTicket.currentTicket;
+          } else if (session.currentTicketId) {
+            // Fallback para versões antigas que não retornam currentTicket
             loadCurrentTicket(session.currentTicketId);
           }
 
@@ -153,6 +273,13 @@ export function useSession () {
           }));
           setIsCreator(false);
 
+          // Verificar se a sessão está encerrada (para guests)
+          if ((resp.data as any).status === 'COMPLETED' || (resp.data as any).status === 'ARCHIVED' || (resp.data as any).status === 'CANCELLED') {
+            console.log('Sessão encerrada detectada (guest):', (resp.data as any).status);
+            router.push(`/${sessionId}/ended`);
+            return;
+          }
+
           const cleanup = initializeSocketConnection(
             publicParticipant!.participantId,
             publicParticipant!.name,
@@ -164,6 +291,16 @@ export function useSession () {
       }
     } catch (error) {
       console.error(t("session.errors.loadSessionData"), error);
+      
+      // Retry logic para falhas de rede
+      if (retryCount < maxRetries) {
+        console.log(`🔄 Tentativa ${retryCount + 1} de ${maxRetries} para carregar dados da sessão...`);
+        setTimeout(() => {
+          loadSessionData(retryCount + 1);
+        }, 2000 * (retryCount + 1)); // Backoff exponencial
+      } else {
+        console.error('❌ Falha ao carregar dados da sessão após todas as tentativas');
+      }
     }
   };
 
@@ -177,8 +314,13 @@ export function useSession () {
         
         // Se o ticket foi estimado, carregar a média
         if (ticket.status === "ESTIMATED") {
-          setAverageVote((ticket as any).averageVote || 0);
+          const avg = (ticket as any).averageVote;
+          setAverageVote(avg !== undefined ? avg : 0);
         }
+        
+        // Marcar que já carregou o ticket para evitar conflitos com WebSocket
+        lastSelectedTicketIdRef.current = ticketId;
+        currentTicketRef.current = ticket;
       }
     } catch (error) {
       console.error(t("session.errors.loadCurrentTicket"), error);
@@ -198,7 +340,8 @@ export function useSession () {
         const ticket = response.data as any;
         setCurrentTicket(ticket);
         if (ticket.status === "ESTIMATED") {
-          setAverageVote((ticket as any).averageVote || 0);
+          const avg = (ticket as any).averageVote;
+          setAverageVote(avg !== undefined ? avg : 0);
         } else {
           setAverageVote(null);
         }
@@ -228,11 +371,26 @@ export function useSession () {
   /** 🔹 Inicializa a conexão com o WebSocket */
   function initializeSocketConnection(storedUserId: string, storedUserName: string, sessionName?: string, votingMode?: string): () => void {
     if (socketRef.current) {
+      console.log('🔄 Desconectando socket anterior...');
       socketRef.current.disconnect();
     }
 
     const socketUrl = `http://localhost:${APP_CONFIG.WS_PORT}`;
-    const socket = io(socketUrl);
+    console.log('🔌 Conectando ao WebSocket:', socketUrl);
+    
+    const socket = io(socketUrl, {
+      // Configurações de reconexão
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
+      // Configurações de transporte
+      transports: ['websocket', 'polling'],
+      upgrade: true,
+      rememberUpgrade: true,
+    });
+    
     socketRef.current = socket;
 
     // Definir socket globalmente para outros componentes
@@ -247,7 +405,47 @@ export function useSession () {
       }
     }, 30000); // A cada 30 segundos
 
+    // Eventos de conexão
     socket.on("connect", () => {
+      console.log('✅ WebSocket conectado com sucesso');
+      setConnectionStatus('connected');
+      
+      // Aguardar um pouco antes de emitir join_room para garantir estabilidade
+      setTimeout(() => {
+        console.log('🚪 Entrando na sala:', sessionId);
+        socket.emit("join_room", {
+          sessionId,
+          userId: storedUserId,
+          userName: storedUserName,
+          sessionName: sessionName || sessionData.sessionName || t("session.defaultName"),
+          organizationId: authUser?.organizationId || null,
+          votingMode: votingMode || sessionData.votingMode 
+        });
+
+        // 🎫 Registrar listeners de tickets APÓS conectar
+        setupTicketListeners(socket);
+      }, 100);
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error('❌ Erro na conexão WebSocket:', error);
+      setConnectionStatus('disconnected');
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.log('🔌 WebSocket desconectado:', reason);
+      setConnectionStatus('disconnected');
+      if (reason === 'io server disconnect') {
+        // Reconectar manualmente se o servidor desconectou
+        socket.connect();
+      }
+    });
+
+    socket.on("reconnect", (attemptNumber) => {
+      console.log('🔄 WebSocket reconectado após', attemptNumber, 'tentativas');
+      setConnectionStatus('connected');
+      
+      // Re-entrar na sala após reconexão
       socket.emit("join_room", {
         sessionId,
         userId: storedUserId,
@@ -256,9 +454,20 @@ export function useSession () {
         organizationId: authUser?.organizationId || null,
         votingMode: votingMode || sessionData.votingMode 
       });
+    });
 
-      // 🎫 Registrar listeners de tickets APÓS conectar
-      setupTicketListeners(socket);
+    socket.on("reconnect_error", (error) => {
+      console.error('❌ Erro na reconexão WebSocket:', error);
+      setConnectionStatus('connecting');
+    });
+
+    socket.on("reconnect_failed", () => {
+      console.error('❌ Falha na reconexão WebSocket após todas as tentativas');
+      setConnectionStatus('disconnected');
+    });
+
+    socket.on("room_joined", (data) => {
+      console.log('✅ Entrada na sala confirmada:', data);
     });
 
     socket.on("heartbeat_ack", () => {
@@ -273,24 +482,57 @@ export function useSession () {
       }
     });
 
-    socket.on("session_update", (data: SessionState) => updateSessionData(data, storedUserId));
+    socket.on("session_update", (data: SessionState) => {
+      console.log('📊 Recebido session_update:', data);
+      updateSessionData(data, storedUserId);
+    });
+    
     socket.on("flip_cards", () => {
+      console.log('🃏 Recebido flip_cards');
       startCountdownBeforeReveal();
     });
-    socket.on("voting_started", handleVotingStarted);
-    socket.on("voting_finished", handleVotingFinished);
-          socket.on("participant_left", handleParticipantLeft);
+    
+    socket.on("voting_started", (data) => {
+      console.log('🎯 Recebido voting_started:', data);
+      handleVotingStarted(data);
+    });
+    
+    socket.on("voting_finished", (data) => {
+      console.log('🏁 Recebido voting_finished:', data);
+      handleVotingFinished(data);
+    });
+    
+    socket.on("participant_left", (data) => {
+      console.log('👋 Recebido participant_left:', data);
+      handleParticipantLeft(data);
+    });
 
-      // Evento para nova solicitação de acesso público
-      socket.on("public-access-request", (data) => {
-        console.log("Nova solicitação de acesso público:", data);
-        // Recarregar solicitações pendentes
-        loadPendingRequests();
-      });
+    // Evento para nova solicitação de acesso público
+    socket.on("public-access-request", (data) => {
+      console.log("Nova solicitação de acesso público:", data);
+      // Recarregar solicitações pendentes
+      loadPendingRequests();
+    });
+
+    // Evento para sessão encerrada
+    socket.on("session_ended", (data) => {
+      console.log("Sessão encerrada:", data);
+      // Redirecionar baseado no tipo de usuário
+      if (isPublicParticipant) {
+        // Guest: redirecionar para página de sessão encerrada
+        router.push(`/${sessionId}/ended`);
+      } else {
+        // Usuário autenticado: redirecionar para dashboard
+        router.push('/dashboard/sessions');
+      }
+    });
 
     return () => {
+      console.log('🧹 Limpando conexão WebSocket...');
       clearInterval(heartbeatInterval);
-      socket.disconnect();
+      if (socket.connected) {
+        socket.disconnect();
+      }
     };
   }
 
@@ -377,9 +619,11 @@ export function useSession () {
       // NUNCA sobrescrever quando há ações otimistas pendentes ou já tem qualquer ticket (mesmo null)
       const hasLocalControl = optimisticTicketIdRef.current !== null || 
                              lastSelectedTicketIdRef.current !== null || 
-                             currentTicketRef.current !== undefined; // undefined = nunca carregou, null = desselecionado
+                             currentTicketRef.current !== null; // null = desselecionado explicitamente, undefined = nunca carregou
       
-      if (!hasLocalControl && data.currentTicketId) {
+      // Só sincronizar se não tem controle local E se o currentTicketId é diferente do atual
+      if (!hasLocalControl && data.currentTicketId && currentTicketRef.current?.id !== data.currentTicketId) {
+        console.log('🔄 Criador sincronizando ticket via session_update:', data.currentTicketId);
         loadTicketFromSelection(data.currentTicketId);
       }
       // ⚠️ CRIADOR: Ignorar completamente updates de session_update se já tem controle local
@@ -482,14 +726,11 @@ export function useSession () {
   useEffect(() => {
     if (!isCreator) return;
 
-    // Carregar imediatamente
-    loadPendingRequests();
-
     // Configurar intervalo para verificar a cada 10 segundos
-    const interval = setInterval(loadPendingRequests, 10000);
+    const interval = setInterval(loadPendingRequests, 8000);
 
     return () => clearInterval(interval);
-  }, [isCreator]);
+  }, [isCreator, loadPendingRequests]);
 
   /** 🔹 Inicia a contagem regressiva antes de revelar os votos */
   function startCountdownBeforeReveal () {
@@ -572,10 +813,11 @@ export function useSession () {
     // Seleção de novo ticket
     selectTicketDirectly(ticket.id);
     
-    // Se o ticket já foi estimado, mostrar resultados mas permitir re-votar
-    if (ticket.status === "ESTIMATED") {
-      setAverageVote((ticket as any).averageVote || 0);
-    }
+         // Se o ticket já foi estimado, mostrar resultados mas permitir re-votar
+     if (ticket.status === "ESTIMATED") {
+       const avg = (ticket as any).averageVote;
+       setAverageVote(avg !== undefined ? avg : 0);
+     }
     
     // Iniciar votação automaticamente se o ticket não foi estimado
     if (ticket.status === "PENDING") {
@@ -625,7 +867,7 @@ export function useSession () {
 
   const finishVoting = async () => {
     if (!currentTicket) return;
-
+    
     try {
       // Calcular média dos votos usando a nova função
       const average = calculateAverageVote();
@@ -653,7 +895,7 @@ export function useSession () {
       const response = await apiService.updateTicket(currentTicket.id, {
         finalEstimate,
         status: "ESTIMATED",
-        averageVote: averageVote || 0
+        averageVote: typeof averageVote === 'number' ? averageVote : 0
       });
 
       if (response.success && response.data) {
@@ -703,9 +945,9 @@ export function useSession () {
     setShowFinalEstimateModal(false);
   };
 
-  const handleVotingFinished = (data: { ticketId: string, averageVote: number }) => {
-    // Validar se o averageVote é um número válido
-    const validAverage = data.averageVote && !isNaN(data.averageVote) ? data.averageVote : 0;
+  const handleVotingFinished = (data: { ticketId: string, averageVote: number | string }) => {
+    // Validar se o averageVote é válido
+    const validAverage = data.averageVote !== undefined && data.averageVote !== null ? data.averageVote : 0;
     setAverageVote(validAverage);
     setShowFinalEstimateModal(true);
   };
@@ -717,24 +959,67 @@ export function useSession () {
     return votedCards;
   }
 
-  /** 🔹 Calcula a média dos votos válidos */
-  function calculateAverageVote(): number {
+  /** 🔹 Calcula a média/consenso dos votos válidos baseado no modo de votação */
+  function calculateAverageVote(): number | string {
     const votedCards = getVotedCards();
+    const votingMode = sessionData.votingMode || "FIBONACCI";
+    
+
     
     // Filtrar votos válidos (excluir ?, ☕, etc.)
-    const numericVotes = votedCards
-      .map(vote => {
-        const num = parseFloat(vote);
-        return isNaN(num) ? null : num;
-      })
-      .filter(vote => vote !== null && vote > 0) as number[];
+    const validVotes = votedCards.filter(vote => vote !== "?" && vote !== "☕");
+    
 
-    if (numericVotes.length === 0) {
-      return 0;
+    
+    if (validVotes.length === 0) {
+      return votingMode === "TSHIRT" || votingMode === "T-SHIRT" ? "N/A" : 0;
     }
 
-    const sum = numericVotes.reduce((acc, vote) => acc + vote, 0);
-    return sum / numericVotes.length;
+    // Para modos numéricos (FIBONACCI, LINEAR)
+    if (votingMode === "FIBONACCI" || votingMode === "LINEAR") {
+      const numericVotes = validVotes
+        .map(vote => {
+          const num = parseFloat(vote);
+          return isNaN(num) ? null : num;
+        })
+        .filter(vote => vote !== null && vote > 0) as number[];
+
+      if (numericVotes.length === 0) {
+        return 0;
+      }
+
+      const sum = numericVotes.reduce((acc, vote) => acc + vote, 0);
+      return sum / numericVotes.length;
+    }
+    
+    // Para modo TSHIRT, calcular o tamanho médio
+    if (votingMode === "TSHIRT" || votingMode === "T-SHIRT") {
+      const tshirtSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+      
+      // Mapear votos para posições (índices)
+      const validSizeVotes = validVotes
+        .map(vote => {
+          const index = tshirtSizes.indexOf(vote);
+          return index >= 0 ? index : null;
+        })
+        .filter(vote => vote !== null) as number[];
+      
+      if (validSizeVotes.length === 0) {
+        return "M"; // Tamanho padrão se não houver votos válidos
+      }
+      
+      // Calcular a média das posições
+      const averagePosition = validSizeVotes.reduce((acc, position) => acc + position, 0) / validSizeVotes.length;
+      
+      // Encontrar o tamanho mais próximo da média
+      const roundedPosition = Math.round(averagePosition);
+      const sizeIndex = Math.max(0, Math.min(roundedPosition, tshirtSizes.length - 1));
+      
+      return tshirtSizes[sizeIndex];
+    }
+    
+    // Fallback para outros modos
+    return 0;
   }
 
   /** 🔹 Gera cards baseados no modo de votação */
@@ -826,22 +1111,38 @@ export function useSession () {
 
   const handleOpenFinalEstimateModal = (ticket: Ticket) => {
     setCurrentTicket(ticket);
-    setAverageVote((ticket as any).averageVote || 0);
+    const avg = (ticket as any).averageVote;
+    setAverageVote(avg !== undefined ? avg : 0);
     setShowFinalEstimateModal(true);
   };
 
   const handleEndSession = useCallback(async () => {
+    // Verificar se o usuário é o criador da sessão
+    if (!isCreator) {
+      console.warn('Apenas o criador da sessão pode encerrá-la');
+      return;
+    }
+    
     if (!confirm(t("session.endSession.confirm"))) return;
     
     try {
       const response = await apiService.updateSession(sessionId, { status: 'COMPLETED' });
       if (response.success) {
+        // Emitir evento WebSocket para notificar todos os participantes
+        if (socketRef.current) {
+          socketRef.current.emit("session_ended", { 
+            sessionId,
+            organizationId: authUser?.organizationId || null
+          });
+        }
+        
+        // Redirecionar o criador para o dashboard
         router.push('/dashboard/sessions');
       }
     } catch (error) {
       console.error(t('logs.endSession'), error);
     }
-  }, [sessionId, apiService, router, t]);
+  }, [sessionId, apiService, router, t, isCreator, authUser?.organizationId]);
 
   const registerTicketUpdateCallback = useCallback((callback: (ticket: Ticket) => void) => {
     setOnTicketUpdate(() => callback);
@@ -925,47 +1226,48 @@ export function useSession () {
     };
   }
 
-  return {
-    sessionData,
-    user: sessionUser,
-    selectedCard,
-    countdown,
-    inviteLink,
-    currentTicket,
-    isCreator,
-    averageVote,
-    showFinalEstimateModal,
-    setShowFinalEstimateModal,
-    votingCards,
-    isVotingInProgress,
-    canVote,
-    canManageTickets,
-    participantNotification,
-    setParticipantNotification,
-    pendingRequests,
-    showPendingRequestsModal,
-    setShowPendingRequestsModal,
-    handleSelectCard,
-    handleFlipCards,
-    handleNewVoting,
-    resetTable,
-    handleTicketSelect,
-    startVoting,
-    startVotingForCurrentTicket,
-    finishVoting,
-    setFinalEstimate,
-    handleOpenFinalEstimateModal,
-    handleEndSession,
-    registerTicketUpdateCallback,
-    emitTicketSelected,
-    emitTicketCreated,
-    emitTicketUpdated,
-    emitTicketDeleted,
-    reloadCurrentTicket,
-    getVotingStats,
-    createSession,
-    selectTicketDirectly,
-    generateInviteLink,
-    handleRequestAction,
-  };
+      return {
+      sessionData,
+      user: sessionUser,
+      selectedCard,
+      countdown,
+      inviteLink,
+      currentTicket,
+      isCreator,
+      averageVote,
+      showFinalEstimateModal,
+      setShowFinalEstimateModal,
+      votingCards,
+      isVotingInProgress,
+      canVote,
+      canManageTickets,
+      participantNotification,
+      setParticipantNotification,
+      pendingRequests,
+      showPendingRequestsModal,
+      setShowPendingRequestsModal,
+      connectionStatus,
+      handleSelectCard,
+      handleFlipCards,
+      handleNewVoting,
+      resetTable,
+      handleTicketSelect,
+      startVoting,
+      startVotingForCurrentTicket,
+      finishVoting,
+      setFinalEstimate,
+      handleOpenFinalEstimateModal,
+      handleEndSession,
+      registerTicketUpdateCallback,
+      emitTicketSelected,
+      emitTicketCreated,
+      emitTicketUpdated,
+      emitTicketDeleted,
+      reloadCurrentTicket,
+      getVotingStats,
+      createSession,
+      selectTicketDirectly,
+      generateInviteLink,
+      handleRequestAction,
+    };
 }

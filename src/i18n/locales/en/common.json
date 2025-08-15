@@ -326,6 +326,13 @@
     "endSession": {
       "confirm": "Are you sure you want to end this session? This action cannot be undone."
     },
+    "ended": {
+      "title": "Session Ended",
+      "message": "This Poker Planning session has been ended by the creator. Thank you for participating!",
+      "sessionId": "Session ID",
+      "closeTab": "Close Tab",
+      "goHome": "Go Home"
+    },
     "defaultName": "Poker Planning Session",
     "anonymous": "Anonymous",
     "revoting": "Re-voting",

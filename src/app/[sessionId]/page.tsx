@@ -45,6 +45,7 @@ export default function SessionPage() {
     pendingRequests,
     showPendingRequestsModal,
     setShowPendingRequestsModal,
+    connectionStatus,
     handleSelectCard,
     handleFlipCards,
     handleNewVoting,
@@ -68,11 +69,14 @@ export default function SessionPage() {
   const finalParticipants = ensureLocalUser(sessionData.participants, user.userId, user.userName);
   const votingStats = getVotingStats();
 
+
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
       <HeaderBar 
         sessionData={sessionData} 
         userName={user.userName} 
+        isCreator={canManageTickets}
         onInviteOpen={() => {
           generateInviteLink();
           setInviteOpen(true);
@@ -81,6 +85,7 @@ export default function SessionPage() {
         onEndSession={handleEndSession}
         pendingRequestsCount={pendingRequests.length}
         onShowPendingRequests={() => setShowPendingRequestsModal(true)}
+        connectionStatus={connectionStatus}
       />
 
       {/* Notificação de participante */}
@@ -116,14 +121,15 @@ export default function SessionPage() {
             />
 
             {/* Resumo de votos ou barra de votação */}
-            {sessionData.isRevealed ? (
-              <VoteSummary 
-                votes={sessionData.participants.map(p => p.selectedCard).filter(card => card !== null && card !== undefined && card.trim() !== "") as string[]}
-                average={averageVote || undefined}
-                totalParticipants={votingStats.totalParticipants}
-                votedCount={votingStats.votedCount}
-              />
-            ) : (
+                         {sessionData.isRevealed ? (
+               <VoteSummary 
+                 votes={sessionData.participants.map(p => p.selectedCard).filter(card => card !== null && card !== undefined && card.trim() !== "") as string[]}
+                 average={averageVote || ""}
+                 totalParticipants={votingStats.totalParticipants}
+                 votedCount={votingStats.votedCount}
+                 votingMode={sessionData.votingMode}
+               />
+             ) : (
               <VoteBar
                 cards={votingCards}
                 selectedCard={selectedCard}
@@ -141,6 +147,7 @@ export default function SessionPage() {
               sessionId={sessionData.sessionId}
               isCreator={canManageTickets}
               currentTicketId={currentTicket?.id || null}
+              votingMode={sessionData.votingMode}
               onTicketSelect={handleTicketSelect}
               onOpenFinalEstimateModal={handleOpenFinalEstimateModal}
               registerTicketUpdateCallback={registerTicketUpdateCallback}
@@ -171,7 +178,7 @@ export default function SessionPage() {
           isOpen={showFinalEstimateModal}
           onClose={() => setShowFinalEstimateModal(false)}
           onConfirm={setFinalEstimate}
-          averageVote={averageVote || 0}
+          averageVote={averageVote || ""}
         />
       )}
 

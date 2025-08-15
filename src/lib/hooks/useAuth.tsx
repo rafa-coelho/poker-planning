@@ -113,6 +113,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      // Se não há accessToken, não tentar autenticação
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
       const apiService = new ApiService(refreshToken, handleAuthFailure);
       const response = await apiService.checkAuth();
 
