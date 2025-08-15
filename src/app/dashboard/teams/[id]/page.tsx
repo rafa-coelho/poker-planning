@@ -495,7 +495,8 @@ export default function TeamDetailsPage() {
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {projects.map((project) => (
-                    <div key={project.id} className="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
+                    <div key={project.id} className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                         onClick={() => router.push(`/dashboard/projects/${project.id}`)}>
                       <div className="px-4 py-5 sm:p-6">
                         <div className="flex items-center">
                           <div 
@@ -511,7 +512,7 @@ export default function TeamDetailsPage() {
                               {project.name}
                             </h3>
                             <p className="text-sm text-gray-500">
-                              {project._count.members} {t('teams.projects.members')} • {project._count.sessions} {t('teams.projects.sessions')}
+                              {project._count.sessions} {t('teams.projects.sessions')}
                             </p>
                           </div>
                         </div>
@@ -520,7 +521,6 @@ export default function TeamDetailsPage() {
                             <p className="text-sm text-gray-600 line-clamp-2">{project.description}</p>
                           </div>
                         )}
-                        {/* Nome do projeto já é clicável na listagem principal de projetos. Removido botão "ver". */}
                       </div>
                     </div>
                   ))}

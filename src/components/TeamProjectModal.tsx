@@ -52,7 +52,7 @@ export default function TeamProjectModal({ isOpen, onClose, teamId, teamName }: 
       const response = await apiService.get(`/api/teams/${teamId}/projects`);
       
       if (response.success && response.data) {
-        setProjects(response.data.projects || []);
+        setProjects((response.data as { projects: Project[] }).projects || []);
       }
     } catch (error) {
       console.error('Erro ao carregar projetos do time:', error);
@@ -66,7 +66,7 @@ export default function TeamProjectModal({ isOpen, onClose, teamId, teamName }: 
       const response = await apiService.get('/api/projects');
       
       if (response.success && response.data) {
-        const allProjects = response.data.projects || [];
+        const allProjects = (response.data as { projects: Project[] }).projects || [];
         // Filtrar projetos que não estão associados ao time
         const teamProjectIds = projects.map(p => p.id);
         const available = allProjects.filter((p: Project) => !teamProjectIds.includes(p.id));
@@ -176,7 +176,7 @@ export default function TeamProjectModal({ isOpen, onClose, teamId, teamName }: 
                       <div>
                         <p className="font-medium text-gray-900">{project.name}</p>
                         <p className="text-sm text-gray-500">
-                          {project._count.members} {t('teams.projects.members')} • {project._count.sessions} {t('teams.projects.sessions')}
+                          {project._count.sessions} {t('teams.projects.sessions')}
                         </p>
                       </div>
                     </div>
@@ -240,7 +240,7 @@ export default function TeamProjectModal({ isOpen, onClose, teamId, teamName }: 
                           <div className="flex-1">
                             <p className="font-medium text-gray-900">{project.name}</p>
                             <p className="text-sm text-gray-500">
-                              {project._count.members} {t('teams.projects.members')} • {project._count.sessions} {t('teams.projects.sessions')}
+                              {project._count.sessions} {t('teams.projects.sessions')}
                             </p>
                           </div>
                         </div>
