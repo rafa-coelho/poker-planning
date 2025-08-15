@@ -39,7 +39,7 @@ export function useSession () {
     sessionName: "",
     participants: [],
     isRevealed: false,
-    votingMode: "FIBONACCI", // Default
+    votingMode: undefined,
   });
 
   const [sessionUser, setSessionUser] = useState({ userId: "", userName: "" });
@@ -108,7 +108,7 @@ export function useSession () {
           ...prev,
           sessionId: session.id,
           sessionName: session.name,
-          votingMode: session.votingMode || "FIBONACCI",
+          votingMode: session.votingMode,
         }));
 
         // Verificar se o usuário é o criador da sessão
@@ -126,7 +126,8 @@ export function useSession () {
         const cleanup = initializeSocketConnection(
           authUser?.id || "anonymous", 
           authUser?.name || t("session.anonymous"),
-          session.name
+          session.name,
+          session.votingMode
         );
         return cleanup || (() => { });
       }
@@ -194,7 +195,7 @@ export function useSession () {
   }, [currentTicket]);
 
   /** 🔹 Inicializa a conexão com o WebSocket */
-  function initializeSocketConnection(storedUserId: string, storedUserName: string, sessionName?: string): () => void {
+  function initializeSocketConnection(storedUserId: string, storedUserName: string, sessionName?: string, votingMode?: string): () => void {
     if (socketRef.current) {
       socketRef.current.disconnect();
     }
@@ -221,7 +222,8 @@ export function useSession () {
         userId: storedUserId,
         userName: storedUserName,
         sessionName: sessionName || sessionData.sessionName || t("session.defaultName"),
-        organizationId: authUser?.organizationId || null
+        organizationId: authUser?.organizationId || null,
+        votingMode: votingMode || sessionData.votingMode 
       });
 
       // 🎫 Registrar listeners de tickets APÓS conectar
@@ -302,7 +304,7 @@ export function useSession () {
     socket.on("ticket_deleted", onTicketDeleted);
   }
 
-  /** 🔹 Atualiza os dados da sessão */
+    /** 🔹 Atualiza os dados da sessão */
   function updateSessionData(data: SessionState, storedUserId: string) {
     // Marcar o usuário atual em cada participante
     const participantsWithCurrentUser = data.participants.map(p => ({
@@ -310,9 +312,12 @@ export function useSession () {
       isCurrentUser: p.userId === storedUserId
     }));
     
-    setSessionData({
-      ...data,
-      participants: participantsWithCurrentUser
+    setSessionData(prev => {
+      return {
+        ...prev,
+        ...data,
+        participants: participantsWithCurrentUser
+      };
     });
     
     // Atualizar dados do usuário atual
@@ -411,7 +416,7 @@ export function useSession () {
     if (!isAuthenticated || !sessionUser) return;
     
     // Validar se o voto é válido para o modo de votação atual
-    if (!isValidVote(cardValue, sessionData.votingMode || "FIBONACCI")) {
+    if (!sessionData.votingMode || !isValidVote(cardValue, sessionData.votingMode)) {
       return;
     }
     
@@ -639,6 +644,7 @@ export function useSession () {
       case "FIBONACCI":
         return ["1", "2", "3", "5", "8", "13", "21", "34", "55", "89", "?", "☕"];
       case "TSHIRT":
+      case "T-SHIRT":
         return ["XS", "S", "M", "L", "XL", "XXL", "?", "☕"];
       case "LINEAR":
         return ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "?", "☕"];
@@ -687,7 +693,8 @@ export function useSession () {
 
   // 🔹 Otimizar re-renders com useMemo para dados computados
   const votingCards = useMemo(() => {
-    return getVotingCards(sessionData.votingMode || "FIBONACCI");
+    if (!sessionData.votingMode) return [];
+    return getVotingCards(sessionData.votingMode);
   }, [sessionData.votingMode]);
 
   const isVotingInProgress = useMemo(() => {
@@ -723,6 +730,19 @@ export function useSession () {
     setAverageVote((ticket as any).averageVote || 0);
     setShowFinalEstimateModal(true);
   };
+
+  const handleEndSession = useCallback(async () => {
+    if (!confirm(t("session.endSession.confirm"))) return;
+    
+    try {
+      const response = await apiService.updateSession(sessionId, { status: 'COMPLETED' });
+      if (response.success) {
+        router.push('/dashboard/sessions');
+      }
+    } catch (error) {
+      console.error('Erro ao encerrar sessão:', error);
+    }
+  }, [sessionId, apiService, router, t]);
 
   const registerTicketUpdateCallback = useCallback((callback: (ticket: Ticket) => void) => {
     setOnTicketUpdate(() => callback);
@@ -830,6 +850,7 @@ export function useSession () {
     finishVoting,
     setFinalEstimate,
     handleOpenFinalEstimateModal,
+    handleEndSession,
     registerTicketUpdateCallback,
     emitTicketSelected,
     emitTicketCreated,

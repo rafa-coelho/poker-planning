@@ -269,6 +269,11 @@
     "title": "Ações Rápidas",
     "backToList": "Voltar à Lista"
   },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "saving": "Salvando..."
+  },
   "stats": {
     "title": "Estatísticas",
     "sessions": "Sessões",
@@ -280,15 +285,25 @@
     "title": "Sessões",
     "description": "Gerencie suas sessões de planning poker",
     "new": "Nova Sessão",
-    "join": "Entrar na Sessão",
     "edit": "Editar Sessão",
+    "editDescription": "Edite as configurações da sessão",
+    "join": "Entrar na Sessão",
     "archive": "Arquivar Sessão",
     "view": "Ver Sessão",
     "viewAll": "Ver Todas",
     "recent": "Sessões Recentes",
     "noSessions": "Nenhuma sessão encontrada",
     "createFirst": "Comece criando sua primeira sessão de planning poker",
-    "createSession": "Criar Sessão"
+    "createSession": "Criar Sessão",
+    "name": "Nome",
+    "namePlaceholder": "Nome da sessão",
+    "descriptionLabel": "Descrição",
+    "descriptionPlaceholder": "Descreva o propósito desta sessão...",
+    "votingMode": "Modo de Votação",
+    "project": "Projeto",
+    "noProject": "Sem projeto",
+    "autoReveal": "Revelar automaticamente",
+    "allowObservers": "Permitir observadores"
   },
   "session": {
     "info": "Informações da Sessão",
@@ -325,18 +340,7 @@
     "voter": "Votante",
     "observer": "Observador"
   },
-  "form": {
-    "name": "Nome da Sessão",
-    "description": "Descrição",
-    "votingMode": "Modo de Votação",
-    "autoReveal": "Revelar votos automaticamente",
-    "allowObservers": "Permitir observadores",
-    "create": "Criar Sessão",
-    "creating": "Criando...",
-    "cancel": "Cancelar",
-    "save": "Salvar",
-    "saving": "Salvando..."
-  },
+
   "errors": {
     "loadSessions": "Erro ao carregar sessões",
     "loadSession": "Erro ao carregar sessão",

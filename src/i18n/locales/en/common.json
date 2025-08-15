@@ -11,6 +11,16 @@
   "share": "Share",
   "close": "Close",
   "linkCopied": "Link copied!",
+  "copyLink": "Copy Link",
+  "teamMembers": "Team Members",
+  "selectTeamMembersToInvite": "Select team members to invite:",
+  "noTeamMembers": "No team members found",
+  "selectMembersToInvite": "Select at least one member to invite",
+  "invitesSent": "{{count}} invite(s) sent successfully",
+  "errorSendingInvites": "Error sending invites",
+  "inviteSelected": "Invite Selected",
+  "sending": "Sending...",
+  "endSession": "End Session",
   "backToDashboard": "Back to Dashboard",
   "menu": "Menu",
   "reports": "Reports",
@@ -255,6 +265,9 @@
     }
   },
   "session": {
+    "endSession": {
+      "confirm": "Are you sure you want to end this session? This action cannot be undone."
+    },
     "defaultName": "Poker Planning Session",
     "anonymous": "Anonymous",
     "revoting": "Re-voting",

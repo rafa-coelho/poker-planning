@@ -330,6 +330,11 @@
     "title": "Quick Actions",
     "backToList": "Back to List"
   },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving..."
+  },
   "stats": {
     "title": "Statistics",
     "sessions": "Sessions",
@@ -341,15 +346,25 @@
     "title": "Sessions",
     "description": "Manage your planning poker sessions",
     "new": "New Session",
-    "join": "Join Session",
     "edit": "Edit Session",
+    "editDescription": "Edit session settings",
+    "join": "Join Session",
     "archive": "Archive Session",
     "view": "View Session",
     "viewAll": "View All",
     "recent": "Recent Sessions",
     "noSessions": "No sessions found",
     "createFirst": "Start by creating your first planning poker session",
-    "createSession": "Create Session"
+    "createSession": "Create Session",
+    "name": "Name",
+    "namePlaceholder": "Session name",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe the purpose of this session...",
+    "votingMode": "Voting Mode",
+    "project": "Project",
+    "noProject": "No project",
+    "autoReveal": "Auto reveal",
+    "allowObservers": "Allow observers"
   },
   "session": {
     "info": "Session Information",
@@ -386,18 +401,7 @@
     "voter": "Voter",
     "observer": "Observer"
   },
-  "form": {
-    "name": "Session Name",
-    "description": "Description",
-    "votingMode": "Voting Mode",
-    "autoReveal": "Auto-reveal votes",
-    "allowObservers": "Allow observers",
-    "create": "Create Session",
-    "creating": "Creating...",
-    "cancel": "Cancel",
-    "save": "Save",
-    "saving": "Saving..."
-  },
+
   "errors": {
     "loadSessions": "Error loading sessions",
     "loadSession": "Error loading session",

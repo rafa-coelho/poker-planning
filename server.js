@@ -169,7 +169,7 @@ io.on("connection", (socket) => {
   });
 
   // 🚪 Entrar na sala
-  socket.on("join_room", ({ sessionId, userId, userName, sessionName, organizationId }) => {
+  socket.on("join_room", async ({ sessionId, userId, userName, sessionName, organizationId, votingMode }) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('error', { message: 'Rate limit exceeded' });
       return;
@@ -186,6 +186,7 @@ io.on("connection", (socket) => {
 
     // Inicializar sessão se não existir
     if (!sessions[sessionId]) {
+      // Por enquanto, usar valores padrão até implementar acesso direto ao banco
       sessions[sessionId] = {
         sessionId,
         sessionName: sessionName || "Sessão Poker Planning",
@@ -193,7 +194,7 @@ io.on("connection", (socket) => {
         participants: [],
         isRevealed: false,
         currentTicketId: null,
-        votingMode: "FIBONACCI",
+        votingMode: votingMode,
         lastActivity: Date.now()
       };
     }

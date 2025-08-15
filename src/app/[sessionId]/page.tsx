@@ -20,6 +20,7 @@ export default function SessionPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+  const sessionId = window.location.pathname.split('/')[1];
 
   const {
     sessionData,
@@ -43,6 +44,7 @@ export default function SessionPage() {
     finishVoting,
     setFinalEstimate,
     handleOpenFinalEstimateModal,
+    handleEndSession,
     registerTicketUpdateCallback,
     emitTicketSelected,
     emitTicketCreated,
@@ -63,6 +65,7 @@ export default function SessionPage() {
         userName={user.userName} 
         onInviteOpen={() => setInviteOpen(true)}
         onToggleSidebar={() => setMobileMenuOpen(true)}
+        onEndSession={handleEndSession}
       />
 
       {/* Notificação de participante */}
@@ -135,10 +138,14 @@ export default function SessionPage() {
         </div>
       </main>
 
-      {/* Modal de convite */}
-      {inviteOpen && (
-        <InviteModal inviteLink={inviteLink} onClose={() => setInviteOpen(false)} />
-      )}
+                      {/* Modal de convite */}
+                {inviteOpen && (
+                  <InviteModal 
+                    inviteLink={inviteLink} 
+                    onClose={() => setInviteOpen(false)}
+                    sessionId={sessionId}
+                  />
+                )}
 
       {/* Modal de estimativa final */}
       {showFinalEstimateModal && currentTicket && (

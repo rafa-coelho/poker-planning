@@ -12,9 +12,10 @@ interface HeaderBarProps {
   userName: string;
   onInviteOpen: () => void;
   onToggleSidebar?: () => void;
+  onEndSession?: () => void;
 }
 
-export default function HeaderBar({ sessionData, userName, onInviteOpen, onToggleSidebar }: HeaderBarProps) {
+export default function HeaderBar({ sessionData, userName, onInviteOpen, onToggleSidebar, onEndSession }: HeaderBarProps) {
   const { t } = useTranslation("common");
   
   return (
@@ -51,6 +52,15 @@ export default function HeaderBar({ sessionData, userName, onInviteOpen, onToggl
             >
               {t("invitePlayers")}
             </button>
+            
+            {onEndSession && (
+              <button
+                className="border border-red-500 text-red-500 px-3 py-1 rounded hover:bg-red-50 transition"
+                onClick={onEndSession}
+              >
+                {t("endSession")}
+              </button>
+            )}
         </div>
       </div>
     </header>

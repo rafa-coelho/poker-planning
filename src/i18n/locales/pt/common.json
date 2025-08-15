@@ -11,6 +11,16 @@
   "share": "Compartilhar",
   "close": "Fechar",
   "linkCopied": "Link copiado!",
+  "copyLink": "Copiar Link",
+  "teamMembers": "Membros do Time",
+  "selectTeamMembersToInvite": "Selecione os membros do time que deseja convidar:",
+  "noTeamMembers": "Nenhum membro do time encontrado",
+  "selectMembersToInvite": "Selecione pelo menos um membro para convidar",
+  "invitesSent": "{{count}} convite(s) enviado(s) com sucesso",
+  "errorSendingInvites": "Erro ao enviar convites",
+  "inviteSelected": "Convidar Selecionados",
+  "sending": "Enviando...",
+  "endSession": "Encerrar Sessão",
   "backToDashboard": "Voltar ao Dashboard",
   "menu": "Menu",
   "reports": "Relatórios",
@@ -255,6 +265,9 @@
     }
   },
   "session": {
+    "endSession": {
+      "confirm": "Tem certeza que deseja encerrar esta sessão? Esta ação não pode ser desfeita."
+    },
     "defaultName": "Sessão Poker Planning",
     "anonymous": "Anônimo",
     "revoting": "Re-votação",
