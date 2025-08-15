@@ -4,6 +4,7 @@ import "@/i18n/index";
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { usePublicAuth } from '@/lib/hooks/usePublicAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -14,13 +15,14 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { t } = useTranslation("common");
   const { user, isLoading } = useAuth();
+  const { isPublicParticipant } = usePublicAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!isLoading && !user && !isPublicParticipant) {
       router.push('/login');
     }
-  }, [user, isLoading, router]);
+  }, [user, isPublicParticipant, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -33,7 +35,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!user) {
+  if (!user && !isPublicParticipant) {
     return null;
   }
 

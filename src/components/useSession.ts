@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import { Ticket, TicketStatus } from "@prisma/client";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { usePublicAuth } from "@/lib/hooks/usePublicAuth";
 import { ApiService } from "@/lib/services/apiService";
 import { useTranslation } from "react-i18next";
 import { APP_CONFIG } from "@/lib/config";
@@ -32,6 +33,7 @@ export function useSession () {
   const router = useRouter();
   const sessionId = params.sessionId as string;
   const { user: authUser, isAuthenticated, isLoading: authLoading, apiService } = useAuth();
+  const { isPublicParticipant, publicParticipant, isInitialized: publicInitialized } = usePublicAuth();
   const { t } = useTranslation("common");
 
   const [sessionData, setSessionData] = useState<SessionState>({
@@ -62,10 +64,10 @@ export function useSession () {
   const lastSelectedTicketIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || !publicInitialized) return;
 
-    if (!isAuthenticated) {
-      router.push("/login");
+    if (!isAuthenticated && !isPublicParticipant) {
+      router.push(`/${sessionId}/join`);
       return;
     }
 
@@ -75,8 +77,12 @@ export function useSession () {
     }
 
     // Configurar dados do usuário
-    const userUniqueId = authUser?.id || "anonymous";
-    const userDisplayName = authUser?.name || t("session.anonymous");
+    const userUniqueId = isPublicParticipant
+      ? publicParticipant!.participantId
+      : (authUser?.id || "anonymous");
+    const userDisplayName = isPublicParticipant
+      ? publicParticipant!.name
+      : (authUser?.name || t("session.anonymous"));
 
     setSessionUser({
       userId: userUniqueId,
@@ -88,7 +94,7 @@ export function useSession () {
 
     // Carregar dados da sessão primeiro, depois inicializar WebSocket
     loadSessionData();
-  }, [sessionId, router, isAuthenticated, authUser, authLoading, t]);
+  }, [sessionId, router, isAuthenticated, isPublicParticipant, authUser, authLoading, publicInitialized, t]);
 
 
 
@@ -104,36 +110,57 @@ export function useSession () {
   /** 🔹 Carrega dados da sessão do banco de dados */
   const loadSessionData = async () => {
     try {
-      const response = await apiService.getSession(sessionId);
-      if (response.success && response.data) {
-        const session = response.data;
-        
-        setSessionData(prev => ({
-          ...prev,
-          sessionId: session.id,
-          sessionName: session.name,
-          votingMode: session.votingMode,
-        }));
+      if (isAuthenticated) {
+        const response = await apiService.getSession(sessionId);
+        if (response.success && response.data) {
+          const session = response.data;
+          
+          setSessionData(prev => ({
+            ...prev,
+            sessionId: session.id,
+            sessionName: session.name,
+            votingMode: session.votingMode,
+          }));
 
-        // Verificar se o usuário é o criador da sessão
-        // Verificar se o usuário atual é o primeiro participante (criador)
-        const currentUser = session.participants.find(p => p.user?.id === authUser?.id);
-        const isUserCreator = currentUser && session.participants.indexOf(currentUser) === 0;
-        setIsCreator(!!isUserCreator);
+          // Verificar se o usuário é o criador da sessão
+          const currentUser = session.participants.find(p => p.user?.id === authUser?.id);
+          const isUserCreator = currentUser && session.participants.indexOf(currentUser) === 0;
+          setIsCreator(!!isUserCreator);
 
-        // Carregar ticket atual se existir
-        if (session.currentTicketId) {
-          loadCurrentTicket(session.currentTicketId);
+          // Carregar ticket atual se existir (somente para usuários autenticados)
+          if (session.currentTicketId) {
+            loadCurrentTicket(session.currentTicketId);
+          }
+
+          const cleanup = initializeSocketConnection(
+            authUser?.id || "anonymous", 
+            authUser?.name || t("session.anonymous"),
+            session.name,
+            session.votingMode
+          );
+          return cleanup || (() => { });
         }
+      } else if (isPublicParticipant) {
+        // Convidado: carrega dados do board usando o token público
+        const guestToken = localStorage.getItem('publicParticipantToken') || '';
+        const resp = await apiService.getSessionAsGuest(sessionId, guestToken);
+        if (resp.success && resp.data) {
+          setSessionData(prev => ({
+            ...prev,
+            sessionId: (resp.data as any).id,
+            sessionName: (resp.data as any).name,
+            votingMode: (resp.data as any).votingMode,
+          }));
+          setIsCreator(false);
 
-        // Inicializar WebSocket com o nome correto da sessão
-        const cleanup = initializeSocketConnection(
-          authUser?.id || "anonymous", 
-          authUser?.name || t("session.anonymous"),
-          session.name,
-          session.votingMode
-        );
-        return cleanup || (() => { });
+          const cleanup = initializeSocketConnection(
+            publicParticipant!.participantId,
+            publicParticipant!.name,
+            (resp.data as any).name,
+            (resp.data as any).votingMode
+          );
+          return cleanup || (() => { });
+        }
       }
     } catch (error) {
       console.error(t("session.errors.loadSessionData"), error);
@@ -278,6 +305,8 @@ export function useSession () {
     };
 
     const onTicketSelected = (data: { ticketId: string | null }) => {
+      console.log('🎯 onTicketSelected recebido:', data, 'isCreator:', isCreatorRef.current);
+      
       if (isCreatorRef.current) {
         // CRIADOR: Ignorar eventos WS para manter controle local
         // Apenas confirmar se foi nossa seleção otimista
@@ -289,8 +318,10 @@ export function useSession () {
 
       // PARTICIPANTES: Sempre seguir o servidor
       if (data.ticketId) {
+        console.log('🔄 Participante recebeu ticket_selected:', data.ticketId);
         loadTicketFromSelection(data.ticketId);
       } else {
+        console.log('🔄 Participante recebeu desseleção de ticket');
         setCurrentTicket(null);
         setAverageVote(null);
         setShowFinalEstimateModal(false);
@@ -481,7 +512,7 @@ export function useSession () {
 
   function handleSelectCard(cardValue: string) {
     
-    if (!isAuthenticated || !sessionUser) return;
+    if ((!isAuthenticated && !isPublicParticipant) || !sessionUser) return;
     
     // Validar se o voto é válido para o modo de votação atual
     if (!sessionData.votingMode || !isValidVote(cardValue, sessionData.votingMode)) {
@@ -771,7 +802,7 @@ export function useSession () {
 
   const canVote = useMemo(() => {
     const result = (
-      isAuthenticated &&
+      (isAuthenticated || isPublicParticipant) &&
       sessionUser &&
       !!currentTicket &&
       (currentTicket.status === "VOTING" || currentTicket.status === "ESTIMATED" || currentTicket.status === "PENDING") &&
@@ -779,7 +810,7 @@ export function useSession () {
     );
     
     return result;
-  }, [isAuthenticated, sessionUser, currentTicket, countdown]);
+  }, [isAuthenticated, isPublicParticipant, sessionUser, currentTicket, countdown]);
 
   const canManageTickets = useMemo(() => {
     return isCreator;
@@ -851,6 +882,8 @@ export function useSession () {
 
   // 🎫 Gerenciamento direto de tickets no hook (APENAS PARA CRIADOR)
   const selectTicketDirectly = useCallback((ticketId: string | null) => {
+    console.log('🎯 selectTicketDirectly chamado:', ticketId);
+    
     if (!ticketId) {
       // Desseleção - aplicar localmente primeiro
       setCurrentTicket(null);
@@ -868,6 +901,7 @@ export function useSession () {
     }
     
     // Emitir para todos os OUTROS (participantes)
+    console.log('📡 Emitindo ticket_selected:', { sessionId, ticketId, organizationId: authUser?.organizationId || null });
     socketRef.current?.emit("ticket_selected", { 
       sessionId, 
       ticketId,

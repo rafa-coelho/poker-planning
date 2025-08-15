@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ];
       
       // Verificar se é uma rota de join de sessão
-      const isJoinRoute = /^\/[^\/]+\/join$/.test(currentPath);
+      const isJoinRoute = /^\/[^\/]+\/join$/.test(currentPath) || /^\/[^\/]+$/.test(currentPath); // também permitir página do board
       
       if (!publicPaths.some(path => currentPath.startsWith(path)) && !isJoinRoute) {
         window.location.href = '/login';
@@ -104,6 +104,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
+      // Se há um token de convidado público, não tentar autenticação completa
+      const publicToken = localStorage.getItem('publicParticipantToken');
+      if (publicToken) {
+        // Para convidados, apenas marcar como não autenticado mas não fazer chamada
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
       const apiService = new ApiService(refreshToken, handleAuthFailure);
       const response = await apiService.checkAuth();
 

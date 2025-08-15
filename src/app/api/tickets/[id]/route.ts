@@ -1,38 +1,96 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withTenantIsolation } from '@/lib/middleware/tenant'
+import { verifyPublicParticipantToken } from '@/lib/auth/publicAuth'
 import { TicketService } from '@/lib/services/ticketService'
 import { SessionService } from '@/lib/services/sessionService'
 import { TicketStatus, Priority } from '@prisma/client'
 import i18next from '@/i18n/server'
 import { TenantContext } from '@/lib/middleware/tenant'
+import { prisma } from '@/lib/db'
 
 /**
  * GET /api/tickets/[id]
  * Busca um ticket específico
  */
-async function getTicket(req: NextRequest, context: TenantContext) {
+async function getTicket(req: NextRequest) {
   try {
     const ticketId = req.nextUrl.pathname.split('/')[3]
 
-    // Verificar se o ticket existe e pertence à organização
-    const ticket = await TicketService.getTicketById(ticketId, context.organizationId)
-    if (!ticket) {
-      return NextResponse.json(
-        { 
-          error: {
-            code: 'TICKET_NOT_FOUND',
-            message: i18next.t('api.errors.notFound'),
-            timestamp: new Date().toISOString()
-          }
-        },
-        { status: 404 }
-      )
+    // Verificar se é convidado (token público) e permitir leitura segura
+    const authHeader = req.headers.get('authorization')
+    let isGuest = false
+    let guestSessionId = null
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      try {
+        const guest = verifyPublicParticipantToken(token)
+        if (guest) {
+          isGuest = true
+          guestSessionId = guest.sessionId
+        }
+      } catch (error) {
+        // Token inválido, continuar para verificar se é usuário autenticado
+      }
     }
 
-    return NextResponse.json({
-      success: true,
-      data: ticket
-    })
+    // Para convidados, verificar se o ticket pertence à sessão deles
+    if (isGuest && guestSessionId) {
+      const ticket = await prisma.ticket.findFirst({
+        where: {
+          id: ticketId,
+          sessionId: guestSessionId
+        },
+        include: {
+          session: {
+            select: {
+              id: true,
+              name: true,
+              votingMode: true,
+            }
+          }
+        }
+      })
+      
+      if (!ticket) {
+        return NextResponse.json(
+          { 
+            error: {
+              code: 'TICKET_NOT_FOUND',
+              message: i18next.t('api.errors.notFound'),
+              timestamp: new Date().toISOString()
+            }
+          },
+          { status: 404 }
+        )
+      }
+      return NextResponse.json({
+        success: true,
+        data: ticket
+      })
+    }
+
+    // Para usuários autenticados, usar withTenantIsolation
+    return withTenantIsolation(async (req: NextRequest, context: TenantContext) => {
+      const ticket = await TicketService.getTicketById(ticketId, context.organizationId)
+      if (!ticket) {
+        return NextResponse.json(
+          { 
+            error: {
+              code: 'TICKET_NOT_FOUND',
+              message: i18next.t('api.errors.notFound'),
+              timestamp: new Date().toISOString()
+            }
+          },
+          { status: 404 }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: ticket
+      })
+    })(req)
   } catch (error) {
     console.error('Get ticket error:', error)
     return NextResponse.json(
@@ -212,6 +270,6 @@ async function deleteTicket(req: NextRequest, context: TenantContext) {
 }
 
 // Exporta as funções com middleware de tenant isolation
-export const GET = withTenantIsolation(getTicket)
+export const GET = getTicket
 export const PUT = withTenantIsolation(updateTicket)
 export const DELETE = withTenantIsolation(deleteTicket) 

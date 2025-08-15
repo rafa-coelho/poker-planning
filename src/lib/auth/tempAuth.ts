@@ -1,4 +1,5 @@
-import { jwt } from './jwt';
+import jwt from 'jsonwebtoken';
+import { APP_CONFIG } from '@/lib/config';
 
 export interface TempParticipantToken {
   participantId: string;
@@ -20,7 +21,7 @@ export function generateTempParticipantToken(participantId: string, sessionId: s
     exp: Math.floor(Date.now() / 1000) + (30 * 60) // 30 minutos
   };
 
-  return jwt.sign(payload, process.env.JWT_SECRET!);
+  return jwt.sign(payload, APP_CONFIG.JWT_SECRET);
 }
 
 /**
@@ -28,7 +29,7 @@ export function generateTempParticipantToken(participantId: string, sessionId: s
  */
 export function verifyTempParticipantToken(token: string): TempParticipantToken | null {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as TempParticipantToken;
+    const decoded = jwt.verify(token, APP_CONFIG.JWT_SECRET) as TempParticipantToken;
     
     // Verificar se é um token temporário
     if (decoded.type !== 'temp_participant') {

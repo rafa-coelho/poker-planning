@@ -1,4 +1,5 @@
-import { jwt } from './jwt';
+import jwt from 'jsonwebtoken';
+import { APP_CONFIG } from '@/lib/config';
 
 export interface PublicParticipantToken {
   participantId: string;
@@ -22,7 +23,7 @@ export function generatePublicParticipantToken(participantId: string, sessionId:
     exp: Math.floor(Date.now() / 1000) + (2 * 60 * 60) // 2 horas
   };
 
-  return jwt.sign(payload, process.env.JWT_SECRET!);
+  return jwt.sign(payload, APP_CONFIG.JWT_SECRET);
 }
 
 /**
@@ -30,7 +31,7 @@ export function generatePublicParticipantToken(participantId: string, sessionId:
  */
 export function verifyPublicParticipantToken(token: string): PublicParticipantToken | null {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as PublicParticipantToken;
+    const decoded = jwt.verify(token, APP_CONFIG.JWT_SECRET) as PublicParticipantToken;
     
     // Verificar se é um token de participante público
     if (decoded.type !== 'public_participant') {

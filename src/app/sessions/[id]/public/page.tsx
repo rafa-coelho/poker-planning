@@ -1,5 +1,6 @@
 'use client';
 
+import "@/i18n/index";
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +46,7 @@ export default function PublicSessionPage() {
   const { t } = useTranslation('common');
   const params = useParams();
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, apiService } = useAuth();
   
   const [sessionData, setSessionData] = useState<PublicAccessData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,19 +74,18 @@ export default function PublicSessionPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/sessions/${sessionId}/public-access`);
-      const data = await response.json();
+      const resp = await apiService.getPublicAccess(sessionId);
 
-      if (data.success) {
-        setSessionData(data.data);
+      if (resp.success && resp.data) {
+        setSessionData(resp.data);
         
         // Se o usuário já tem acesso, redirecionar para a sessão
-        if (data.data.currentUser.hasAccess) {
+        if (resp.data.currentUser.hasAccess) {
           router.push(`/sessions/${sessionId}`);
           return;
         }
       } else {
-        setError(data.error?.message || 'Erro ao verificar acesso público');
+        setError(resp.error?.message || 'Erro ao verificar acesso público');
       }
     } catch (err) {
       setError('Erro ao conectar com o servidor');
@@ -104,25 +104,17 @@ export default function PublicSessionPage() {
       setSubmitting(true);
       setError(null);
 
-      const response = await fetch(`/api/sessions/${sessionId}/public-access`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(accessForm),
-      });
+      const resp = await apiService.requestPublicAccess(sessionId, accessForm);
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (resp.success && resp.data) {
         setRequestStatus({
           status: 'pending',
-          message: data.data.message,
-          participantId: data.data.participantId
+          message: resp.data.message,
+          participantId: resp.data.participantId
         });
         setShowAccessModal(false);
       } else {
-        setError(data.error?.message || 'Erro ao solicitar acesso');
+        setError(resp.error?.message || 'Erro ao solicitar acesso');
       }
     } catch (err) {
       setError('Erro ao conectar com o servidor');

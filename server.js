@@ -139,11 +139,24 @@ function updateSession (sessionId) {
 // 🔹 Verificar isolamento por organização
 function validateOrganizationAccess(socket, sessionId, organizationId) {
   const session = sessions[sessionId];
-  if (session && session.organizationId && session.organizationId !== organizationId) {
+  
+  // Se a sessão não tem organizationId definido, permitir acesso
+  if (!session || !session.organizationId) {
+    return true;
+  }
+  
+  // Se o organizationId é null/undefined (convidado público), permitir acesso
+  if (!organizationId) {
+    return true;
+  }
+  
+  // Se ambos têm organizationId, verificar se são iguais
+  if (session.organizationId !== organizationId) {
     logEvent('UNAUTHORIZED_ACCESS', socket.id, { sessionId, organizationId });
     socket.emit('error', { message: 'Unauthorized access to session' });
     return false;
   }
+  
   return true;
 }
 

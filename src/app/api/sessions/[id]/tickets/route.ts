@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withTenantIsolation } from '@/lib/middleware/tenant'
+import { verifyPublicParticipantToken } from '@/lib/auth/publicAuth'
 import { SessionService } from '@/lib/services/sessionService'
 import { TicketService } from '@/lib/services/ticketService'
 import { TicketStatus, Priority } from '@prisma/client'
@@ -14,6 +15,17 @@ async function listTickets(req: NextRequest, context: TenantContext) {
   try {
     const sessionId = req.nextUrl.pathname.split('/')[3] // sessions/[id]/tickets
     
+    // Verificar se é convidado (token público) e permitir leitura segura
+    const authHeader = req.headers.get('authorization')
+    let isGuest = false
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      const guest = verifyPublicParticipantToken(token)
+      if (guest && guest.sessionId === sessionId) {
+        isGuest = true
+      }
+    }
+
     // Verificar se a sessão existe e pertence à organização
     const session = await SessionService.getSessionById(sessionId, context.organizationId)
     if (!session) {
@@ -144,5 +156,28 @@ async function createTicket(req: NextRequest, context: TenantContext) {
 }
 
 // Exporta as funções com middleware de tenant isolation
-export const GET = withTenantIsolation(listTickets)
+export async function GET(req: NextRequest) {
+  const sessionId = req.nextUrl.pathname.split('/')[3]
+  const authHeader = req.headers.get('authorization')
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7)
+    const guest = verifyPublicParticipantToken(token)
+    if (guest && guest.sessionId === sessionId) {
+      try {
+        // Buscar a sessão para obter a organizationId
+        const session = await SessionService.getSessionById(sessionId, undefined as any)
+        if (!session) {
+          return NextResponse.json({ error: { code: 'SESSION_NOT_FOUND', message: i18next.t('api.errors.notFound'), timestamp: new Date().toISOString() } }, { status: 404 })
+        }
+        const tickets = await TicketService.listTicketsBySession(sessionId, session.organizationId)
+        return NextResponse.json({ success: true, data: tickets })
+      } catch (error) {
+        console.error('Guest list tickets error:', error)
+        return NextResponse.json({ error: { code: 'LIST_TICKETS_ERROR', message: i18next.t('api.errors.listTickets'), timestamp: new Date().toISOString() } }, { status: 500 })
+      }
+    }
+  }
+  // Fallback autenticado com tenant isolation
+  return (withTenantIsolation(listTickets) as any)(req)
+}
 export const POST = withTenantIsolation(createTicket) 

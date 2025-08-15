@@ -1,12 +1,12 @@
 "use client";
 
+import "@/i18n/index";
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePublicAuth } from '@/lib/hooks/usePublicAuth';
 import { Toaster, toast } from 'react-hot-toast';
-import { io, Socket } from 'socket.io-client';
 import { PublicParticipantRequest, PublicParticipantResponse } from '@/types/publicAccess';
 
 interface RequestStatus {
@@ -21,7 +21,7 @@ export default function JoinSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const router = useRouter();
   const { t } = useTranslation('common');
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, apiService } = useAuth();
   const { setPublicParticipant } = usePublicAuth();
 
   const [sessionData, setSessionData] = useState<any>(null);
@@ -31,7 +31,7 @@ export default function JoinSessionPage() {
   const [accessForm, setAccessForm] = useState<PublicParticipantRequest>({ name: '' });
   const [submitting, setSubmitting] = useState(false);
   const [requestStatus, setRequestStatus] = useState<RequestStatus | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  
 
   // Carregar status salvo do localStorage
   useEffect(() => {
@@ -58,83 +58,7 @@ export default function JoinSessionPage() {
     }
   }, [sessionId]);
 
-  // Conectar WebSocket para notificações em tempo real
-  useEffect(() => {
-    if (requestStatus?.status === 'pending' && requestStatus.participantId) {
-      const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001');
-
-      newSocket.on('connect', () => {
-        console.log('WebSocket connected for public access');
-        // Juntar à sala específica do participante
-        newSocket.emit('join_public_participant', {
-          participantId: requestStatus.participantId,
-          sessionId
-        });
-      });
-
-      newSocket.on('public-access-response', (data: { participantId: string; action: 'APPROVE' | 'REJECT'; authToken?: string }) => {
-        if (data.participantId === requestStatus.participantId) {
-          if (data.action === 'APPROVE') {
-            const message = t('join.approvedRedirecting');
-            const newStatus = {
-              status: 'approved' as const,
-              message,
-              participantId: requestStatus.participantId,
-              authToken: data.authToken
-            };
-            
-            setRequestStatus(newStatus);
-            
-            // Salvar no localStorage
-            localStorage.setItem(`publicAccess_${sessionId}`, JSON.stringify(newStatus));
-            
-            toast.success(t('permissionApproved'));
-            
-            // Salvar token de autenticação pública
-            if (requestStatus.authToken) {
-              setPublicParticipant(requestStatus.authToken);
-            }
-            
-            // Salvar token de autenticação pública
-            if (data.authToken) {
-              setPublicParticipant(data.authToken);
-            }
-            
-            // Redirecionar imediatamente
-            router.push(`/${sessionId}`);
-          } else {
-            const message = t('join.rejectedMessage');
-            setRequestStatus({
-              status: 'rejected',
-              message,
-              participantId: requestStatus.participantId
-            });
-            
-            // Limpar do localStorage
-            localStorage.removeItem(`publicAccess_${sessionId}`);
-            
-            toast.error(t('permissionRejected'));
-          }
-        }
-      });
-
-      newSocket.on('disconnect', () => {
-        console.log('WebSocket disconnected');
-      });
-
-      setSocket(newSocket);
-
-      // Verificação automática a cada 5 segundos
-      const interval = setInterval(() => {
-        checkRequestStatus();
-      }, 5000);
-
-      return () => {
-        newSocket.disconnect();
-        clearInterval(interval);
-      };
-    }
-  }, [requestStatus?.status, requestStatus?.participantId, sessionId, router]);
+  
 
   // Verificar permissão para usuário logado
   const checkSessionPermission = useCallback(async () => {
@@ -142,17 +66,10 @@ export default function JoinSessionPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/sessions/${sessionId}/public-access`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const dataResp = await apiService.getPublicAccess(sessionId);
 
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        if (data.data.currentUser.hasAccess) {
+      if (dataResp.success && dataResp.data) {
+        if (dataResp.data.currentUser.hasAccess) {
           // Usuário tem acesso - redirecionar para a sessão
           router.push(`/${sessionId}`);
         } else {
@@ -174,17 +91,10 @@ export default function JoinSessionPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/sessions/${sessionId}/public-access`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const resp = await apiService.getPublicAccess(sessionId);
 
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        setSessionData(data.data);
+      if (resp.success && resp.data) {
+        setSessionData(resp.data);
       } else {
         setError('sessionNotFound');
       }
@@ -203,26 +113,15 @@ export default function JoinSessionPage() {
       setRequestStatus(prev => ({ ...prev!, status: 'checking' }));
 
       // Usar a nova API de status que aceita tokens de participantes públicos
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
+      const tokenToUse = requestStatus.authToken || requestStatus.tempToken || '';
+      const resp = await apiService.getPublicParticipantStatus(
+        sessionId,
+        requestStatus.participantId,
+        tokenToUse
+      );
 
-      // Enviar token apropriado baseado no status
-      if (requestStatus.authToken) {
-        headers['Authorization'] = `Bearer ${requestStatus.authToken}`;
-      } else if (requestStatus.tempToken) {
-        headers['Authorization'] = `Bearer ${requestStatus.tempToken}`;
-      }
-
-      const response = await fetch(`/api/sessions/${sessionId}/public-participants/${requestStatus.participantId}/status`, {
-        method: 'GET',
-        headers,
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        const participant = data.data;
+      if (resp.success && resp.data) {
+        const participant = resp.data;
         
         if (participant.status === 'APPROVED') {
           const message = t('join.approvedRedirecting');
@@ -230,7 +129,7 @@ export default function JoinSessionPage() {
             status: 'approved' as const,
             message,
             participantId: requestStatus.participantId,
-            authToken: requestStatus.authToken
+            authToken: participant.authToken || requestStatus.authToken
           };
           
           setRequestStatus(newStatus);
@@ -240,12 +139,12 @@ export default function JoinSessionPage() {
           toast.success(t('permissionApproved'));
           
           // Salvar token de autenticação pública
-          if (data.authToken) {
-            setPublicParticipant(data.authToken);
+          if (participant.authToken) {
+            setPublicParticipant(participant.authToken);
           }
           
           // Redirecionar imediatamente
-          router.push(`/${sessionId}`);
+          setTimeout(() => router.push(`/${sessionId}`), 0);
         } else if (participant.status === 'REJECTED') {
           const message = t('join.rejectedMessage');
           setRequestStatus({
@@ -263,6 +162,19 @@ export default function JoinSessionPage() {
       console.error('Erro ao verificar status:', err);
     }
   }, [requestStatus, sessionId, router]);
+
+  // Polling periódico para verificar status da solicitação (sem WebSocket)
+  useEffect(() => {
+    if (requestStatus?.status === 'pending' && requestStatus.participantId) {
+      // Checa imediatamente uma vez, depois inicia o intervalo
+      checkRequestStatus();
+      const interval = setInterval(checkRequestStatus, 5000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [requestStatus?.status, requestStatus?.participantId, checkRequestStatus]);
 
   // Inicializar verificação de autenticação
   useEffect(() => {
@@ -293,22 +205,14 @@ export default function JoinSessionPage() {
       setSubmitting(true);
       setError(null);
 
-      const response = await fetch(`/api/sessions/${sessionId}/public-access`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(accessForm),
-      });
+      const resp = await apiService.requestPublicAccess(sessionId, accessForm);
 
-      const data: PublicParticipantResponse = await response.json();
-
-      if (data.success && data.data) {
+      if (resp.success && resp.data) {
         const newStatus = {
           status: 'pending' as const,
           message: t('join.notificationMessage'),
-          participantId: data.data.participantId,
-          tempToken: (data.data as any).tempToken
+          participantId: resp.data.participantId,
+          tempToken: (resp.data as any).tempToken
         };
         
         setRequestStatus(newStatus);
@@ -319,7 +223,7 @@ export default function JoinSessionPage() {
         
         toast.success(t('permissionRequested'));
       } else {
-        setError(data.error?.message || 'errorEnterName');
+        setError(resp.error?.message || 'errorEnterName');
       }
     } catch (err) {
       setError('errorEnterName');

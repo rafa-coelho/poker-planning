@@ -129,12 +129,33 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const token = localStorage.getItem('accessToken');
-    
-    if (token) {
-      options.headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`,
-      };
+    const guestToken = localStorage.getItem('publicParticipantToken');
+    const existingAuth = (options.headers as Record<string, string> | undefined)?.['Authorization']
+      || (options.headers as Record<string, string> | undefined)?.['authorization'];
+    // Só injeta Authorization automaticamente se NÃO houver header customizado
+    if (!existingAuth) {
+      let tokenToUse: string | null = guestToken || null;
+
+      // Fallback: tentar recuperar do estado salvo por sessão (publicAccess_<sessionId>)
+      if (!tokenToUse) {
+        const match = endpoint.match(/\/api\/sessions\/([^/]+)/);
+        const sessionIdFromEndpoint = match?.[1];
+        if (sessionIdFromEndpoint) {
+          const saved = localStorage.getItem(`publicAccess_${sessionIdFromEndpoint}`);
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              tokenToUse = parsed.authToken || parsed.tempToken || null;
+            } catch { /* ignore */ }
+          }
+        }
+      }
+
+      if (tokenToUse) {
+        options.headers = { ...options.headers, 'Authorization': `Bearer ${tokenToUse}` };
+      } else if (token) {
+        options.headers = { ...options.headers, 'Authorization': `Bearer ${token}` };
+      }
     }
 
     let response = await fetch(`${this.baseUrl}${endpoint}`, options);
@@ -275,6 +296,61 @@ class ApiService {
    */
   async getSession(sessionId: string): Promise<ApiResponse<Session>> {
     return this.request<Session>(`/api/sessions/${sessionId}`);
+  }
+
+  /**
+   * Busca sessão permitindo convidado: passe Authorization manual se for token público (não definido aqui)
+   */
+  async getSessionAsGuest(sessionId: string, guestToken: string): Promise<ApiResponse<Session>> {
+    return this.request<Session>(`/api/sessions/${sessionId}`, {
+      headers: { Authorization: `Bearer ${guestToken}` }
+    });
+  }
+
+  // ===== ACESSO PÚBLICO / JOIN SESSION =====
+
+  /**
+   * Verifica informações de acesso público da sessão
+   */
+  async getPublicAccess(sessionId: string): Promise<ApiResponse<any>> {
+    return this.request<any>(`/api/sessions/${sessionId}/public-access`, {
+      method: 'GET'
+    });
+  }
+
+  /**
+   * Solicita acesso como participante público
+   */
+  async requestPublicAccess(sessionId: string, data: { name: string; email?: string }): Promise<ApiResponse<{
+    participantId: string;
+    status: 'PENDING';
+    message: string;
+    expiresAt?: string;
+    tempToken?: string;
+  }>> {
+    return this.request(`/api/sessions/${sessionId}/public-access`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  /**
+   * Verifica status do participante público (aceita Authorization: Bearer <auth|temp token>)
+   */
+  async getPublicParticipantStatus(sessionId: string, participantId: string, token: string): Promise<ApiResponse<{
+    id: string;
+    name: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'EXPIRED';
+    approvedAt?: string;
+    expiresAt?: string;
+    authToken?: string | null;
+  }>> {
+    return this.request(`/api/sessions/${sessionId}/public-participants/${participantId}/status`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
   }
 
   /**
@@ -585,6 +661,12 @@ class ApiService {
    * Alias para listTickets - busca tickets de uma sessão
    */
   async getSessionTickets(sessionId: string): Promise<ApiResponse<Ticket[]>> {
+    const guestToken = typeof window !== 'undefined' ? localStorage.getItem('publicParticipantToken') : null;
+    if (guestToken) {
+      return this.request<Ticket[]>(`/api/sessions/${sessionId}/tickets`, {
+        headers: { Authorization: `Bearer ${guestToken}` }
+      });
+    }
     return this.listTickets(sessionId);
   }
 

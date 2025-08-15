@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { verifyPublicParticipantToken } from '@/lib/auth/publicAuth';
+import { verifyPublicParticipantToken, generatePublicParticipantToken } from '@/lib/auth/publicAuth';
 import { verifyTempParticipantToken } from '@/lib/auth/tempAuth';
 
 export async function GET(
@@ -42,29 +42,29 @@ export async function GET(
       );
     }
 
-    // Verificar autenticação baseada no status
+    // Verificar autenticação baseada no token recebido (público ou temporário)
     const authHeader = request.headers.get('authorization');
-    
-    if (participant.status === 'APPROVED') {
-      // Para participantes aprovados, verificar token público
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: {
-              code: 'UNAUTHORIZED',
-              message: 'Token de autenticação necessário para participantes aprovados',
-              timestamp: new Date().toISOString()
-            }
-          },
-          { status: 401 }
-        );
-      }
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Token de autenticação necessário',
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 401 }
+      );
+    }
 
-      const token = authHeader.substring(7);
-      const publicParticipant = verifyPublicParticipantToken(token);
-      
-      if (!publicParticipant || publicParticipant.participantId !== participantId) {
+    const token = authHeader.substring(7);
+
+    const publicParticipantToken = verifyPublicParticipantToken(token);
+    const tempParticipantToken = publicParticipantToken ? null : verifyTempParticipantToken(token);
+
+    if (publicParticipantToken) {
+      if (publicParticipantToken.participantId !== participantId) {
         return NextResponse.json(
           {
             success: false,
@@ -77,26 +77,8 @@ export async function GET(
           { status: 401 }
         );
       }
-    } else if (participant.status === 'PENDING') {
-      // Para participantes pendentes, verificar token temporário
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: {
-              code: 'UNAUTHORIZED',
-              message: 'Token temporário necessário para participantes pendentes',
-              timestamp: new Date().toISOString()
-            }
-          },
-          { status: 401 }
-        );
-      }
-
-      const token = authHeader.substring(7);
-      const tempParticipant = verifyTempParticipantToken(token);
-      
-      if (!tempParticipant || tempParticipant.participantId !== participantId) {
+    } else if (tempParticipantToken) {
+      if (tempParticipantToken.participantId !== participantId) {
         return NextResponse.json(
           {
             success: false,
@@ -109,6 +91,25 @@ export async function GET(
           { status: 401 }
         );
       }
+    } else {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INVALID_TOKEN',
+            message: 'Token inválido ou não autorizado',
+            timestamp: new Date().toISOString()
+          }
+        },
+        { status: 401 }
+      );
+    }
+
+    // Se o participante foi aprovado e o cliente ainda está usando um token temporário,
+    // emitir um authToken público para que ele possa continuar autenticado
+    let authToken: string | null = null;
+    if (participant.status === 'APPROVED' && tempParticipantToken) {
+      authToken = generatePublicParticipantToken(participant.id, sessionId, participant.name);
     }
 
     return NextResponse.json({
@@ -126,7 +127,8 @@ export async function GET(
           id: participant.approver.id,
           name: participant.approver.name,
           email: participant.approver.email
-        } : null
+        } : null,
+        authToken
       }
     });
 

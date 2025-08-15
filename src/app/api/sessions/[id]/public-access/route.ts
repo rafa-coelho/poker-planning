@@ -239,31 +239,9 @@ export async function POST(
       }
     });
 
-    // 8. Log da tentativa de acesso
-    console.log(`Novo participante público solicitado: ${name} para sessão ${sessionId}`, {
-      ipAddress,
-      userAgent,
-      timestamp: new Date().toISOString()
-    });
 
     // 9. Gerar token temporário para o participante pendente
     const tempToken = generateTempParticipantToken(publicParticipant.id, sessionId);
-
-    // 10. Emitir evento WebSocket para notificar o dono da sessão
-    try {
-      const { io } = await import('socket.io-client');
-      const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001');
-      
-      socket.emit('public-access-request', {
-        sessionId,
-        participantId: publicParticipant.id,
-        participantName: name
-      });
-      
-      socket.disconnect();
-    } catch (error) {
-      console.error('Erro ao emitir evento WebSocket:', error);
-    }
 
     return NextResponse.json({
       success: true,
