@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useBreadcrumbs } from '@/lib/context/breadcrumbContext';
 import PageHeader from '@/components/PageHeader';
 
 interface Session {
@@ -34,6 +35,7 @@ export default function SessionsPage() {
   const { t } = useTranslation("dashboard");
   const router = useRouter();
   const { apiService } = useAuth();
+  const { clearBreadcrumbs } = useBreadcrumbs();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +52,11 @@ export default function SessionsPage() {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [shouldFetch, setShouldFetch] = useState(1);
+
+  // Limpar breadcrumbs customizados para usar o breadcrumb automático
+  useEffect(() => {
+    clearBreadcrumbs();
+  }, [clearBreadcrumbs]);
 
   useEffect(() => {
     console.log('useEffect executando:', { pagination: pagination.page, shouldFetch });
