@@ -1,9 +1,9 @@
 'use client';
 
 import "@/i18n/index";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { PublicRoute } from '@/lib/middleware/routeProtection';
@@ -22,13 +22,23 @@ interface LoginErrors {
 export default function LoginPage() {
   const { t } = useTranslation("common");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const [form, setForm] = useState<LoginForm>({
     email: '',
     password: ''
   });
   const [errors, setErrors] = useState<LoginErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // Capturar parâmetro redirect da URL
+  useEffect(() => {
+    const redirect = searchParams.get('redirect');
+    if (redirect) {
+      setRedirectTo(redirect);
+    }
+  }, [searchParams]);
 
   const validateForm = (): boolean => {
     const newErrors: LoginErrors = {};
@@ -67,8 +77,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirecionar para o dashboard após login bem-sucedido
-      router.push('/dashboard');
+      // Redirecionar para o destino especificado ou dashboard
+      router.push(redirectTo || '/dashboard');
     } catch (error) {
       setErrors({
         general: t('auth.common.error')

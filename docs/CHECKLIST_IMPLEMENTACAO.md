@@ -7,10 +7,10 @@
 💾 FASE 2: Persistência & Core Features   [x] 40/40 tarefas  
 👥 FASE 2.5: Gestão de Usuários e Times   [x] 36/48 tarefas
 🏢 FASE 3: Features Empresariais          [x] 60/60 tarefas
-🌐 FASE 3.5: Sessões Públicas             [ ] 0/25 tarefas
+🌐 FASE 3.5: Sessões Públicas             [x] 20/25 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [x] 179/236 tarefas concluídas (75.8%)
+Total: [x] 199/236 tarefas concluídas (84.3%)
 ```
 
 ---
@@ -485,28 +485,28 @@ Organization
 ## 🌐 FASE 3.5: Sessões Públicas (Semanas 6.5-7)
 
 ### 3.5.1 Sistema de Acesso Público (Dia 40-42)
-- [ ] Criar middleware de verificação de acesso público
-- [ ] Implementar lógica de verificação de permissões
-- [ ] Criar sistema de convites por link público
-- [ ] Implementar validação de sessão existente
-- [ ] Criar endpoint `/api/sessions/[id]/public-access`
-- [ ] Implementar verificação de status da sessão
-- [ ] Criar sistema de logs de acesso público
-- [ ] Implementar rate limiting para acessos públicos
-- [ ] Testar isolamento de dados entre organizações
-- [ ] Documentar fluxo de acesso público
+- [x] Criar middleware de verificação de acesso público
+- [x] Implementar lógica de verificação de permissões
+- [x] Criar sistema de convites por link público
+- [x] Implementar validação de sessão existente
+- [x] Criar endpoint `/api/sessions/[id]/public-access`
+- [x] Implementar verificação de status da sessão
+- [x] Criar sistema de logs de acesso público
+- [x] Implementar rate limiting para acessos públicos
+- [x] Testar isolamento de dados entre organizações
+- [x] Documentar fluxo de acesso público
 
 ### 3.5.2 Interface de Acesso Público (Dia 43-44)
-- [ ] Criar página `/sessions/[id]/public` para acesso público
-- [ ] Implementar tela de verificação de login
-- [ ] Criar modal de entrada sem conta
-- [ ] Implementar formulário de nome do participante
-- [ ] Criar sistema de aprovação pelo dono da sessão
-- [ ] Implementar notificações de novos participantes
-- [ ] Criar interface de gestão de participantes externos
-- [ ] Implementar sistema de expulsão de participantes
-- [ ] Criar indicadores visuais de participantes externos
-- [ ] Testar responsividade da interface pública
+- [x] Criar página `/sessions/[id]/public` para acesso público
+- [x] Implementar tela de verificação de login
+- [x] Criar modal de entrada sem conta
+- [x] Implementar formulário de nome do participante
+- [x] Criar sistema de aprovação pelo dono da sessão
+- [x] Implementar notificações de novos participantes
+- [x] Criar interface de gestão de participantes externos
+- [x] Implementar sistema de expulsão de participantes
+- [x] Criar indicadores visuais de participantes externos
+- [x] Testar responsividade da interface pública
 
 ### 3.5.3 Gestão de Participantes Externos (Dia 45-46)
 - [ ] Criar model `PublicParticipant` no Prisma

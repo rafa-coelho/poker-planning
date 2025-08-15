@@ -14,24 +14,34 @@ O sistema de **Sessões Públicas** permite que qualquer pessoa acesse uma sess�
 
 ## 🔄 Fluxo de Acesso Público
 
-### 1. Acesso via Link
+### 1. Acesso via Link Único
 ```
-https://app.pokerplanning.com/sessions/[sessionId]/public
+https://app.pokerplanning.com/sessions/[sessionId]/join
 ```
 
-### 2. Verificação de Status
-- [ ] Sessão existe e está ativa
-- [ ] Sessão permite acesso público
-- [ ] Usuário tem permissão (se logado)
+### 2. Fluxo Principal
+1. **Usuário acessa** `/sessions/[sessionId]/join`
+2. **Sistema carrega** informações da sessão
+3. **Sistema verifica** se usuário está logado
 
-### 3. Opções de Entrada
-- **Logado**: Acesso direto se tiver permissão
-- **Não logado**: Opção de login ou entrada sem conta
+### 3. Fluxo para Usuário LOGADO
+- ✅ **Verifica se usuário está no time da sessão**
+  - Se SIM → **Acesso direto** à sessão
+  - Se NÃO → **Retorna "not_found"** (sessão não existe)
 
-### 4. Entrada sem Conta
-- [ ] Fornecer nome do participante
-- [ ] Aguardar aprovação do dono da sessão
-- [ ] Acesso após aprovação
+### 4. Fluxo para Usuário NÃO LOGADO
+- ✅ **Mostra campo "Seu nome"** e botão "Pedir permissão"
+- ✅ **Ao solicitar permissão**:
+  - Envia evento via WebSocket para o dono da sessão
+  - Mostra badge de notificação para o dono
+- ✅ **Dono da sessão**:
+  - Vê badge indicando solicitações pendentes
+  - Clica na badge → vê lista de solicitantes
+  - Pode **aprovar** ou **reprovar** cada um
+- ✅ **Se APROVADO**:
+  - Usuário é **redirecionado imediatamente** para a sessão
+- ✅ **Se REPROVADO**:
+  - Usuário vê mensagem "Sua solicitação foi reprovada"
 
 ## 🏗️ Arquitetura Técnica
 
@@ -62,7 +72,6 @@ model PublicParticipant {
 // Adicionar ao model Session
 model Session {
   // ... campos existentes ...
-  allowPublicAccess Boolean @default(false)
   publicAccessCode  String? @unique // código único para acesso público
   publicParticipants PublicParticipant[]
 }
@@ -70,9 +79,9 @@ model Session {
 
 ### Endpoints da API
 
-#### 1. Verificar Acesso Público
+#### 1. Verificar Acesso à Sessão (Join)
 ```typescript
-GET /api/sessions/[id]/public-access
+GET /api/sessions/[id]/join
 ```
 
 **Response:**
@@ -83,8 +92,24 @@ GET /api/sessions/[id]/public-access
     "sessionId": "session_123",
     "name": "Sprint Planning",
     "status": "ACTIVE",
-    "allowPublicAccess": true,
-    "requiresApproval": true,
+    "currentUser": {
+      "isLoggedIn": true,
+      "hasAccess": true,
+      "userId": "user_123",
+      "userName": "João Silva"
+    }
+  }
+}
+```
+
+**Se usuário não logado:**
+```json
+{
+  "success": true,
+  "data": {
+    "sessionId": "session_123",
+    "name": "Sprint Planning",
+    "status": "ACTIVE",
     "currentUser": {
       "isLoggedIn": false,
       "hasAccess": false
@@ -93,7 +118,7 @@ GET /api/sessions/[id]/public-access
 }
 ```
 
-#### 2. Solicitar Acesso Público
+#### 2. Solicitar Acesso como Convidado
 ```typescript
 POST /api/sessions/[id]/public-access
 ```
@@ -137,19 +162,30 @@ GET /api/sessions/[id]/public-participants
 
 ## 🎨 Interface do Usuário
 
-### 1. Página de Acesso Público
+### 1. Página de Join Unificada
 ```
-/sessions/[id]/public
+/sessions/[id]/join
 ```
+
+**Lógica da Página:**
+1. **Se usuário ESTÁ LOGADO**:
+   - ✅ Verificar se tem permissão para a sessão
+   - ✅ Se SIM → Redirecionar direto para `/sessions/[id]`
+   - ✅ Se NÃO → Mostrar erro de permissão
+
+2. **Se usuário NÃO ESTÁ LOGADO**:
+   - ✅ Mostrar página com duas opções:
+     - **"Entrar com Conta"** → Redirecionar para `/login`
+     - **"Participar como Convidado"** → Abrir modal de solicitação
 
 **Componentes:**
 - Header com informações da sessão
 - Opções de entrada (Login / Entrada sem conta)
-- Formulário de nome do participante
+- Modal de solicitação de acesso
 - Status de aprovação
 - Loading states e mensagens de erro
 
-### 2. Modal de Entrada sem Conta
+### 2. Modal de Solicitação de Acesso
 - Campo de nome (obrigatório)
 - Campo de email (opcional)
 - Botão de solicitar acesso
@@ -188,15 +224,17 @@ GET /api/sessions/[id]/public-participants
 
 ### Fase 1: Backend (Dias 40-42)
 1. Criar model `PublicParticipant`
-2. Implementar endpoints da API
+2. Implementar endpoint `/api/sessions/[id]/join`
 3. Criar middleware de verificação
 4. Implementar sistema de aprovação
 
 ### Fase 2: Frontend (Dias 43-44)
-1. Criar página de acesso público
-2. Implementar modal de entrada
-3. Criar interface de aprovação
-4. Integrar com WebSocket
+1. **Modificar página `/sessions/[id]/join`** para seguir lógica unificada
+2. Implementar redirecionamento automático para usuários logados
+3. Criar interface de opções para usuários não logados
+4. Implementar modal de solicitação de acesso
+5. Criar interface de aprovação
+6. Integrar com WebSocket
 
 ### Fase 3: Segurança (Dias 45-46)
 1. Implementar validações
@@ -206,11 +244,19 @@ GET /api/sessions/[id]/public-participants
 
 ## 📱 Experiência do Usuário
 
-### Para Participantes Externos
-1. **Acesso Simples**: Link direto para a sessão
-2. **Processo Claro**: Instruções claras sobre o processo
-3. **Feedback Imediato**: Status de aprovação em tempo real
-4. **Interface Familiar**: Mesma interface da sessão normal
+### Para Quem Compartilha o Link
+1. **Link Único**: Um só link para todos os tipos de usuários
+2. **Sem Diferenciação**: Não há "público" vs "logado" no sistema
+3. **Informações Claras**: Explicação de como funciona o acesso
+4. **Simplicidade**: Botão "Convidar" unificado
+
+### Para Quem Recebe o Link
+1. **Acesso Unificado**: Mesmo link funciona para todos
+2. **Fluxo Intuitivo**: 
+   - Se logado → Acesso direto
+   - Se não logado → Escolher entre login ou convidado
+3. **Processo Transparente**: Instruções claras sobre aprovação
+4. **Interface Familiar**: Mesma experiência da sessão normal
 
 ### Para Donos da Sessão
 1. **Controle Total**: Aprovar/rejeitar participantes
@@ -252,12 +298,14 @@ GET /api/sessions/[id]/public-participants
 ## 🧪 Testes
 
 ### Cenários de Teste
-1. **Acesso Normal**: Usuário logado acessa sessão pública
-2. **Entrada sem Conta**: Usuário não logado solicita acesso
-3. **Aprovação**: Dono aprova participante externo
-4. **Rejeição**: Dono rejeita participante externo
-5. **Timeout**: Participante não aprovado expira
-6. **Segurança**: Tentativas de acesso não autorizado
+1. **Usuário Logado com Permissão**: Acesso direto à sessão
+2. **Usuário Logado sem Permissão**: Mostrar erro de permissão
+3. **Usuário Não Logado**: Mostrar opções (login/convidado)
+4. **Entrada como Convidado**: Usuário não logado solicita acesso
+5. **Aprovação**: Dono aprova participante externo
+6. **Rejeição**: Dono rejeita participante externo
+7. **Timeout**: Participante não aprovado expira
+8. **Segurança**: Tentativas de acesso não autorizado
 
 ### Testes de Performance
 - [ ] Carga de múltiplos participantes externos
@@ -275,6 +323,43 @@ GET /api/sessions/[id]/public-participants
 - [ ] Guia de como compartilhar sessões públicas
 - [ ] Instruções para participantes externos
 - [ ] FAQ sobre sessões públicas
+
+## ⚠️ Correção Necessária
+
+### Problema Atual
+A página `/sessions/[id]/join` está redirecionando automaticamente para o login em vez de seguir o fluxo unificado.
+
+### Solução
+Modificar a página `/sessions/[id]/join` para:
+
+1. **Verificar se usuário está logado**
+2. **Se logado**: Verificar permissão e redirecionar para sessão
+3. **Se não logado**: Mostrar opções (login/convidado)
+
+### Código da Correção
+```typescript
+// src/app/[sessionId]/join/page.tsx
+export default function JoinSessionPage() {
+  const { isAuthenticated, user } = useAuth();
+  const { sessionId } = useParams();
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Verificar se tem permissão para a sessão
+      checkSessionPermission(sessionId).then(hasPermission => {
+        if (hasPermission) {
+          router.push(`/${sessionId}`); // Acesso direto
+        } else {
+          setError('Você não tem permissão para esta sessão');
+        }
+      });
+    }
+    // Se não logado, mostrar opções na página
+  }, [isAuthenticated, sessionId]);
+  
+  // ... resto da implementação
+}
+```
 
 ---
 

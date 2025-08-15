@@ -42,11 +42,11 @@ export default function InviteModal ({
       setLoading(true);
       // Buscar membros do time associado à sessão
       const response = await apiService.get(`/api/sessions/${sessionId}`);
-      if (response.success && response.data?.project?.teams?.[0]?.id) {
-        const teamId = response.data.project.teams[0].id;
+      if (response.success && (response.data as any)?.project?.teams?.[0]?.id) {
+        const teamId = (response.data as any).project.teams[0].id;
         const teamResponse = await apiService.get(`/api/teams/${teamId}/members`);
         if (teamResponse.success && teamResponse.data) {
-          setTeamMembers(teamResponse.data.members.map((m: any) => m.user));
+          setTeamMembers((teamResponse.data as any).members.map((m: any) => m.user));
         }
       }
     } catch (error) {
@@ -141,10 +141,11 @@ export default function InviteModal ({
             <FiUsers size={16} />
             <span>{t("teamMembers")}</span>
           </button>
+
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'link' ? (
+        {activeTab === 'link' && (
           <div>
             <p className="text-sm text-gray-600 mb-3">
               {t("shareThisLink")}
@@ -164,6 +165,26 @@ export default function InviteModal ({
                 <FiCopy size={16} />
               </button>
             </div>
+            
+            {/* Informações sobre acesso */}
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
+              <div className="flex items-start space-x-2">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="text-sm text-blue-800">
+                  <p className="font-medium mb-1">Como funciona o acesso:</p>
+                  <ul className="space-y-1 text-xs">
+                    <li>• <strong>Usuários logados:</strong> Acesso direto à sessão</li>
+                    <li>• <strong>Usuários não logados:</strong> Podem participar como convidados</li>
+                    <li>• <strong>Convidados:</strong> Precisam fornecer nome e aguardar aprovação</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
             <div className="flex justify-end space-x-2">
               <button
                 onClick={shareLink}
@@ -179,7 +200,9 @@ export default function InviteModal ({
               </button>
             </div>
           </div>
-        ) : (
+        )}
+
+        {activeTab === 'team' && (
           <div>
             <p className="text-sm text-gray-600 mb-3">
               {t("selectTeamMembersToInvite")}
@@ -234,6 +257,8 @@ export default function InviteModal ({
             </div>
           </div>
         )}
+
+
       </div>
     </div>
   );

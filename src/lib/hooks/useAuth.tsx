@@ -54,9 +54,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Redirecionar para login se estiver em área autenticada
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+      const publicPaths = [
+        '/login', 
+        '/register', 
+        '/forgot-password', 
+        '/reset-password',
+        '/join' // Permitir acesso à página de join sem autenticação
+      ];
       
-      if (!publicPaths.some(path => currentPath.startsWith(path))) {
+      // Verificar se é uma rota de join de sessão
+      const isJoinRoute = /^\/[^\/]+\/join$/.test(currentPath);
+      
+      if (!publicPaths.some(path => currentPath.startsWith(path)) && !isJoinRoute) {
         window.location.href = '/login';
       }
     }

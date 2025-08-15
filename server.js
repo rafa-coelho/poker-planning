@@ -221,6 +221,29 @@ io.on("connection", (socket) => {
     updateSession(sessionId);
   });
 
+  // 🚪 Participante público se juntando para receber notificações
+  socket.on("join_public_participant", ({ participantId, sessionId }) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('error', { message: 'Rate limit exceeded' });
+      return;
+    }
+
+    logEvent('JOIN_PUBLIC_PARTICIPANT', socket.id, { 
+      participantId,
+      sessionId 
+    });
+    
+    // Juntar à sala específica do participante
+    socket.join(`participant_${participantId}`);
+    
+    // Armazenar informações do participante
+    socket.participantId = participantId;
+    socket.sessionId = sessionId;
+    
+    // Juntar também à sala da sessão para receber atualizações gerais
+    socket.join(sessionId);
+  });
+
   // 🃏 Selecionar carta
   socket.on("select_card", ({ sessionId, userId, cardValue, organizationId }) => {
     if (!checkRateLimit(socket.id)) {
@@ -548,6 +571,54 @@ io.on("connection", (socket) => {
     io.to(data.sessionId).emit("final_estimate_set", { 
       ticketId: data.ticketId, 
       finalEstimate: data.finalEstimate 
+    });
+  });
+
+  // Eventos para public access
+  socket.on("public-access-request", (data) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('error', { message: 'Rate limit exceeded' });
+      return;
+    }
+
+    logEvent('PUBLIC_ACCESS_REQUEST', socket.id, { 
+      sessionId: data.sessionId, 
+      participantId: data.participantId,
+      participantName: data.participantName 
+    });
+
+    // Notificar o dono da sessão sobre a nova solicitação
+    io.to(data.sessionId).emit("public-access-request", {
+      participantId: data.participantId,
+      participantName: data.participantName,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  socket.on("public-access-response", (data) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('error', { message: 'Rate limit exceeded' });
+      return;
+    }
+
+    if (!validateOrganizationAccess(socket, data.sessionId, data.organizationId)) {
+      return;
+    }
+
+    logEvent('PUBLIC_ACCESS_RESPONSE', socket.id, { 
+      sessionId: data.sessionId, 
+      participantId: data.participantId,
+      action: data.action 
+    });
+
+    // Notificar o participante sobre a resposta (aprovação/rejeição)
+    // Enviar para uma sala específica do participante
+    io.to(`participant_${data.participantId}`).emit("public-access-response", {
+      participantId: data.participantId,
+      action: data.action,
+      sessionId: data.sessionId,
+      authToken: data.authToken,
+      timestamp: new Date().toISOString()
     });
   });
 });

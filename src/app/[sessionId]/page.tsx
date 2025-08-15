@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import "../../i18n/index";
 import { useTranslation } from "react-i18next";
+import { useParams } from "next/navigation";
 
 import HeaderBar from "../../components/HeaderBar";
 import VoteBar from "../../components/VoteBar";
@@ -11,16 +12,20 @@ import TicketManager from "../../components/TicketManager";
 import FinalEstimateModal from "../../components/FinalEstimateModal";
 import ParticipantNotification from "../../components/ParticipantNotification";
 import MobileMenu from "../../components/MobileMenu";
+import PendingRequestsModal from "../../components/PendingRequestsModal";
 import { useSession } from "@/components/useSession";
 import Table from "@/components/Table";
 import { ensureLocalUser } from "@/components/utils";
 import VoteSummary from "@/components/VoteSummary";
 
+
 export default function SessionPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const { t } = useTranslation();
-  const sessionId = window.location.pathname.split('/')[1];
+  const params = useParams();
+  const sessionId = params.sessionId as string;
 
   const {
     sessionData,
@@ -37,6 +42,9 @@ export default function SessionPage() {
     canManageTickets,
     participantNotification,
     setParticipantNotification,
+    pendingRequests,
+    showPendingRequestsModal,
+    setShowPendingRequestsModal,
     handleSelectCard,
     handleFlipCards,
     handleNewVoting,
@@ -53,6 +61,8 @@ export default function SessionPage() {
     reloadCurrentTicket,
     getVotingStats,
     selectTicketDirectly,
+    generateInviteLink,
+    handleRequestAction,
   } = useSession();
 
   const finalParticipants = ensureLocalUser(sessionData.participants, user.userId, user.userName);
@@ -63,9 +73,14 @@ export default function SessionPage() {
       <HeaderBar 
         sessionData={sessionData} 
         userName={user.userName} 
-        onInviteOpen={() => setInviteOpen(true)}
+        onInviteOpen={() => {
+          generateInviteLink();
+          setInviteOpen(true);
+        }}
         onToggleSidebar={() => setMobileMenuOpen(true)}
         onEndSession={handleEndSession}
+        pendingRequestsCount={pendingRequests.length}
+        onShowPendingRequests={() => setShowPendingRequestsModal(true)}
       />
 
       {/* Notificação de participante */}
@@ -73,6 +88,8 @@ export default function SessionPage() {
         notification={participantNotification}
         onClose={() => setParticipantNotification(null)}
       />
+
+
 
       {/* Menu Mobile */}
       <MobileMenu 
@@ -157,6 +174,16 @@ export default function SessionPage() {
           averageVote={averageVote || 0}
         />
       )}
+
+      {/* Modal de solicitações pendentes */}
+      <PendingRequestsModal
+        isOpen={showPendingRequestsModal}
+        onClose={() => setShowPendingRequestsModal(false)}
+        requests={pendingRequests}
+        onApprove={(participantId) => handleRequestAction(participantId, 'APPROVE')}
+        onReject={(participantId) => handleRequestAction(participantId, 'REJECT')}
+      />
+
     </div>
   );
 }

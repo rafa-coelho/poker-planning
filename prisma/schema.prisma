@@ -72,6 +72,7 @@ model User {
   invitesSent    Invite[] @relation("InviteCreator")
   projectMembers ProjectMember[]
   teamMembers    TeamMember[]
+  approvedPublicParticipants PublicParticipant[] @relation("PublicParticipantApprover")
   
   @@map("users")
 }
@@ -112,9 +113,13 @@ model Session {
   updatedAt      DateTime      @updatedAt
   endedAt        DateTime?
   
+  // Public access settings
+  publicAccessCode  String? @unique // código único para acesso público
+  
   // Relations
   participants   SessionParticipant[]
   tickets        Ticket[]
+  publicParticipants PublicParticipant[]
   
   @@map("sessions")
 }
@@ -140,6 +145,29 @@ model SessionParticipant {
   
   @@unique([sessionId, userId])
   @@map("session_participants")
+}
+
+// 🌐 Participantes Públicos (sem conta)
+model PublicParticipant {
+  id            String   @id @default(cuid())
+  sessionId     String
+  name          String
+  ipAddress     String?
+  userAgent     String?
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED, EXPIRED
+  approvedBy    String?  // userId do aprovador
+  approvedAt    DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  session       Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  approver      User?    @relation("PublicParticipantApprover", fields: [approvedBy], references: [id])
+
+  @@unique([sessionId, name])
+  @@index([sessionId, status])
+  @@index([expiresAt])
+  @@map("public_participants")
 }
 
 // 📋 Projetos/Times

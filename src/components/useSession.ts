@@ -52,6 +52,8 @@ export function useSession () {
   const [showFinalEstimateModal, setShowFinalEstimateModal] = useState(false);
   const [onTicketUpdate, setOnTicketUpdate] = useState<((ticket: Ticket) => void) | null>(null);
   const [participantNotification, setParticipantNotification] = useState<{ userName: string; type: 'left' | 'joined' } | null>(null);
+  const [pendingRequests, setPendingRequests] = useState<Array<{ id: string; name: string; createdAt: string }>>([]);
+  const [showPendingRequestsModal, setShowPendingRequestsModal] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
   const isCreatorRef = useRef<boolean>(false);
@@ -87,6 +89,8 @@ export function useSession () {
     // Carregar dados da sessão primeiro, depois inicializar WebSocket
     loadSessionData();
   }, [sessionId, router, isAuthenticated, authUser, authLoading, t]);
+
+
 
   /** 🔹 Solicita permissão para notificações */
   const requestNotificationPermission = () => {
@@ -173,7 +177,7 @@ export function useSession () {
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar ticket:', error);
+      console.error(t('logs.loadTicket'), error);
       // Ignorar erros transitórios
     }
   }, [apiService]);
@@ -235,7 +239,7 @@ export function useSession () {
     });
 
     socket.on("error", (error: { message: string }) => {
-      console.error("WebSocket error:", error.message);
+      console.error(t('logs.websocketError'), error.message);
       if (error.message === 'Rate limit exceeded') {
         // Implementar retry logic ou mostrar mensagem ao usuário
         console.warn("Rate limit exceeded, waiting before retry...");
@@ -248,7 +252,14 @@ export function useSession () {
     });
     socket.on("voting_started", handleVotingStarted);
     socket.on("voting_finished", handleVotingFinished);
-    socket.on("participant_left", handleParticipantLeft);
+          socket.on("participant_left", handleParticipantLeft);
+
+      // Evento para nova solicitação de acesso público
+      socket.on("public-access-request", (data) => {
+        console.log("Nova solicitação de acesso público:", data);
+        // Recarregar solicitações pendentes
+        loadPendingRequests();
+      });
 
     return () => {
       clearInterval(heartbeatInterval);
@@ -386,11 +397,68 @@ export function useSession () {
 
   /** 🔹 Gera o link de convite */
   function generateInviteLink () {
-    setInviteLink(typeof window !== "undefined"
+    const link = typeof window !== "undefined"
       ? `${window.location.origin}/${sessionId}/join`
-      : `${HOST}/${sessionId}/join`
-    );
+      : `${HOST}/${sessionId}/join`;
+    
+    setInviteLink(link);
   }
+
+  /** 🔹 Carrega solicitações pendentes de participantes públicos */
+  const loadPendingRequests = useCallback(async () => {
+    if (!isCreator) return;
+    
+    try {
+      const response = await apiService.get(`/api/sessions/${sessionId}/public-participants`);
+      if (response.success && response.data) {
+        const participants = response.data as any[];
+        const pending = participants.filter((p: any) => p.status === 'PENDING');
+        setPendingRequests(pending);
+      }
+    } catch (error) {
+      console.error(t('logs.loadPendingRequests'), error);
+    }
+  }, [apiService, sessionId, isCreator]);
+
+  /** 🔹 Aprova ou rejeita uma solicitação */
+  const handleRequestAction = useCallback(async (participantId: string, action: 'APPROVE' | 'REJECT') => {
+    try {
+      const response = await apiService.put(`/api/sessions/${sessionId}/public-participants/${participantId}`, {
+        action
+      });
+      
+      if (response.success) {
+        // Recarregar solicitações pendentes
+        await loadPendingRequests();
+        
+        // Emitir evento via WebSocket para notificar o participante
+        if (socketRef.current) {
+          socketRef.current.emit('public-access-response', {
+            participantId,
+            action,
+            sessionId,
+            organizationId: authUser?.organizationId || null,
+            authToken: (response.data as any)?.authToken || null
+          });
+        }
+      }
+    } catch (error) {
+      console.error(t('logs.processRequest'), error);
+    }
+  }, [apiService, sessionId, loadPendingRequests]);
+
+  // Carregar solicitações pendentes periodicamente (apenas para o criador)
+  useEffect(() => {
+    if (!isCreator) return;
+
+    // Carregar imediatamente
+    loadPendingRequests();
+
+    // Configurar intervalo para verificar a cada 10 segundos
+    const interval = setInterval(loadPendingRequests, 10000);
+
+    return () => clearInterval(interval);
+  }, [isCreator]);
 
   /** 🔹 Inicia a contagem regressiva antes de revelar os votos */
   function startCountdownBeforeReveal () {
@@ -740,7 +808,7 @@ export function useSession () {
         router.push('/dashboard/sessions');
       }
     } catch (error) {
-      console.error('Erro ao encerrar sessão:', error);
+      console.error(t('logs.endSession'), error);
     }
   }, [sessionId, apiService, router, t]);
 
@@ -840,6 +908,9 @@ export function useSession () {
     canManageTickets,
     participantNotification,
     setParticipantNotification,
+    pendingRequests,
+    showPendingRequestsModal,
+    setShowPendingRequestsModal,
     handleSelectCard,
     handleFlipCards,
     handleNewVoting,
@@ -860,5 +931,7 @@ export function useSession () {
     getVotingStats,
     createSession,
     selectTicketDirectly,
+    generateInviteLink,
+    handleRequestAction,
   };
 }

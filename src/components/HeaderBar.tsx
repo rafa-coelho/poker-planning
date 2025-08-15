@@ -13,9 +13,11 @@ interface HeaderBarProps {
   onInviteOpen: () => void;
   onToggleSidebar?: () => void;
   onEndSession?: () => void;
+  pendingRequestsCount?: number;
+  onShowPendingRequests?: () => void;
 }
 
-export default function HeaderBar({ sessionData, userName, onInviteOpen, onToggleSidebar, onEndSession }: HeaderBarProps) {
+export default function HeaderBar({ sessionData, userName, onInviteOpen, onToggleSidebar, onEndSession, pendingRequestsCount = 0, onShowPendingRequests }: HeaderBarProps) {
   const { t } = useTranslation("common");
   
   return (
@@ -23,12 +25,12 @@ export default function HeaderBar({ sessionData, userName, onInviteOpen, onToggl
       <div className="px-4 py-3 flex items-center justify-between">
         
         <div className="flex items-center space-x-3">
-          {/* Botão de menu */}
+          {/* Menu button */}
           {onToggleSidebar && (
             <button
               onClick={onToggleSidebar}
               className="p-2 rounded-md hover:bg-gray-100"
-              title="Menu"
+              title={t('menu')}
             >
               <Bars3Icon className="h-6 w-6 text-gray-600" />
             </button>
@@ -45,6 +47,25 @@ export default function HeaderBar({ sessionData, userName, onInviteOpen, onToggl
             <div className="flex items-center space-x-1 text-gray-700">
               <span className="font-medium text-sm">{userName}</span>
             </div>
+
+            {/* Notification of pending requests */}
+            {pendingRequestsCount > 0 && onShowPendingRequests && (
+              <button
+                className="relative border border-orange-500 text-orange-500 px-3 py-1 rounded hover:bg-orange-50 transition"
+                onClick={onShowPendingRequests}
+                title={`${pendingRequestsCount} ${t('pending')}`}
+              >
+                <span className="flex items-center space-x-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5z" />
+                  </svg>
+                  <span>{t('pendingRequests')} ({pendingRequestsCount})</span>
+                </span>
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {pendingRequestsCount}
+                </span>
+              </button>
+            )}
 
             <button
               className="border border-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-50 transition"
