@@ -62,10 +62,29 @@ export default function ProjectsPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [availableTeams, setAvailableTeams] = useState<any[]>([]);
+  const [shouldFetch, setShouldFetch] = useState(0);
 
   useEffect(() => {
     fetchProjects();
-  }, [pagination.page, search, statusFilter]);
+  }, [pagination.page, shouldFetch]);
+
+  // Debounce para o campo de busca
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (search !== undefined) {
+        setPagination(prev => ({ ...prev, page: 1 }));
+        setShouldFetch(prev => prev + 1);
+      }
+    }, 500); // 500ms of delay
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  // Filtro de status
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setShouldFetch(prev => prev + 1);
+  }, [statusFilter]);
 
   useEffect(() => {
     if (showCreateModal || editingProject) {
@@ -287,10 +306,10 @@ export default function ProjectsPage() {
       {/* Projects Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         {loading ? (
-          <div className="p-6 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-sm text-gray-500">Carregando projetos...</p>
-          </div>
+                      <div className="p-6 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-500">{t('loading.projects')}</p>
+            </div>
         ) : projects.length === 0 ? (
           <div className="p-6 text-center">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -362,7 +381,7 @@ export default function ProjectsPage() {
                             >
                               {project.name}
                             </button>
-                            <div className="text-sm text-gray-500">Criado por {project.createdBy.name}</div>
+                            <div className="text-sm text-gray-500">{t('projects.table.createdBy')} {project.createdBy.name}</div>
                           </div>
                         </div>
                       </td>
@@ -385,7 +404,7 @@ export default function ProjectsPage() {
                           <button
                             onClick={() => router.push(`/dashboard/projects/${project.id}`)}
                             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors"
-                            title="Ver detalhes do projeto"
+                            title={t('actions.viewProjectDetails')}
                           >
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -397,7 +416,7 @@ export default function ProjectsPage() {
                             <button
                               onClick={() => handleEditProject(project)}
                               className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full text-amber-700 bg-amber-100 hover:bg-amber-200 transition-colors"
-                              title="Editar projeto"
+                              title={t('actions.editProject')}
                             >
                               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -409,7 +428,7 @@ export default function ProjectsPage() {
                             <button
                               onClick={() => handleDeleteProject(project.id)}
                               className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 transition-colors"
-                              title="Desativar projeto"
+                              title={t('actions.deactivateProject')}
                             >
                               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

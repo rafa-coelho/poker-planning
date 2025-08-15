@@ -31,7 +31,7 @@ export function useSession () {
   const params = useParams();
   const router = useRouter();
   const sessionId = params.sessionId as string;
-  const { user: authUser, isAuthenticated, isLoading: authLoading, apiService } = useAuth();î
+  const { user: authUser, isAuthenticated, isLoading: authLoading, apiService } = useAuth();
   const { t } = useTranslation("common");
 
   const [sessionData, setSessionData] = useState<SessionState>({

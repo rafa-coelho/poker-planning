@@ -31,7 +31,7 @@ export default function HomePage () {
       router.push(`/${sessionId}/join`);
     } catch (error) {
       toast.error(t("errorCreatingSession"));
-      console.error("Erro ao criar a sessão:", error);
+      console.error(t("errors.createSession"), error);
     } finally {
       setLoading(false);
     }

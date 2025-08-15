@@ -51,6 +51,7 @@
       "projects": "Projetos",
       "status": "Status",
       "createdAt": "Criado em",
+      "createdBy": "Criado por",
       "actions": "Ações"
     },
     "form": {
@@ -91,6 +92,7 @@
       "addMember": "Adicionar Membro",
       "removeMember": "Remover Membro",
       "changeRole": "Alterar Role",
+      "role": "Função",
       "noMembers": "Nenhum membro encontrado",
       "roles": {
         "ADMIN": "Administrador",
@@ -174,6 +176,7 @@
       "sessions": "Sessões",
       "status": "Status",
       "createdAt": "Criado em",
+      "createdBy": "Criado por",
       "actions": "Ações"
     },
     "form": {
@@ -418,16 +421,152 @@
     "next": "Próxima"
   },
   "reports": {
-    "title": "Relatórios",
-    "description": "Analise métricas e relatórios da sua organização",
-    "comingSoon": "Relatórios em breve",
-    "comingSoonDescription": "Esta funcionalidade está sendo desenvolvida e estará disponível em breve."
+    "title": "Relatórios e Analytics",
+    "description": "Analise o desempenho das suas sessões de planning poker",
+    "actions": {
+      "configureReport": "Configurar Relatório"
+    },
+    "config": {
+      "title": "Configure seu relatório",
+      "description": "Selecione os filtros desejados para gerar relatórios personalizados sobre suas sessões de planning poker.",
+      "filtersTitle": "Filtros do Relatório",
+      "periodLabel": "Período de Análise",
+      "teamLabel": "Time (Opcional)",
+      "projectLabel": "Projeto (Opcional)",
+      "period7d": "Últimos 7 dias",
+      "period30d": "Últimos 30 dias",
+      "period90d": "Últimos 90 dias",
+      "period1y": "Último ano",
+      "allTeams": "Todos os times",
+      "allProjects": "Todos os projetos",
+      "noProjectsForTeam": "Nenhum projeto disponível para este time",
+      "summaryTitle": "Resumo da Análise",
+      "period": "Período",
+      "team": "Time",
+      "project": "Projeto",
+      "generateReport": "Gerar Relatório",
+      "generatingReport": "Gerando Relatório...",
+      "newAnalysis": "Nova Análise",
+      "export": "Exportar",
+      "analysisTypes": {
+        "temporal": {
+          "title": "Análise Temporal",
+          "description": "Visualize tendências ao longo do tempo e compare períodos diferentes."
+        },
+        "consensus": {
+          "title": "Qualidade das Estimativas",
+          "description": "Analise o consenso das equipes e identifique oportunidades de melhoria."
+        },
+        "productivity": {
+          "title": "Produtividade",
+          "description": "Monitore a eficiência das sessões e o tempo médio de votação."
+        }
+      }
+    },
+    "tabs": {
+      "overview": "Visão Geral",
+      "sessions": "Sessões",
+      "consensus": "Consenso",
+      "productivity": "Produtividade"
+    },
+    "overview": {
+      "totalSessionsTitle": "Total de Sessões",
+      "activeSessionsTitle": "Sessões Ativas",
+      "estimatedTicketsTitle": "Tickets Estimados",
+      "totalParticipantsTitle": "Participantes",
+      "sessionsOverTimeTitle": "Sessões ao Longo do Tempo",
+      "sessionsLabel": "Sessões",
+      "noDataAvailable": "Nenhum dado disponível para este período"
+    },
+    "sessions": {
+      "summaryTitle": "Resumo de Sessões",
+      "totalSessionsLabel": "Total de Sessões",
+      "activeSessionsLabel": "Sessões Ativas",
+      "totalTicketsLabel": "Total de Tickets",
+      "participationTitle": "Participação nas Sessões",
+      "participantsLabel": "Participantes",
+      "noDataAvailable": "Nenhum dado disponível para este período"
+    },
+    "consensus": {
+      "qualityTitle": "Qualidade do Consenso",
+      "averageConsensusLabel": "Consenso Médio",
+      "estimatedTicketsLabel": "Tickets com Estimativa",
+      "distributionTitle": "Distribuição do Consenso",
+      "noDataAvailable": "Nenhum dado disponível para este período"
+    },
+    "productivity": {
+      "metricsTitle": "Métricas de Produtividade",
+      "averageVotingTimeLabel": "min",
+      "averageVotingTimeDesc": "Tempo Médio de Votação",
+      "completionRateLabel": "Taxa de Conclusão",
+      "participationRateTitle": "Taxa de Participação",
+      "participationRateLabel": "Taxa de Participação",
+      "noDataAvailable": "Nenhum dado disponível para este período"
+    },
+    "noDataFound": "Nenhum dado encontrado",
+    "noDataDescription": "Não há dados disponíveis para os filtros selecionados. Tente ajustar os filtros ou selecionar um período diferente.",
+    "filters": {
+      "title": "Filtros",
+      "period": "Período",
+      "project": "Projeto",
+      "team": "Time",
+      "last7Days": "Últimos 7 dias",
+      "last30Days": "Últimos 30 dias",
+      "last90Days": "Últimos 90 dias",
+      "lastYear": "Último ano",
+      "allProjects": "Todos os projetos",
+      "allTeams": "Todos os times"
+    },
+    "metrics": {
+      "totalSessions": "Total de Sessões",
+      "activeSessions": "Sessões Ativas",
+      "totalTickets": "Total de Tickets",
+      "estimatedTickets": "Tickets Estimados",
+      "totalParticipants": "Total de Participantes",
+      "averageConsensus": "Consenso Médio",
+      "averageVotingTime": "Tempo Médio de Votação"
+    },
+    "charts": {
+      "sessionsOverTime": "Sessões ao Longo do Tempo",
+      "consensusRates": "Taxa de Consenso",
+      "participationRates": "Taxa de Participação",
+      "sessions": "Sessões",
+      "participants": "Participantes",
+      "participationRate": "Taxa de Participação"
+    },
+    "export": {
+      "sessions": "Exportar Sessões",
+      "tickets": "Exportar Tickets",
+      "consensus": "Exportar Consenso"
+    },
+    "messages": {
+      "exportSuccess": "Relatório exportado com sucesso!",
+      "noData": "Nenhum dado encontrado",
+      "noDataDescription": "Não há dados disponíveis para os filtros selecionados"
+    },
+    "errors": {
+      "loadFailed": "Erro ao carregar relatórios",
+      "exportFailed": "Erro ao exportar relatório",
+      "noData": "Nenhum dado encontrado",
+      "noDataDescription": "Não há dados disponíveis para os filtros selecionados"
+    },
+    "generatedAt": "Gerado em"
   },
   "users": {
     "title": "Usuários",
     "description": "Gerencie os usuários da sua organização",
+    "searchPlaceholder": "Buscar por nome ou email...",
+    "filters": {
+      "allRoles": "Todas as Funções",
+      "allStatuses": "Todos os Status",
+      "active": "Ativos",
+      "inactive": "Inativos"
+    },
     "new": "Novo Usuário",
     "edit": "Editar Usuário",
+    "noUsers": "Nenhum usuário encontrado",
+    "createFirst": "Comece adicionando o primeiro usuário à sua organização",
+    "createUser": "Adicionar Usuário",
     "table": {
       "name": "Nome",
       "email": "Email",
@@ -438,10 +577,20 @@
     },
     "form": {
       "name": "Nome",
+      "namePlaceholder": "Nome completo do usuário",
       "email": "Email",
+      "emailPlaceholder": "email@exemplo.com",
       "role": "Função",
+      "rolePlaceholder": "Selecione uma função",
       "teams": "Times",
-      "isActive": "Usuário Ativo"
+      "isActive": "Usuário Ativo",
+      "create": "Adicionar Usuário",
+      "creating": "Adicionando...",
+      "update": "Atualizar Usuário",
+      "updating": "Atualizando...",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "saving": "Salvando..."
     },
     "roles": {
       "SUPER_ADMIN": "Super Administrador",
@@ -492,6 +641,10 @@
       }
     },
     "messages": {
+      "userCreated": "Usuário criado com sucesso",
+      "userUpdated": "Usuário atualizado com sucesso",
+      "userDeleted": "Usuário desativado com sucesso",
+      "userActivated": "Usuário ativado com sucesso",
       "passwordResetSent": "Email de reset de senha enviado para {{name}} com sucesso",
       "passwordResetSentSelf": "Email de reset de senha enviado para o seu email com sucesso"
     },
@@ -500,6 +653,11 @@
       "confirmOther": "{{name}} receberá um email com instruções para resetar a senha."
     },
     "errors": {
+      "loadFailed": "Erro ao carregar usuários",
+      "createFailed": "Erro ao criar usuário",
+      "updateFailed": "Erro ao atualizar usuário",
+      "deleteFailed": "Erro ao desativar usuário",
+      "activateFailed": "Erro ao ativar usuário",
       "loadUser": "Erro ao carregar usuário",
       "notFound": "Usuário não encontrado",
       "passwordResetFailed": "Erro ao enviar email de reset de senha. Tente novamente.",

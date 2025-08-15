@@ -156,8 +156,12 @@ export function getLimitErrorMessage(
 /**
  * Utility para obter mensagem de erro quando feature não está disponível
  */
+import { useTranslation } from 'react-i18next';
+
 export function getFeatureErrorMessage(
   feature: string
 ): string {
-  return `A feature "${feature}" não está disponível no seu plano atual. Faça upgrade para acessar recursos avançados.`
+  // Note: This function is used outside of React components
+  // For now, return a generic message. In a real app, you'd use i18next.t() directly
+  return `The "${feature}" feature is not available in your current plan. Upgrade to access advanced features.`
 }

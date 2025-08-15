@@ -14,6 +14,8 @@ async function listSessions(req: NextRequest, context: TenantContext) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const statusParam = searchParams.get('status')
     const status = statusParam ? (statusParam as SessionStatus) : undefined
+    const votingModeParam = searchParams.get('votingMode')
+    const votingMode = votingModeParam ? (votingModeParam as VotingMode) : undefined
     const search = searchParams.get('search') || undefined
     const projectId = searchParams.get('projectId') || undefined
 
@@ -21,6 +23,7 @@ async function listSessions(req: NextRequest, context: TenantContext) {
       page,
       limit,
       status,
+      votingMode,
       search,
       projectId,
       userId: context.userId,

@@ -251,6 +251,7 @@ class ApiService {
     page?: number;
     limit?: number;
     status?: string;
+    votingMode?: string;
     search?: string;
     projectId?: string;
   } = {}): Promise<ApiResponse<Session[]>> {
@@ -259,6 +260,7 @@ class ApiService {
     if (params.page) searchParams.append('page', params.page.toString());
     if (params.limit) searchParams.append('limit', params.limit.toString());
     if (params.status) searchParams.append('status', params.status);
+    if (params.votingMode) searchParams.append('votingMode', params.votingMode);
     if (params.search) searchParams.append('search', params.search);
     if (params.projectId) searchParams.append('projectId', params.projectId);
 

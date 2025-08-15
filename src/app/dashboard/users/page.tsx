@@ -54,10 +54,29 @@ export default function UsersPage() {
     teamIds: [] as string[]
   });
   const [submitting, setSubmitting] = useState(false);
+  const [shouldFetch, setShouldFetch] = useState(0);
 
   useEffect(() => {
     fetchUsers();
-  }, [pagination.page, search, roleFilter, statusFilter]);
+  }, [pagination.page, shouldFetch]);
+
+  // Debounce para o campo de busca
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (search !== undefined) {
+        setPagination(prev => ({ ...prev, page: 1 }));
+        setShouldFetch(prev => prev + 1);
+      }
+    }, 500); // 500ms de delay
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  // Filtros de role e status
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setShouldFetch(prev => prev + 1);
+  }, [roleFilter, statusFilter]);
 
   const fetchUsers = async () => {
     try {
@@ -224,10 +243,10 @@ export default function UsersPage() {
       {/* Users Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         {loading ? (
-          <div className="p-6 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-sm text-gray-500">Carregando usuários...</p>
-          </div>
+                      <div className="p-6 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-500">{t('loading.users')}</p>
+            </div>
         ) : users.length === 0 ? (
           <div className="p-6 text-center">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

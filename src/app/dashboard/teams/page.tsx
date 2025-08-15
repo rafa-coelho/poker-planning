@@ -63,10 +63,29 @@ export default function TeamsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [shouldFetch, setShouldFetch] = useState(0);
 
   useEffect(() => {
     fetchTeams();
-  }, [pagination.page, search, statusFilter]);
+  }, [pagination.page, shouldFetch]);
+
+  // Debounce para o campo de busca
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (search !== undefined) {
+        setPagination(prev => ({ ...prev, page: 1 }));
+        setShouldFetch(prev => prev + 1);
+      }
+    }, 500); // 500ms de delay
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  // Filtro de status
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setShouldFetch(prev => prev + 1);
+  }, [statusFilter]);
 
   const fetchTeams = async () => {
     try {
@@ -233,7 +252,7 @@ export default function TeamsPage() {
         {loading ? (
           <div className="p-6 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-sm text-gray-500">Carregando times...</p>
+            <p className="mt-2 text-sm text-gray-500">{t('loading.teams')}</p>
           </div>
         ) : teams.length === 0 ? (
           <div className="p-6 text-center">
@@ -302,7 +321,7 @@ export default function TeamsPage() {
                             >
                               {team.name}
                             </button>
-                            <div className="text-sm text-gray-500">Criado por {team.createdBy.name}</div>
+                            <div className="text-sm text-gray-500">{t('teams.table.createdBy')} {team.createdBy.name}</div>
                           </div>
                         </div>
                       </td>
@@ -325,7 +344,7 @@ export default function TeamsPage() {
                           <button
                             onClick={() => router.push(`/dashboard/teams/${team.id}`)}
                             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors"
-                            title="Ver detalhes do time"
+                            title={t('actions.viewTeamDetails')}
                           >
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

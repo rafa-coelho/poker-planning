@@ -40,7 +40,6 @@
   "errorEnterSessionName": "Por favor, insira um nome para a sessão!",
   "joinSessionTitle": "Entrar na Sessão do Planning Poker",
   "joinSessionDescription": "Digite seu nome para entrar na sessão:",
-  "loading": "Carregando...",
   "yourName": "Seu Nome",
   "namePlaceholder": "Digite seu nome...",
   "enterSession": "Entrar na Sessão",
@@ -288,10 +287,40 @@
       "title": "Participante saiu",
       "message": "{{userName}} saiu da sessão"
     },
+    "participantJoined": {
+      "title": "Participante entrou",
+      "message": "{{userName}} entrou na sessão"
+    },
     "errors": {
       "startVoting": "Erro ao iniciar votação",
       "finishVoting": "Erro ao finalizar votação",
       "setFinalEstimate": "Erro ao definir estimativa final"
     }
+  },
+  "loading": {
+    "general": "Carregando...",
+    "teams": "Carregando times...",
+    "projects": "Carregando projetos...",
+    "users": "Carregando usuários...",
+    "sessions": "Carregando sessões..."
+  },
+  "createdBy": "Criado por",
+  "actions": {
+    "viewDetails": "Ver detalhes",
+    "viewTeamDetails": "Ver detalhes do time",
+    "viewProjectDetails": "Ver detalhes do projeto",
+    "editTeam": "Editar time",
+    "editProject": "Editar projeto",
+    "deactivateTeam": "Desativar time",
+    "deactivateProject": "Desativar projeto",
+    "activateTeam": "Ativar time",
+    "activateProject": "Ativar projeto"
+  },
+  "errors": {
+    "createSession": "Erro ao criar a sessão"
+  },
+  "limits": {
+    "reached": "Limite de {{resource}} atingido (máximo: {{limit}}). Faça upgrade do seu plano para aumentar os limites.",
+    "featureNotAvailable": "A feature \"{{feature}}\" não está disponível no seu plano atual. Faça upgrade para acessar recursos avançados."
   }
 }

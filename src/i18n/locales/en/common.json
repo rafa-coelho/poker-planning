@@ -40,7 +40,6 @@
   "errorEnterSessionName": "Please enter a session name!",
   "joinSessionTitle": "Join Planning Poker Session",
   "joinSessionDescription": "Enter your name to join the session:",
-  "loading": "Loading...",
   "yourName": "Your Name",
   "namePlaceholder": "Enter your name...",
   "enterSession": "Join Session",
@@ -288,10 +287,40 @@
       "title": "Participant left",
       "message": "{{userName}} left the session"
     },
+    "participantJoined": {
+      "title": "Participant joined",
+      "message": "{{userName}} joined the session"
+    },
     "errors": {
       "startVoting": "Error starting voting",
       "finishVoting": "Error finishing voting",
       "setFinalEstimate": "Error setting final estimate"
     }
+  },
+  "loading": {
+    "general": "Loading...",
+    "teams": "Loading teams...",
+    "projects": "Loading projects...",
+    "users": "Loading users...",
+    "sessions": "Loading sessions..."
+  },
+  "createdBy": "Created by",
+  "actions": {
+    "viewDetails": "View details",
+    "viewTeamDetails": "View team details",
+    "viewProjectDetails": "View project details",
+    "editTeam": "Edit team",
+    "editProject": "Edit project",
+    "deactivateTeam": "Deactivate team",
+    "deactivateProject": "Deactivate project",
+    "activateTeam": "Activate team",
+    "activateProject": "Activate project"
+  },
+  "errors": {
+    "createSession": "Error creating session"
+  },
+  "limits": {
+    "reached": "{{resource}} limit reached (maximum: {{limit}}). Upgrade your plan to increase limits.",
+    "featureNotAvailable": "The \"{{feature}}\" feature is not available in your current plan. Upgrade to access advanced features."
   }
 }

@@ -109,6 +109,8 @@ export const GET = withTenantIsolation(async (req, context) => {
           },
           teams: {
             select: {
+              id: true,
+              name: true,
               members: {
                 select: { userId: true }
               }
@@ -151,7 +153,11 @@ export const GET = withTenantIsolation(async (req, context) => {
         members: currentUser.role === 'MEMBER' || currentUser.role === 'VIEWER' 
           ? project.members.filter(m => m.userId === context.userId)
           : undefined,
-        teams: undefined
+        // Incluir times com informações básicas
+        teams: project.teams.map(team => ({
+          id: team.id,
+          name: team.name
+        }))
       };
     });
 

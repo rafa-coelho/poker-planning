@@ -140,6 +140,7 @@ export class SessionService {
       page?: number
       limit?: number
       status?: SessionStatus
+      votingMode?: VotingMode
       search?: string
       projectId?: string
       userId?: string
@@ -151,12 +152,13 @@ export class SessionService {
     page: number
     totalPages: number
   }> {
-    const { page = 1, limit = 10, status, search, projectId, userId, userRole } = options
+    const { page = 1, limit = 10, status, votingMode, search, projectId, userId, userRole } = options
     const skip = (page - 1) * limit
 
     const where: any = {
       organizationId,
       ...(status && { status }),
+      ...(votingMode && { votingMode }),
       ...(projectId && { projectId }),
     }
 

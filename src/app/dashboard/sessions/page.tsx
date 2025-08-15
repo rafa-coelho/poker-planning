@@ -35,7 +35,7 @@ export default function SessionsPage() {
   const router = useRouter();
   const { apiService } = useAuth();
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -49,36 +49,67 @@ export default function SessionsPage() {
     search: ''
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [shouldFetch, setShouldFetch] = useState(1);
 
   useEffect(() => {
-    fetchSessions();
-  }, [pagination.page, filters]);
-
-  const fetchSessions = async () => {
-    try {
+    console.log('useEffect executando:', { pagination: pagination.page, shouldFetch });
+    
+    const fetchData = async () => {
+      console.log('Iniciando fetchData');
       setLoading(true);
+      setError(null);
       
-      const response = await apiService.listSessions({
-        page: pagination.page,
-        limit: pagination.limit,
-        search: filters.search || undefined,
-        status: filters.status || undefined
-      });
+      try {
+        const response = await apiService.listSessions({
+          page: pagination.page,
+          limit: pagination.limit,
+          search: filters.search || undefined,
+          status: filters.status || undefined,
+          votingMode: filters.votingMode || undefined
+        });
 
-      if (response.success && response.data) {
-        setSessions(response.data);
-        if (response.pagination) {
-          setPagination(response.pagination);
+        console.log('Response recebida:', response);
+
+        if (response.success && response.data) {
+          console.log('Dados recebidos:', response.data.length, 'sessões');
+          setSessions(response.data);
+          if (response.pagination) {
+            setPagination(response.pagination);
+          }
+        } else {
+          console.log('Erro na resposta:', response.error);
+          setError(response.error?.message || t('errors.loadSessions'));
         }
-      } else {
-        setError(response.error?.message || t('errors.loadSessions'));
+      } catch (err) {
+        console.log('Erro capturado:', err);
+        setError(err instanceof Error ? err.message : t('errors.unknown'));
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.unknown'));
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchData();
+  }, [pagination.page, shouldFetch]);
+
+  // Debounce para o campo de busca
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (filters.search !== undefined) {
+        setPagination(prev => ({ ...prev, page: 1 }));
+        setShouldFetch(prev => prev + 1);
+      }
+    }, 500); // 500ms de delay
+
+    return () => clearTimeout(timeoutId);
+  }, [filters.search]);
+
+  // Filtros de status e votingMode
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setShouldFetch(prev => prev + 1);
+  }, [filters.status, filters.votingMode]);
+
+
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -157,41 +188,10 @@ export default function SessionsPage() {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-        </div>
-      </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">
-              {t('errors.loadSessions')}
-            </h3>
-            <div className="mt-2 text-sm text-red-700">
-              {error}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
+  console.log('Estado atual:', { sessions: sessions.length, loading, error });
+  
   return (
     <div>
       <div className="mb-8">
@@ -324,7 +324,29 @@ export default function SessionsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sessions.map((session) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                        <span className="ml-2 text-gray-600">{t('loading.sessions')}</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-4 text-center text-red-600">
+                      {error}
+                    </td>
+                  </tr>
+                ) : sessions.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                      {t('sessions.noSessions')}
+                    </td>
+                  </tr>
+                ) : (
+                  sessions.map((session) => (
                   <tr key={session.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
@@ -372,7 +394,8 @@ export default function SessionsPage() {
                       )}
                     </td>
                   </tr>
-                ))}
+                ))
+                )}
               </tbody>
             </table>
           </div>
