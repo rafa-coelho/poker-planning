@@ -7,9 +7,10 @@
 💾 FASE 2: Persistência & Core Features   [x] 40/40 tarefas  
 👥 FASE 2.5: Gestão de Usuários e Times   [x] 36/48 tarefas
 🏢 FASE 3: Features Empresariais          [x] 60/60 tarefas
+🌐 FASE 3.5: Sessões Públicas             [ ] 0/25 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [x] 179/211 tarefas concluídas
+Total: [x] 179/236 tarefas concluídas (75.8%)
 ```
 
 ---
@@ -481,6 +482,68 @@ Organization
 
 ---
 
+## 🌐 FASE 3.5: Sessões Públicas (Semanas 6.5-7)
+
+### 3.5.1 Sistema de Acesso Público (Dia 40-42)
+- [ ] Criar middleware de verificação de acesso público
+- [ ] Implementar lógica de verificação de permissões
+- [ ] Criar sistema de convites por link público
+- [ ] Implementar validação de sessão existente
+- [ ] Criar endpoint `/api/sessions/[id]/public-access`
+- [ ] Implementar verificação de status da sessão
+- [ ] Criar sistema de logs de acesso público
+- [ ] Implementar rate limiting para acessos públicos
+- [ ] Testar isolamento de dados entre organizações
+- [ ] Documentar fluxo de acesso público
+
+### 3.5.2 Interface de Acesso Público (Dia 43-44)
+- [ ] Criar página `/sessions/[id]/public` para acesso público
+- [ ] Implementar tela de verificação de login
+- [ ] Criar modal de entrada sem conta
+- [ ] Implementar formulário de nome do participante
+- [ ] Criar sistema de aprovação pelo dono da sessão
+- [ ] Implementar notificações de novos participantes
+- [ ] Criar interface de gestão de participantes externos
+- [ ] Implementar sistema de expulsão de participantes
+- [ ] Criar indicadores visuais de participantes externos
+- [ ] Testar responsividade da interface pública
+
+### 3.5.3 Gestão de Participantes Externos (Dia 45-46)
+- [ ] Criar model `PublicParticipant` no Prisma
+- [ ] Implementar API para gestão de participantes externos
+- [ ] Criar sistema de aprovação/rejeição automática
+- [ ] Implementar timeout para participantes não aprovados
+- [ ] Criar sistema de limpeza de participantes inativos
+- [ ] Implementar notificações para dono da sessão
+- [ ] Criar histórico de participantes externos
+- [ ] Implementar sistema de bloqueio de IPs abusivos
+- [ ] Testar fluxo completo de participantes externos
+- [ ] Documentar processo de gestão
+
+### 3.5.4 Segurança e Validações (Dia 47-48)
+- [ ] Implementar validação de nomes de participantes
+- [ ] Criar sistema de captcha para entrada pública
+- [ ] Implementar verificação de IP para evitar spam
+- [ ] Criar sistema de blacklist de nomes inapropriados
+- [ ] Implementar timeout de sessão para participantes externos
+- [ ] Criar sistema de logs de segurança
+- [ ] Implementar notificações de atividades suspeitas
+- [ ] Testar cenários de segurança
+- [ ] Validar isolamento de dados
+- [ ] Documentar medidas de segurança
+
+### ✅ Critérios de Aceitação - Fase 3.5
+- [ ] Qualquer sessão pode ser acessada publicamente via link
+- [ ] Sistema de login/entrada sem conta funcionando
+- [ ] Aprovação de participantes externos implementada
+- [ ] Interface responsiva para acesso público
+- [ ] Segurança e validações implementadas
+- [ ] Isolamento de dados mantido
+- [ ] Logs e monitoramento funcionando
+- [ ] Documentação completa do fluxo
+
+---
+
 ## 🔧 FASE 4: Otimização & Polimento (Semanas 7-8)
 
 ### 4.1 Preparação para Paywall (Dia 35-37)
@@ -598,6 +661,14 @@ Organization
 - [x] Sistema de convites por link funcionando
 - [x] Relatórios básicos implementados
 - [x] Permissões granulares funcionando
+
+### Marco 3.5 - Sessões Públicas (Fim Semana 7)
+**Critérios:**
+- [ ] Acesso público a sessões via link
+- [ ] Sistema de entrada sem conta implementado
+- [ ] Aprovação de participantes externos funcionando
+- [ ] Interface pública responsiva
+- [ ] Segurança e validações implementadas
 
 ### Marco 4 - Pronto para Produção (Fim Semana 8)
 **Critérios:**
