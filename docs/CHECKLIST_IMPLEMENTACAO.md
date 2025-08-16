@@ -7,10 +7,10 @@
 💾 FASE 2: Persistência & Core Features   [x] 40/40 tarefas  
 👥 FASE 2.5: Gestão de Usuários e Times   [x] 36/48 tarefas
 🏢 FASE 3: Features Empresariais          [x] 60/60 tarefas
-🌐 FASE 3.5: Sessões Públicas             [x] 20/25 tarefas
+🌐 FASE 3.5: Sessões Públicas             [x] 25/25 tarefas
 🔧 FASE 4: Otimização & Polimento         [ ] 0/20 tarefas
 
-Total: [x] 199/236 tarefas concluídas (84.3%)
+Total: [x] 204/236 tarefas concluídas (86.4%)
 ```
 
 ---
@@ -484,7 +484,7 @@ Organization
 
 ## 🌐 FASE 3.5: Sessões Públicas (Semanas 6.5-7)
 
-### 3.5.1 Sistema de Acesso Público (Dia 40-42)
+### 3.5.1 Sistema de Acesso Público (Dia 40-42) ✅ CONCLUÍDO
 - [x] Criar middleware de verificação de acesso público
 - [x] Implementar lógica de verificação de permissões
 - [x] Criar sistema de convites por link público
@@ -496,7 +496,7 @@ Organization
 - [x] Testar isolamento de dados entre organizações
 - [x] Documentar fluxo de acesso público
 
-### 3.5.2 Interface de Acesso Público (Dia 43-44)
+### 3.5.2 Interface de Acesso Público (Dia 43-44) ✅ CONCLUÍDO
 - [x] Criar página `/sessions/[id]/public` para acesso público
 - [x] Implementar tela de verificação de login
 - [x] Criar modal de entrada sem conta
@@ -508,39 +508,39 @@ Organization
 - [x] Criar indicadores visuais de participantes externos
 - [x] Testar responsividade da interface pública
 
-### 3.5.3 Gestão de Participantes Externos (Dia 45-46)
-- [ ] Criar model `PublicParticipant` no Prisma
-- [ ] Implementar API para gestão de participantes externos
-- [ ] Criar sistema de aprovação/rejeição automática
-- [ ] Implementar timeout para participantes não aprovados
-- [ ] Criar sistema de limpeza de participantes inativos
-- [ ] Implementar notificações para dono da sessão
-- [ ] Criar histórico de participantes externos
-- [ ] Implementar sistema de bloqueio de IPs abusivos
-- [ ] Testar fluxo completo de participantes externos
-- [ ] Documentar processo de gestão
+### 3.5.3 Gestão de Participantes Externos (Dia 45-46) ✅ CONCLUÍDO
+- [x] Criar model `PublicParticipant` no Prisma
+- [x] Implementar API para gestão de participantes externos
+- [x] Criar sistema de aprovação/rejeição automática
+- [x] Implementar timeout para participantes não aprovados
+- [x] Criar sistema de limpeza de participantes inativos
+- [x] Implementar notificações para dono da sessão
+- [x] Criar histórico de participantes externos
+- [x] Implementar sistema de bloqueio de IPs abusivos
+- [x] Testar fluxo completo de participantes externos
+- [x] Documentar processo de gestão
 
-### 3.5.4 Segurança e Validações (Dia 47-48)
-- [ ] Implementar validação de nomes de participantes
-- [ ] Criar sistema de captcha para entrada pública
-- [ ] Implementar verificação de IP para evitar spam
-- [ ] Criar sistema de blacklist de nomes inapropriados
-- [ ] Implementar timeout de sessão para participantes externos
-- [ ] Criar sistema de logs de segurança
-- [ ] Implementar notificações de atividades suspeitas
-- [ ] Testar cenários de segurança
-- [ ] Validar isolamento de dados
-- [ ] Documentar medidas de segurança
+### 3.5.4 Segurança e Validações (Dia 47-48) ✅ CONCLUÍDO
+- [x] Implementar validação de nomes de participantes
+- [x] Criar sistema de captcha para entrada pública
+- [x] Implementar verificação de IP para evitar spam
+- [x] Criar sistema de blacklist de nomes inapropriados
+- [x] Implementar timeout de sessão para participantes externos
+- [x] Criar sistema de logs de segurança
+- [x] Implementar notificações de atividades suspeitas
+- [x] Testar cenários de segurança
+- [x] Validar isolamento de dados
+- [x] Documentar medidas de segurança
 
-### ✅ Critérios de Aceitação - Fase 3.5
-- [ ] Qualquer sessão pode ser acessada publicamente via link
-- [ ] Sistema de login/entrada sem conta funcionando
-- [ ] Aprovação de participantes externos implementada
-- [ ] Interface responsiva para acesso público
-- [ ] Segurança e validações implementadas
-- [ ] Isolamento de dados mantido
-- [ ] Logs e monitoramento funcionando
-- [ ] Documentação completa do fluxo
+### ✅ Critérios de Aceitação - Fase 3.5 ✅ CONCLUÍDO
+- [x] Qualquer sessão pode ser acessada publicamente via link
+- [x] Sistema de login/entrada sem conta funcionando
+- [x] Aprovação de participantes externos implementada
+- [x] Interface responsiva para acesso público
+- [x] Segurança e validações implementadas
+- [x] Isolamento de dados mantido
+- [x] Logs e monitoramento funcionando
+- [x] Documentação completa do fluxo
 
 ---
 
@@ -662,13 +662,13 @@ Organization
 - [x] Relatórios básicos implementados
 - [x] Permissões granulares funcionando
 
-### Marco 3.5 - Sessões Públicas (Fim Semana 7)
+### Marco 3.5 - Sessões Públicas (Fim Semana 7) ✅ CONCLUÍDO
 **Critérios:**
-- [ ] Acesso público a sessões via link
-- [ ] Sistema de entrada sem conta implementado
-- [ ] Aprovação de participantes externos funcionando
-- [ ] Interface pública responsiva
-- [ ] Segurança e validações implementadas
+- [x] Acesso público a sessões via link
+- [x] Sistema de entrada sem conta implementado
+- [x] Aprovação de participantes externos funcionando
+- [x] Interface pública responsiva
+- [x] Segurança e validações implementadas
 
 ### Marco 4 - Pronto para Produção (Fim Semana 8)
 **Critérios:**
