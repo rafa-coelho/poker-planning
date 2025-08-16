@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken'
-import { JWTPayload, RefreshTokenPayload, PLAN_FEATURES } from '@/types/auth'
-import { User, Organization, Plan } from '@prisma/client'
+import { JWTPayload, RefreshTokenPayload } from '@/types/auth'
+import { User, Organization } from '@prisma/client'
 import { APP_CONFIG } from '@/lib/config'
+import { planService } from '@/lib/services/planService'
 
 /**
  * Configurações JWT
@@ -10,7 +11,7 @@ const JWT_SECRET = APP_CONFIG.JWT_SECRET
 const JWT_REFRESH_SECRET = APP_CONFIG.JWT_REFRESH_SECRET
 const JWT_ISSUER = APP_CONFIG.JWT_ISSUER
 
-// Tempos de expiração
+// Expiration times
 export const TOKEN_EXPIRATION = {
   ACCESS_TOKEN: '15m',  // 15 minutos
   REFRESH_TOKEN: '7d',  // 7 dias
@@ -32,6 +33,9 @@ export function generateAccessToken(
   const now = Math.floor(Date.now() / 1000)
   const expiration = rememberMe ? TOKEN_EXPIRATION.REMEMBER_ME : TOKEN_EXPIRATION.ACCESS_TOKEN
   
+  // 🎯 Usar PlanService para obter features do plano
+  const features = planService.getPlanFeatures(organization.plan)
+  
   const payload: JWTPayload = {
     userId: user.id,
     email: user.email,
@@ -39,7 +43,7 @@ export function generateAccessToken(
     role: user.role,
     organizationId: organization.id,
     organizationSlug: organization.slug,
-    features: PLAN_FEATURES[organization.plan] || PLAN_FEATURES.FREE,
+    features: features,
     externalId: user.externalId || undefined,
     externalSource: user.externalSource || undefined,
     iat: now
@@ -117,6 +121,57 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
 }
 
 /**
+ * Decodifica token sem verificar assinatura (apenas para leitura)
+ * @param token Token JWT
+ * @returns Payload decodificado ou null se inválido
+ */
+export function decodeToken(token: string): JWTPayload | null {
+  try {
+    const decoded = jwt.decode(token) as JWTPayload
+    return decoded
+  } catch (error) {
+    console.error('Error decoding token:', error)
+    return null
+  }
+}
+
+/**
+ * Verifica se token está expirado
+ * @param token Token JWT
+ * @returns true se expirado, false caso contrário
+ */
+export function isTokenExpired(token: string): boolean {
+  try {
+    const decoded = jwt.decode(token) as JWTPayload
+    if (!decoded.exp) return false
+    
+    const now = Math.floor(Date.now() / 1000)
+    return now >= decoded.exp
+  } catch (error) {
+    return true
+  }
+}
+
+/**
+ * Calcula tempo restante do token
+ * @param token Token JWT
+ * @returns Tempo restante em segundos, ou 0 se expirado
+ */
+export function getTokenTimeRemaining(token: string): number {
+  try {
+    const decoded = jwt.decode(token) as JWTPayload
+    if (!decoded.exp) return 0
+    
+    const now = Math.floor(Date.now() / 1000)
+    const remaining = decoded.exp - now
+    
+    return remaining > 0 ? remaining : 0
+  } catch (error) {
+    return 0
+  }
+}
+
+/**
  * Extrai token do header Authorization
  * @param authHeader Header Authorization
  * @returns Token limpo ou null
@@ -140,7 +195,7 @@ export function extractTokenFromHeader(authHeader: string | undefined): string |
 /**
  * Verifica se o token está próximo do vencimento
  * @param payload Payload do JWT
- * @param thresholdMinutes Minutos antes do vencimento para considerar "próximo"
+ * @param thresholdMinutes Minutes before expiration to consider "near"
  * @returns Se está próximo do vencimento
  */
 export function isTokenNearExpiration(payload: JWTPayload, thresholdMinutes: number = 5): boolean {

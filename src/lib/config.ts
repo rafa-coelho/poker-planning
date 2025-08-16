@@ -54,6 +54,10 @@ export const APP_CONFIG = {
   // Multi-tenancy
   DEFAULT_ORGANIZATION_PLAN: process.env.DEFAULT_ORGANIZATION_PLAN || 'FREE',
   
+  // Billing Service (futuro)
+  BILLING_SERVICE_URL: process.env.BILLING_SERVICE_URL || '',
+  BILLING_SERVICE_API_KEY: process.env.BILLING_SERVICE_API_KEY || '',
+  
   // Segurança
   SESSION_SECRET: process.env.SESSION_SECRET || 'fallback-session-secret',
   CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000',

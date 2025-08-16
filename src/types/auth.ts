@@ -1,4 +1,5 @@
 import { UserRole } from '@prisma/client'
+import { PlanFeatures } from '@/lib/config/plans'
 
 // JWT Payload Types
 export interface JWTPayload {
@@ -10,14 +11,7 @@ export interface JWTPayload {
   organizationSlug: string
   
   // Claims para controle de features (paywall futuro)
-  features: {
-    maxSessions: number
-    maxParticipants: number
-    hasAdvancedReports: boolean
-    hasCustomBranding: boolean
-    hasSSO: boolean
-    hasAPI: boolean
-  }
+  features: PlanFeatures
   
   // External integration (futuro)
   externalId?: string
@@ -135,16 +129,12 @@ export interface AuthenticatedRequest {
   user: JWTPayload
 }
 
-// Feature flags para controle de paywall
-export interface FeatureFlags {
-  maxSessions: number
-  maxParticipants: number
-  hasAdvancedReports: boolean
-  hasCustomBranding: boolean
-  hasSSO: boolean
-  hasAPI: boolean
-}
+// 🎯 Feature flags para controle de paywall
+// Agora usando o tipo do PlanService
+export type FeatureFlags = PlanFeatures
 
+// 📋 Mapeamento de planos para features (usando PlanService)
+// Este objeto será removido em favor do PlanService centralizado
 export const PLAN_FEATURES: Record<string, FeatureFlags> = {
   FREE: {
     maxSessions: 5,
@@ -152,7 +142,17 @@ export const PLAN_FEATURES: Record<string, FeatureFlags> = {
     hasAdvancedReports: false,
     hasCustomBranding: false,
     hasSSO: false,
-    hasAPI: false
+    hasAPI: false,
+    hasPublicSessions: true,
+    hasTeamManagement: false,
+    hasProjectManagement: false,
+    hasUserManagement: false,
+    hasAuditLogs: false,
+    hasPrioritySupport: false,
+    maxTeamMembers: 0,
+    maxProjectMembers: 0,
+    maxStorageGB: 1,
+    retentionDays: 30
   },
   PRO: {
     maxSessions: 50,
@@ -160,7 +160,17 @@ export const PLAN_FEATURES: Record<string, FeatureFlags> = {
     hasAdvancedReports: true,
     hasCustomBranding: true,
     hasSSO: false,
-    hasAPI: true
+    hasAPI: true,
+    hasPublicSessions: true,
+    hasTeamManagement: true,
+    hasProjectManagement: true,
+    hasUserManagement: true,
+    hasAuditLogs: true,
+    hasPrioritySupport: false,
+    maxTeamMembers: 20,
+    maxProjectMembers: 50,
+    maxStorageGB: 10,
+    retentionDays: 90
   },
   ENTERPRISE: {
     maxSessions: -1, // unlimited
@@ -168,6 +178,16 @@ export const PLAN_FEATURES: Record<string, FeatureFlags> = {
     hasAdvancedReports: true,
     hasCustomBranding: true,
     hasSSO: true,
-    hasAPI: true
+    hasAPI: true,
+    hasPublicSessions: true,
+    hasTeamManagement: true,
+    hasProjectManagement: true,
+    hasUserManagement: true,
+    hasAuditLogs: true,
+    hasPrioritySupport: true,
+    maxTeamMembers: -1, // unlimited
+    maxProjectMembers: -1, // unlimited
+    maxStorageGB: 100,
+    retentionDays: 365
   }
 } 

@@ -4,6 +4,7 @@
  */
 
 import i18next from 'i18next';
+import { translateErrorMessage } from '@/lib/utils/errorMessages';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -245,11 +246,15 @@ class ApiService {
         };
       }
       
+      // Translate error message if it's a code
+      const errorMessage = errorData.error?.message || i18next.t('api.errors.generic', { status: response.status, statusText: response.statusText });
+      const translatedMessage = translateErrorMessage(errorMessage, i18next.t);
+      
       return {
         success: false,
         error: {
           code: errorCode,
-          message: errorData.error?.message || i18next.t('api.errors.generic', { status: response.status, statusText: response.statusText }),
+          message: translatedMessage,
           timestamp: new Date().toISOString()
         }
       };
@@ -943,6 +948,148 @@ class ApiService {
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'DELETE'
+    });
+  }
+
+  /**
+   * 📋 Planos e Billing
+   */
+
+  /**
+   * GET /api/plans
+   * Lista todos os planos disponíveis
+   */
+  async getPlans(options?: {
+    includeCurrent?: boolean;
+    includeUpgrades?: boolean;
+  }): Promise<ApiResponse<{
+    plans: Array<{
+      id: string;
+      name: string;
+      description: string;
+      price: {
+        monthly: number;
+        yearly: number;
+        currency: string;
+      };
+      features: any;
+      isPopular?: boolean;
+      isEnterprise?: boolean;
+      trialDays: number;
+    }>;
+    currentPlan?: any;
+    upgradePlans?: any[];
+  }>> {
+    const params = new URLSearchParams();
+    if (options?.includeCurrent) params.append('includeCurrent', 'true');
+    if (options?.includeUpgrades) params.append('includeUpgrades', 'true');
+    
+    const url = `/api/plans${params.toString() ? `?${params.toString()}` : ''}`;
+    return this.get(url);
+  }
+
+  /**
+   * POST /api/plans/compare
+   * Compara planos específicos
+   */
+  async comparePlans(planIds: string[]): Promise<ApiResponse<{
+    comparison: any[];
+    currentPlan: string;
+  }>> {
+    return this.post('/api/plans', { planIds });
+  }
+
+  /**
+   * GET /api/plans/usage
+   * Obtém estatísticas de uso da organização
+   */
+  async getUsage(): Promise<ApiResponse<{
+    usage: {
+      sessionsCount: number;
+      participantsCount: number;
+      teamMembersCount: number;
+      projectMembersCount: number;
+      storageUsedGB: number;
+      activeUsersCount: number;
+    };
+    usageStats: {
+      sessions: { current: number; limit: number; percentage: number };
+      participants: { current: number; limit: number; percentage: number };
+      teamMembers: { current: number; limit: number; percentage: number };
+      projectMembers: { current: number; limit: number; percentage: number };
+    };
+    warnings: Array<{
+      feature: string;
+      current: number;
+      limit: number;
+      percentage: number;
+      message: string;
+    }>;
+    currentPlan: {
+      id: string;
+      name: string;
+      features: any;
+    };
+    upgrade?: {
+      availablePlans: Array<{
+        id: string;
+        name: string;
+        price: any;
+        yearlySavings: number;
+      }>;
+    };
+  }>> {
+    return this.get('/api/plans/usage');
+  }
+
+  /**
+   * POST /api/plans/usage/check-limit
+   * Verifica se uma ação específica excederia o limite
+   */
+  async checkLimit(feature: string, currentUsage: number, increment: number = 1): Promise<ApiResponse<{
+    wouldExceed: boolean;
+    currentUsage: number;
+    newUsage: number;
+    limit: number;
+    percentage: number;
+    feature: string;
+    currentPlan: {
+      id: string;
+      name: string;
+    };
+    upgrade?: {
+      availablePlans: Array<{
+        id: string;
+        name: string;
+        price: any;
+      }>;
+    };
+  }>> {
+    return this.post('/api/plans/usage/check-limit', {
+      feature,
+      currentUsage,
+      increment
+    });
+  }
+
+  /**
+   * 🚀 Processar upgrade de plano
+   * TODO: Integrar com sistema de billing externo
+   */
+  async processUpgrade(planId: string, billingCycle: 'monthly' | 'yearly'): Promise<ApiResponse<{
+    success: boolean;
+    newPlan: string;
+    billingCycle: string;
+  }>> {
+    // TODO: Implementar integração com sistema de billing
+    // Por enquanto, simular sucesso
+    return Promise.resolve({
+      success: true,
+      data: {
+        success: true,
+        newPlan: planId,
+        billingCycle
+      }
     });
   }
 }
