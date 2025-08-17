@@ -23,7 +23,7 @@ export default function SessionPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation("sessions");
   const params = useParams();
   const sessionId = params.sessionId as string;
 
@@ -73,9 +73,9 @@ export default function SessionPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
-      <HeaderBar 
-        sessionData={sessionData} 
-        userName={user.userName} 
+      <HeaderBar
+        sessionData={sessionData}
+        userName={user.userName}
         isCreator={canManageTickets}
         onInviteOpen={() => {
           generateInviteLink();
@@ -88,22 +88,22 @@ export default function SessionPage() {
         connectionStatus={connectionStatus}
       />
 
-      {/* Notificação de participante */}
-      <ParticipantNotification 
+      {/* Participant notification */}
+      <ParticipantNotification
         notification={participantNotification}
         onClose={() => setParticipantNotification(null)}
       />
 
 
 
-      {/* Menu Mobile */}
-      <MobileMenu 
+      {/* Mobile menu */}
+      <MobileMenu
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />
 
       <main className="flex-1 flex">
-        {/* Área principal - Mesa de votação */}
+        {/* Main area - Voting table */}
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="w-full h-full flex flex-col items-center justify-between">
             <div />
@@ -120,16 +120,16 @@ export default function SessionPage() {
               hasSelectedTicket={!!currentTicket}
             />
 
-            {/* Resumo de votos ou barra de votação */}
-                         {sessionData.isRevealed ? (
-               <VoteSummary 
-                 votes={sessionData.participants.map(p => p.selectedCard).filter(card => card !== null && card !== undefined && card.trim() !== "") as string[]}
-                 average={averageVote || ""}
-                 totalParticipants={votingStats.totalParticipants}
-                 votedCount={votingStats.votedCount}
-                 votingMode={sessionData.votingMode}
-               />
-             ) : (
+            {/* Vote summary or voting bar */}
+            {sessionData.isRevealed ? (
+              <VoteSummary
+                votes={sessionData.participants.map(p => p.selectedCard).filter(card => card !== null && card !== undefined && card.trim() !== "") as string[]}
+                average={averageVote || ""}
+                totalParticipants={votingStats.totalParticipants}
+                votedCount={votingStats.votedCount}
+                votingMode={sessionData.votingMode}
+              />
+            ) : (
               <VoteBar
                 cards={votingCards}
                 selectedCard={selectedCard}
@@ -140,7 +140,7 @@ export default function SessionPage() {
           </div>
         </div>
 
-        {/* Sidebar direita - Gerenciador de tickets */}
+        {/* Right sidebar - Ticket manager */}
         <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
           {sessionData.sessionId && (
             <TicketManager
@@ -162,16 +162,16 @@ export default function SessionPage() {
         </div>
       </main>
 
-                      {/* Modal de convite */}
-                {inviteOpen && (
-                  <InviteModal 
-                    inviteLink={inviteLink} 
-                    onClose={() => setInviteOpen(false)}
-                    sessionId={sessionId}
-                  />
-                )}
+      {/* Invite modal */}
+      {inviteOpen && (
+        <InviteModal
+          inviteLink={inviteLink}
+          onClose={() => setInviteOpen(false)}
+          sessionId={sessionId}
+        />
+      )}
 
-      {/* Modal de estimativa final */}
+      {/* Final estimate modal */}
       {showFinalEstimateModal && currentTicket && (
         <FinalEstimateModal
           ticket={currentTicket}
@@ -182,7 +182,7 @@ export default function SessionPage() {
         />
       )}
 
-      {/* Modal de solicitações pendentes */}
+      {/* Pending requests modal */}
       <PendingRequestsModal
         isOpen={showPendingRequestsModal}
         onClose={() => setShowPendingRequestsModal(false)}

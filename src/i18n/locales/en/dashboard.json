@@ -80,6 +80,12 @@
       "active": "Active",
       "inactive": "Inactive"
     },
+    "actions": {
+      "view": "View user",
+      "edit": "Edit user",
+      "delete": "Deactivate user",
+      "confirmDelete": "Are you sure you want to deactivate this user?"
+    },
     "messages": {
       "userCreated": "User created successfully",
       "userUpdated": "User updated successfully",
@@ -89,358 +95,42 @@
       "passwordResetSentSelf": "Password reset email sent to you"
     }
   },
-  "teams": {
-    "title": "Teams",
-    "description": "Manage teams in your organization",
-    "new": "New Team",
-    "edit": "Edit Team",
-    "delete": "Delete Team",
-    "view": "View Team",
-    "viewAll": "View All",
-    "noTeams": "No teams found",
-    "createFirst": "Start by creating the first team",
-    "createTeam": "Create Team",
-    "searchPlaceholder": "Search by name...",
-    "table": {
-      "name": "Name",
-      "description": "Description",
-      "members": "Members",
-      "projects": "Projects",
-      "createdAt": "Created At",
-      "createdBy": "Created by",
-      "actions": "Actions"
-    },
-    "form": {
-      "name": "Name",
-      "namePlaceholder": "Team name",
-      "description": "Description",
-      "descriptionPlaceholder": "Team description",
-      "create": "Create Team",
-      "creating": "Creating...",
-      "update": "Update Team",
-      "updating": "Updating...",
-      "cancel": "Cancel",
-      "save": "Save",
-      "saving": "Saving..."
-    },
-    "messages": {
-      "teamCreated": "Team created successfully",
-      "teamUpdated": "Team updated successfully",
-      "teamDeleted": "Team deleted successfully"
-    },
-    "members": {
-      "title": "Team Members",
-      "addMember": "Add Member",
-      "removeMember": "Remove Member",
-      "changeRole": "Change Role",
-      "role": "Role",
-      "noMembers": "No members found",
-      "roles": {
-        "ADMIN": "Administrator",
-        "MEMBER": "Member",
-        "VIEWER": "Viewer"
-      }
-    },
-    "errors": {
-      "loadFailed": "Failed to load teams",
-      "createFailed": "Failed to create team",
-      "updateFailed": "Failed to update team",
-      "deleteFailed": "Failed to delete team"
-    }
+  "stats": {
+    "sessions": "Sessions",
+    "participants": "Participants",
+    "tickets": "Tickets",
+    "totalSessions": "Total Sessions",
+    "activeSessions": "Active Sessions",
+    "totalProjects": "Total Projects",
+    "totalTeamMembers": "Team Members",
+    "averageEstimates": "Average Estimates",
+    "consensusRate": "Consensus Rate"
   },
-  "projects": {
-    "title": "Projects",
-    "description": "Manage projects in your organization",
-    "new": "New Project",
-    "edit": "Edit Project",
-    "delete": "Delete Project",
-    "view": "View Project",
-    "viewAll": "View All",
-    "noProjects": "No projects found",
-    "createFirst": "Start by creating the first project",
-    "createProject": "Create Project",
-    "searchPlaceholder": "Search by name...",
-    "table": {
-      "name": "Name",
-      "description": "Description",
-      "members": "Members",
-      "teams": "Teams",
-      "sessions": "Sessions",
-      "createdAt": "Created At",
-      "createdBy": "Created by",
-      "actions": "Actions"
-    },
-    "form": {
-      "name": "Name",
-      "namePlaceholder": "Project name",
-      "description": "Description",
-      "descriptionPlaceholder": "Project description",
-      "color": "Color",
-      "create": "Create Project",
-      "creating": "Creating...",
-      "update": "Update Project",
-      "updating": "Updating...",
-      "cancel": "Cancel",
-      "save": "Save",
-      "saving": "Saving..."
-    },
-    "messages": {
-      "projectCreated": "Project created successfully",
-      "projectUpdated": "Project updated successfully",
-      "projectDeleted": "Project deleted successfully"
-    },
-    "errors": {
-      "loadFailed": "Failed to load projects",
-      "createFailed": "Failed to create project",
-      "updateFailed": "Failed to update project",
-      "deleteFailed": "Failed to delete project"
-    }
+  "status": {
+    "active": "Active",
+    "completed": "Completed",
+    "archived": "Archived"
   },
-  "sessions": {
-    "title": "Sessions",
-    "description": "Manage your planning poker sessions",
-    "new": "New Session",
-    "edit": "Edit Session",
-    "delete": "Delete Session",
-    "view": "View Session",
-    "viewAll": "View All",
+  "recent": "Recent Sessions",
+  "noSessions": "No sessions found",
+  "viewAll": "View All",
+  "viewSessions": "View Sessions",
+  "new": "New Session",
+  "session": {
+    "participants": "participants",
+    "tickets": "tickets"
+  },
+  "recentSessions": {
+    "title": "Recent Sessions",
     "noSessions": "No sessions found",
-    "createFirst": "Start by creating your first session",
+    "createFirst": "Create your first session to get started!"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
     "createSession": "Create Session",
-    "searchPlaceholder": "Search by name or description...",
-    "filters": {
-      "allStatuses": "All Statuses",
-      "allModes": "All Modes",
-      "clear": "Clear Filters"
-    },
-    "table": {
-      "name": "Name",
-      "description": "Description",
-      "status": "Status",
-      "votingMode": "Voting Mode",
-      "participants": "Participants",
-      "tickets": "Tickets",
-      "createdBy": "Created By",
-      "createdAt": "Created At",
-      "actions": "Actions"
-    },
-    "form": {
-      "name": "Name",
-      "namePlaceholder": "Session name",
-      "description": "Description",
-      "descriptionPlaceholder": "Session description",
-      "project": "Project",
-      "projectPlaceholder": "Select a project (optional)",
-      "votingMode": "Voting Mode",
-      "autoReveal": "Auto Reveal",
-      "allowObservers": "Allow Observers",
-      "create": "Create Session",
-      "creating": "Creating...",
-      "update": "Update Session",
-      "updating": "Updating...",
-      "cancel": "Cancel",
-      "save": "Save",
-      "saving": "Saving..."
-    },
-    "votingModes": {
-      "FIBONACCI": "Fibonacci",
-      "TSHIRT": "T-shirt",
-      "LINEAR": "Linear",
-      "CUSTOM": "Custom"
-    },
-    "status": {
-      "ACTIVE": "Active",
-      "COMPLETED": "Completed",
-      "ARCHIVED": "Archived",
-      "CANCELLED": "Cancelled"
-    },
-    "messages": {
-      "sessionCreated": "Session created successfully",
-      "sessionUpdated": "Session updated successfully",
-      "sessionDeleted": "Session deleted successfully"
-    },
-    "errors": {
-      "loadFailed": "Failed to load sessions",
-      "createFailed": "Failed to create session",
-      "updateFailed": "Failed to update session",
-      "deleteFailed": "Failed to delete session"
-    }
-  },
-  "newSession": {
-    "title": "New Session",
-    "description": "Create a new planning poker session",
-    "name": "Session Name",
-    "namePlaceholder": "Enter session name",
-    "description": "Description",
-    "descriptionPlaceholder": "Enter a description (optional)",
-    "project": "Project",
-    "projectPlaceholder": "Select a project (optional)",
-    "votingMode": "Voting Mode",
-    "autoReveal": "Auto Reveal",
-    "allowObservers": "Allow Observers",
-    "create": "Create Session",
-    "creating": "Creating...",
-    "cancel": "Cancel"
-  },
-  "tickets": {
-    "title": "Tickets",
-    "description": "Manage session tickets",
-    "new": "New Ticket",
-    "edit": "Edit Ticket",
-    "delete": "Delete Ticket",
-    "noTickets": "No tickets created yet"
-  },
-  "voting": {
-    "title": "Voting",
-    "currentTicket": "Current Ticket",
-    "noCurrentTicket": "No ticket currently voting",
-    "startVoting": "Start Voting",
-    "finishVoting": "Finish Voting",
-    "revealCards": "Reveal Cards",
-    "hideCards": "Hide Cards",
-    "averageVote": "Average Vote",
-    "finalDecision": "Final Decision",
-    "confirmDecision": "Confirm Decision",
-    "decisionModal": {
-      "title": "Set Final Estimate",
-      "description": "Set the final estimate for this ticket",
-      "averageLabel": "Average votes",
-      "finalLabel": "Final estimate",
-      "confirm": "Confirm",
-      "cancel": "Cancel"
-    }
-  },
-  "reports": {
-    "title": "Reports & Analytics",
-    "description": "Analyze your planning poker session performance",
-    "actions": {
-      "configureReport": "Configure Report"
-    },
-    "config": {
-      "title": "Configure your report",
-      "description": "Select the desired filters to generate personalized reports about your planning poker sessions.",
-      "filtersTitle": "Report Filters",
-      "periodLabel": "Analysis Period",
-      "teamLabel": "Team (Optional)",
-      "projectLabel": "Project (Optional)",
-      "period7d": "Last 7 days",
-      "period30d": "Last 30 days",
-      "period90d": "Last 90 days",
-      "period1y": "Last year",
-      "allTeams": "All teams",
-      "allProjects": "All projects",
-      "noProjectsForTeam": "No projects available for this team",
-      "summaryTitle": "Analysis Summary",
-      "period": "Period",
-      "team": "Team",
-      "project": "Project",
-      "generateReport": "Generate Report",
-      "generatingReport": "Generating Report...",
-      "newAnalysis": "New Analysis",
-      "export": "Export",
-      "analysisTypes": {
-        "temporal": {
-          "title": "Temporal Analysis",
-          "description": "Visualize trends over time and compare different periods."
-        },
-        "consensus": {
-          "title": "Estimate Quality",
-          "description": "Analyze team consensus and identify improvement opportunities."
-        },
-        "productivity": {
-          "title": "Productivity",
-          "description": "Monitor session efficiency and average voting time."
-        }
-      }
-    },
-    "tabs": {
-      "overview": "Overview",
-      "sessions": "Sessions",
-      "consensus": "Consensus",
-      "productivity": "Productivity"
-    },
-    "overview": {
-      "totalSessionsTitle": "Total Sessions",
-      "activeSessionsTitle": "Active Sessions",
-      "estimatedTicketsTitle": "Estimated Tickets",
-      "totalParticipantsTitle": "Participants",
-      "sessionsOverTimeTitle": "Sessions Over Time",
-      "sessionsLabel": "Sessions",
-      "noDataAvailable": "No data available for this period"
-    },
-    "sessions": {
-      "summaryTitle": "Sessions Summary",
-      "totalSessionsLabel": "Total Sessions",
-      "activeSessionsLabel": "Active Sessions",
-      "totalTicketsLabel": "Total Tickets",
-      "participationTitle": "Session Participation",
-      "participantsLabel": "Participants",
-      "noDataAvailable": "No data available for this period"
-    },
-    "consensus": {
-      "qualityTitle": "Consensus Quality",
-      "averageConsensusLabel": "Average Consensus",
-      "estimatedTicketsLabel": "Estimated Tickets",
-      "distributionTitle": "Consensus Distribution",
-      "noDataAvailable": "No data available for this period"
-    },
-    "productivity": {
-      "metricsTitle": "Productivity Metrics",
-      "averageVotingTimeLabel": "min",
-      "averageVotingTimeDesc": "Average Voting Time",
-      "completionRateLabel": "Completion Rate",
-      "participationRateTitle": "Participation Rate",
-      "participationRateLabel": "Participation Rate",
-      "noDataAvailable": "No data available for this period"
-    },
-    "noDataFound": "No data found",
-    "noDataDescription": "No data available for the selected filters. Try adjusting the filters or selecting a different period.",
-    "filters": {
-      "title": "Filters",
-      "period": "Period",
-      "project": "Project",
-      "team": "Team",
-      "last7Days": "Last 7 days",
-      "last30Days": "Last 30 days",
-      "last90Days": "Last 90 days",
-      "lastYear": "Last year",
-      "allProjects": "All projects",
-      "allTeams": "All teams"
-    },
-    "metrics": {
-      "totalSessions": "Total Sessions",
-      "activeSessions": "Active Sessions",
-      "totalTickets": "Total Tickets",
-      "estimatedTickets": "Estimated Tickets",
-      "totalParticipants": "Total Participants",
-      "averageConsensus": "Average Consensus",
-      "averageVotingTime": "Average Voting Time"
-    },
-    "charts": {
-      "sessionsOverTime": "Sessions Over Time",
-      "consensusRates": "Consensus Rates",
-      "participationRates": "Participation Rates",
-      "sessions": "Sessions",
-      "participants": "Participants",
-      "participationRate": "Participation Rate"
-    },
-    "export": {
-      "sessions": "Export Sessions",
-      "tickets": "Export Tickets",
-      "consensus": "Export Consensus"
-    },
-    "messages": {
-      "exportSuccess": "Report exported successfully!",
-      "noData": "No data found",
-      "noDataDescription": "No data available for the selected filters"
-    },
-    "errors": {
-      "loadFailed": "Error loading reports",
-      "exportFailed": "Error exporting report",
-      "noData": "No data found",
-      "noDataDescription": "No data available for the selected filters"
-    },
-    "generatedAt": "Generated at"
+    "createProject": "Create Project",
+    "inviteTeam": "Invite Team",
+    "viewReports": "View Reports"
   },
   "filters": {
     "search": "Search",
@@ -576,5 +266,6 @@
     "BAD_REQUEST": "Bad request",
     "DATABASE_ERROR": "Temporary connection error. Reload the page in a few seconds",
     "API_ERROR": "API error"
-  }
+  },
+  "loading": "Loading dashboard..."
 }

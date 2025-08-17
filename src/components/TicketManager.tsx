@@ -11,6 +11,7 @@ import {
   FlagIcon
 } from "@heroicons/react/24/outline";
 import TicketModal from "./TicketModal";
+import "@/i18n/index";
 
 interface TicketManagerProps {
   sessionId: string;
@@ -49,7 +50,7 @@ export default function TicketManager({
   reloadCurrentTicket,
   selectTicketDirectly,
 }: TicketManagerProps) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("tickets");
   const { apiService } = useAuth();
 
   // Função para determinar o texto apropriado baseado no modo de votação
@@ -335,7 +336,7 @@ export default function TicketManager({
   };
 
   const handleDeleteTicket = async (ticketId: string) => {
-    if (!confirm(t("tickets.deleteConfirm"))) return;
+    if (!confirm(t("deleteConfirm"))) return;
 
     try {
       const response = await apiService.deleteTicket(ticketId);
@@ -417,13 +418,13 @@ export default function TicketManager({
   const getPriorityLabel = (priority: any) => { // Priority type is not directly imported, so using 'any' for now
     switch (priority) {
       case "LOW":
-        return t("tickets.priority.low");
+        return t("priority.low");
       case "MEDIUM":
-        return t("tickets.priority.medium");
+        return t("priority.medium");
       case "HIGH":
-        return t("tickets.priority.high");
+        return t("priority.high");
       case "URGENT":
-        return t("tickets.priority.urgent");
+        return t("priority.urgent");
       default:
         return priority;
     }
@@ -432,11 +433,11 @@ export default function TicketManager({
   const getStatusLabel = (status: any) => { // TicketStatus type is not directly imported, so using 'any' for now
     switch (status) {
       case "PENDING":
-        return t("tickets.status.pending");
+        return t("status.pending");
       case "VOTING":
-        return t("tickets.status.voting");
+        return t("status.voting");
       case "ESTIMATED":
-        return t("tickets.status.estimated");
+        return t("status.estimated");
       default:
         return status;
     }
@@ -461,14 +462,14 @@ export default function TicketManager({
       {/* Header com título e botão de adicionar */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold text-gray-900">
-          {t("tickets.title")}
+          {t("title")}
         </h3>
         {isCreator && (
           <button
             onClick={() => setShowModal(true)}
             className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
           >
-            {t("tickets.create")}
+            {t("create")}
           </button>
         )}
       </div>
@@ -494,7 +495,7 @@ export default function TicketManager({
         </div>
       ) : tickets.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          {t("tickets.empty")}
+          {t("empty")}
         </div>
       ) : (
         <div className="space-y-3">
@@ -535,7 +536,7 @@ export default function TicketManager({
                     )}
                     {!ticket.finalEstimate && ticket.averageVote && (
                       <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                        Média: {typeof ticket.averageVote === 'number' ? ticket.averageVote.toFixed(1) : ticket.averageVote}
+                        {t("average")}: {typeof ticket.averageVote === 'number' ? ticket.averageVote.toFixed(1) : ticket.averageVote}
                       </span>
                     )}
                   </div>
@@ -543,26 +544,26 @@ export default function TicketManager({
                   {/* Dica visual para tickets selecionados */}
                   {currentTicketId === ticket.id && (
                     <div className="mt-2 text-xs text-blue-600 font-medium">
-                      {t("tickets.hints.selectedForVoting")}
+                      {t("hints.selectedForVoting")}
                     </div>
                   )}
                   
                   {/* Dicas visuais para diferentes status */}
                   {currentTicketId !== ticket.id && ticket.status === "PENDING" && (
                     <div className="mt-2 text-xs text-blue-600 font-medium">
-                      {isCreator ? t("tickets.hints.pendingCreator") : t("tickets.hints.pendingParticipant")}
+                      {isCreator ? t("hints.pendingCreator") : t("hints.pendingParticipant")}
                     </div>
                   )}
                   
                   {currentTicketId !== ticket.id && ticket.status === "VOTING" && (
                     <div className="mt-2 text-xs text-blue-600 font-medium">
-                      ⏳ {t("tickets.status.voting")} - {isCreator ? t("tickets.hints.votingCreator") : t("tickets.hints.votingParticipant")}
+                      ⏳ {t("status.voting")} - {isCreator ? t("hints.votingCreator") : t("hints.votingParticipant")}
                     </div>
                   )}
                   
                   {currentTicketId !== ticket.id && ticket.status === "ESTIMATED" && (
                     <div className="mt-2 text-xs text-green-600 font-medium">
-                      ✅ {t("tickets.status.estimated")} - {isCreator ? t("tickets.hints.estimatedCreator") : t("tickets.hints.estimatedParticipant")}
+                      ✅ {t("status.estimated")} - {isCreator ? t("hints.estimatedCreator") : t("hints.estimatedParticipant")}
                     </div>
                   )}
                   
@@ -574,7 +575,7 @@ export default function TicketManager({
                   )}
                   {currentTicketId === ticket.id && ticket.status === "ESTIMATED" && (
                     <div className="mt-2 text-xs text-orange-600 font-medium">
-                      {t("tickets.hints.currentEstimated")}
+                      {t("hints.currentEstimated")}
                     </div>
                   )}
                 </div>
@@ -589,7 +590,7 @@ export default function TicketManager({
                           onOpenFinalEstimateModal(ticket); 
                         }} 
                         className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-all duration-200 hover:scale-110 active:scale-95" 
-                        title={t("tickets.buttons.updateEstimate")}
+                        title={t("buttons.updateEstimate")}
                       > 
                         <FlagIcon className="h-4 w-4" /> 
                       </button>
@@ -602,7 +603,7 @@ export default function TicketManager({
                         startEditTicket(ticket); 
                       }} 
                       className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded transition-colors" 
-                      title={t("tickets.buttons.edit")}
+                      title={t("buttons.edit")}
                     > 
                       <PencilIcon className="h-4 w-4" /> 
                     </button>
@@ -614,7 +615,7 @@ export default function TicketManager({
                         handleDeleteTicket(ticket.id); 
                       }} 
                       className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors" 
-                      title={t("tickets.buttons.delete")}
+                      title={t("buttons.delete")}
                     > 
                       <TrashIcon className="h-4 w-4" /> 
                     </button>

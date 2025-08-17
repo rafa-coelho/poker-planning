@@ -1,0 +1,132 @@
+{
+  "title": "Relatórios & Analytics",
+  "description": "Analise o desempenho das suas sessões de planning poker",
+  "actions": {
+    "configureReport": "Configurar Relatório"
+  },
+  "config": {
+    "title": "Configure seu relatório",
+    "description": "Selecione os filtros desejados para gerar relatórios personalizados sobre suas sessões de planning poker.",
+    "filtersTitle": "Filtros do Relatório",
+    "periodLabel": "Período de Análise",
+    "teamLabel": "Time (Opcional)",
+    "projectLabel": "Projeto (Opcional)",
+    "period7d": "Últimos 7 dias",
+    "period30d": "Últimos 30 dias",
+    "period90d": "Últimos 90 dias",
+    "period1y": "Último ano",
+    "allTeams": "Todos os times",
+    "allProjects": "Todos os projetos",
+    "noProjectsForTeam": "Nenhum projeto disponível para este time",
+    "summaryTitle": "Resumo da Análise",
+    "period": "Período",
+    "team": "Time",
+    "project": "Projeto",
+    "generateReport": "Gerar Relatório",
+    "generatingReport": "Gerando Relatório...",
+    "newAnalysis": "Nova Análise",
+    "export": "Exportar",
+    "analysisTypes": {
+      "temporal": {
+        "title": "Análise Temporal",
+        "description": "Visualize tendências ao longo do tempo e compare diferentes períodos."
+      },
+      "consensus": {
+        "title": "Qualidade das Estimativas",
+        "description": "Analise o consenso da equipe e identifique oportunidades de melhoria."
+      },
+      "productivity": {
+        "title": "Produtividade",
+        "description": "Monitore a eficiência das sessões e tempo médio de votação."
+      }
+    }
+  },
+  "tabs": {
+    "overview": "Visão Geral",
+    "sessions": "Sessões",
+    "consensus": "Consenso",
+    "productivity": "Produtividade"
+  },
+  "overview": {
+    "totalSessionsTitle": "Total de Sessões",
+    "activeSessionsTitle": "Sessões Ativas",
+    "estimatedTicketsTitle": "Tickets Estimados",
+    "totalParticipantsTitle": "Participantes",
+    "sessionsOverTimeTitle": "Sessões ao Longo do Tempo",
+    "sessionsLabel": "Sessões",
+    "noDataAvailable": "Nenhum dado disponível para este período"
+  },
+  "sessions": {
+    "summaryTitle": "Resumo das Sessões",
+    "totalSessionsLabel": "Total de Sessões",
+    "activeSessionsLabel": "Sessões Ativas",
+    "totalTicketsLabel": "Total de Tickets",
+    "participationTitle": "Participação nas Sessões",
+    "participantsLabel": "Participantes",
+    "noDataAvailable": "Nenhum dado disponível para este período"
+  },
+  "consensus": {
+    "qualityTitle": "Qualidade do Consenso",
+    "averageConsensusLabel": "Consenso Médio",
+    "estimatedTicketsLabel": "Tickets Estimados",
+    "distributionTitle": "Distribuição do Consenso",
+    "noDataAvailable": "Nenhum dado disponível para este período"
+  },
+  "productivity": {
+    "metricsTitle": "Métricas de Produtividade",
+    "averageVotingTimeLabel": "min",
+    "averageVotingTimeDesc": "Tempo Médio de Votação",
+    "completionRateLabel": "Taxa de Conclusão",
+    "participationRateTitle": "Taxa de Participação",
+    "participationRateLabel": "Taxa de Participação",
+    "noDataAvailable": "Nenhum dado disponível para este período"
+  },
+  "noDataFound": "Nenhum dado encontrado",
+  "noDataDescription": "Nenhum dado disponível para os filtros selecionados. Tente ajustar os filtros ou selecionar um período diferente.",
+  "filters": {
+    "title": "Filtros",
+    "period": "Período",
+    "project": "Projeto",
+    "team": "Time",
+    "last7Days": "Últimos 7 dias",
+    "last30Days": "Últimos 30 dias",
+    "last90Days": "Últimos 90 dias",
+    "lastYear": "Último ano",
+    "allProjects": "Todos os projetos",
+    "allTeams": "Todos os times"
+  },
+  "metrics": {
+    "totalSessions": "Total de Sessões",
+    "activeSessions": "Sessões Ativas",
+    "totalTickets": "Total de Tickets",
+    "estimatedTickets": "Tickets Estimados",
+    "totalParticipants": "Total de Participantes",
+    "averageConsensus": "Consenso Médio",
+    "averageVotingTime": "Tempo Médio de Votação"
+  },
+  "charts": {
+    "sessionsOverTime": "Sessões ao Longo do Tempo",
+    "consensusRates": "Taxas de Consenso",
+    "participationRates": "Taxas de Participação",
+    "sessions": "Sessões",
+    "participants": "Participantes",
+    "participationRate": "Taxa de Participação"
+  },
+  "export": {
+    "sessions": "Exportar Sessões",
+    "tickets": "Exportar Tickets",
+    "consensus": "Exportar Consenso"
+  },
+  "messages": {
+    "exportSuccess": "Relatório exportado com sucesso!",
+    "noData": "Nenhum dado encontrado",
+    "noDataDescription": "Nenhum dado disponível para os filtros selecionados"
+  },
+  "errors": {
+    "loadFailed": "Erro ao carregar relatórios",
+    "exportFailed": "Erro ao exportar relatório",
+    "noData": "Nenhum dado encontrado",
+    "noDataDescription": "Nenhum dado disponível para os filtros selecionados"
+  },
+  "generatedAt": "Gerado em"
+} 

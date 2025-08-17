@@ -1,66 +1,34 @@
 {
   "copyright": "© {{year}} {{appName}}. All rights reserved.",
-  "feelingLonely": "Feeling lonely?",
-  "invitePlayers": "Invite players",
-  "pickYourCards": "Pick your cards!",
-  "noCard": "No card?",
-  "chooseYourCard": "Choose your card",
-  "flipCards": "Flip cards",
-  "startNewVoting": "New voting",
-  "shareThisLink": "Share this link with your team:",
-  "share": "Share",
   "close": "Close",
-  "linkCopied": "Link copied!",
-  "copyLink": "Copy Link",
-  "teamMembers": "Team Members",
-  "selectTeamMembersToInvite": "Select team members to invite:",
-  "noTeamMembers": "No team members found",
-  "selectMembersToInvite": "Select at least one member to invite",
-  "invitesSent": "{{count}} invite(s) sent successfully",
-  "errorSendingInvites": "Error sending invites",
-  "inviteSelected": "Invite Selected",
-  "sending": "Sending...",
-  "endSession": "End Session",
-  "backToDashboard": "Back to Dashboard",
+  "cancel": "Cancel",
+  "saving": "Saving...",
+  "error": "Error",
+  "loading": "Loading...",
+  "noItems": "No items found",
+  "tryAgain": "Try again",
   "menu": "Menu",
   "reports": "Reports",
   "teams": "Teams",
   "projects": "Projects",
   "settings": "Settings",
+  "profile": "Profile",
+  "logout": "Logout",
   "collapse": "Collapse",
   "expand": "Expand menu",
-  "sessionName": "Session name",
-  "votes": "Votes",
-  "average": "Average",
-  "agreement": "Agreement",
-  "welcomeTitle": "Welcome to Poker Planning",
-  "welcomeDescription": "Create a session and invite your team to estimate tasks easily!",
-  "sessionPlaceholder": "Type a name for the session...",
-  "createGame": "Create Session",
-  "errorEnterSessionName": "Please enter a session name!",
-  "joinSessionTitle": "Join Planning Poker Session",
-  "joinSessionDescription": "Enter your name to join the session:",
-  "yourName": "Your Name",
-  "namePlaceholder": "Enter your name...",
-  "enterSession": "Join Session",
-  "errorEnterName": "Please enter your name!",
-  "requestPermission": "Request Permission",
-  "requestingPermission": "Requesting...",
-  "permissionRequested": "Permission Requested",
-  "permissionApproved": "Permission Approved!",
-  "permissionRejected": "Permission Rejected",
-  "cancel": "Cancel",
-  "error": "Error",
-  "tryAgain": "Try Again",
-  "askPermission": "Ask Permission",
-  "login": "Login",
-  "pendingRequests": "Pending Requests",
-  "noPendingRequests": "No pending requests",
-  "pending": "pending",
-  "noPendingRequestsMessage": "No pending requests at the moment.",
-  "requestedAt": "Requested at",
-  "approveDescription": "The participant will be added to the session",
-  "rejectDescription": "The request will be removed",
+  "filters": {
+    "search": "Search",
+    "searchPlaceholder": "Search...",
+    "status": "Status",
+    "allStatuses": "All Statuses",
+    "allModes": "All Modes",
+    "clear": "Clear Filters"
+  },
+  "pagination": {
+    "showing": "Showing {{from}} to {{to}} of {{total}} results",
+    "previous": "Previous",
+    "next": "Next"
+  },
   "validation": {
     "nameRequired": "Name is required",
     "nameTooShort": "Name must have at least 2 characters",
@@ -84,284 +52,10 @@
     "participantCreated": "Request sent successfully! Waiting for session owner approval.",
     "internalError": "Internal server error.",
     "unauthorized": "Authentication token required",
-    "invalidToken": "Invalid or unauthorized token for this participant",
+    "invalidToken": "Invalid token or not authorized for this participant",
     "participantNotFound": "Participant not found.",
     "tempTokenRequired": "Temporary token required for pending participants",
-    "invalidTempToken": "Invalid or unauthorized temporary token for this participant"
-  },
-      "join": {
-      "notificationMessage": "You will receive a notification when approved.",
-      "howToParticipate": "How to participate in this session",
-      "twoOptions": "You have two options to participate:",
-      "loginOption": "Login: Direct access to session (if you have permission)",
-      "permissionOption": "Request Permission: Request access as guest",
-      "sessionPlanningPoker": "Planning Poker Session",
-      "checkingStatus": "Checking request status...",
-      "approvedRedirecting": "Approved! Redirecting to session...",
-      "rejectedMessage": "Your request was rejected.",
-      "checkStatus": "Check Status",
-      "backToRequest": "Back to Request"
-    },
-  "menu": "Menu",
-  "auth": {
-    "common": {
-      "loading": "Loading...",
-      "error": "Internal server error"
-    },
-    "login": {
-      "title": "Login",
-      "subtitle": "Sign in to your account",
-      "email": "Email",
-      "password": "Password",
-      "emailPlaceholder": "Enter your email...",
-      "passwordPlaceholder": "Enter your password...",
-      "loginButton": "Sign in",
-      "submit": "Sign in",
-      "forgotPassword": "Forgot password?",
-      "noAccount": "Don't have an account?",
-      "register": "Register",
-      "registerLink": "Create account",
-      "errors": {
-        "requiredEmail": "Email is required",
-        "invalidEmail": "Invalid email",
-        "requiredPassword": "Password is required",
-        "invalidCredentials": "Invalid email or password",
-        "serverError": "Internal server error"
-      }
-    },
-    "register": {
-      "title": "Register",
-      "subtitle": "Create your account",
-      "name": "Name",
-      "email": "Email",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "organizationName": "Organization Name",
-      "namePlaceholder": "Enter your full name...",
-      "emailPlaceholder": "Enter your email...",
-      "passwordPlaceholder": "Enter your password...",
-      "confirmPasswordPlaceholder": "Confirm your password...",
-      "organizationPlaceholder": "Enter your organization name...",
-      "registerButton": "Create account",
-      "submit": "Register",
-      "hasAccount": "Already have an account?",
-      "login": "Sign in",
-      "loginLink": "Login",
-      "errors": {
-        "nameRequired": "Name is required",
-        "emailRequired": "Email is required",
-        "passwordRequired": "Password is required",
-        "confirmPasswordRequired": "Password confirmation is required",
-        "organizationRequired": "Organization name is required",
-        "invalidEmail": "Invalid email",
-        "passwordTooShort": "Password must have at least 6 characters",
-        "passwordsDoNotMatch": "Passwords do not match",
-        "emailAlreadyExists": "Email is already in use",
-        "organizationAlreadyExists": "Organization name is already in use",
-        "validationError": "Invalid data",
-        "emailExists": "Email already in use",
-        "weakPassword": "Password too weak",
-        "serverError": "Internal server error"
-      }
-    },
-    "forgotPassword": {
-      "title": "Forgot password?",
-      "subtitle": "Enter your email to receive a recovery link",
-      "email": "Email",
-      "emailPlaceholder": "Enter your email...",
-      "sendButton": "Send recovery link",
-      "submit": "Send recovery link",
-      "backToLogin": "Back to login",
-      "success": "If the email exists, you will receive a recovery link",
-      "errors": {
-        "emailRequired": "Email is required",
-        "invalidEmail": "Invalid email",
-        "userNotFound": "User not found",
-        "emailNotConfigured": "Email service not configured",
-        "rateLimitExceeded": "Too many attempts. Try again in a few minutes",
-        "resetTokenExists": "A valid recovery link already exists",
-        "serverError": "Internal server error"
-      }
-    },
-    "resetPassword": {
-      "title": "Reset Password",
-      "subtitle": "Enter your new password",
-      "newPassword": "New Password",
-      "newPasswordPlaceholder": "Enter your new password",
-      "confirmPassword": "Confirm Password",
-      "confirmPasswordPlaceholder": "Confirm your new password",
-      "submit": "Change Password",
-      "backToLogin": "Back to login",
-      "passwordRequirements": "Minimum 6 characters",
-      "passwordsMatch": "Passwords match",
-      "success": "Password changed successfully!",
-      "invalidToken": "Invalid or expired token",
-      "passwordTooShort": "Password must have at least 6 characters",
-      "passwordsDoNotMatch": "Passwords do not match",
-      "error": "Error changing password",
-      "errors": {
-        "invalidToken": "Invalid or expired token",
-        "passwordTooShort": "Password must have at least 6 characters",
-        "passwordsDoNotMatch": "Passwords do not match",
-        "tokenExpired": "Token expired",
-        "serverError": "Internal server error"
-      }
-    },
-    "invite": {
-      "title": "Accept Invitation",
-      "subtitle": "Set a password for your account",
-      "newPassword": "Your Password",
-      "newPasswordPlaceholder": "Enter a secure password",
-      "confirmPassword": "Confirm Password",
-      "confirmPasswordPlaceholder": "Confirm your password",
-      "submit": "Accept Invitation",
-      "backToLogin": "Back to login",
-      "passwordRequirements": "Minimum 6 characters",
-      "passwordsMatch": "Passwords match",
-      "success": "Invitation accepted! Your account has been set up successfully.",
-      "invalidToken": "Invalid or expired invitation",
-      "passwordTooShort": "Password must have at least 6 characters",
-      "passwordsDoNotMatch": "Passwords do not match",
-      "error": "Error accepting invitation",
-      "errors": {
-        "invalidToken": "Invalid or expired invitation",
-        "passwordTooShort": "Password must have at least 6 characters",
-        "passwordsDoNotMatch": "Passwords do not match",
-        "tokenExpired": "Invitation expired",
-        "inviteAlreadyUsed": "Invitation already used",
-        "serverError": "Internal server error"
-      }
-    }
-  },
-  "logs": {
-    "session": {
-      "loadingSessionData": "Loading session data...",
-      "sessionDataLoaded": "Session data loaded successfully",
-      "sessionDataError": "Error loading session data",
-      "loadingCurrentTicket": "Loading current ticket...",
-      "currentTicketLoaded": "Current ticket loaded successfully",
-      "currentTicketError": "Error loading current ticket",
-      "socketConnecting": "Connecting to WebSocket...",
-      "socketConnected": "Connected to WebSocket",
-      "socketDisconnected": "Disconnected from WebSocket",
-      "votingStarted": "Voting started",
-      "votingStartedError": "Error starting voting",
-      "votingFinished": "Voting finished",
-      "votingFinishedError": "Error finishing voting",
-      "finalEstimateSet": "Final estimate set",
-      "finalEstimateError": "Error setting final estimate",
-      "cardSelected": "Card selected",
-      "cardsFlipped": "Cards flipped",
-      "newVotingStarted": "New voting started"
-    }
-  },
-  "tickets": {
-    "title": "Tickets",
-    "create": "Create Ticket",
-    "update": "Update Ticket",
-    "edit": "Edit Ticket",
-    "delete": "Delete",
-    "deleteConfirm": "Are you sure you want to delete this ticket?",
-    "startVoting": "Start Voting",
-    "finishVoting": "Finish Voting",
-    "revote": "Re-vote",
-    "setFinalEstimate": "Set Final Estimate",
-    "empty": "No tickets created yet",
-    "form": {
-      "title": "Title",
-      "titlePlaceholder": "Enter ticket title",
-      "description": "Description",
-      "descriptionPlaceholder": "Enter ticket description (optional)",
-      "priority": "Priority",
-      "finalEstimate": "Final Estimate",
-      "finalEstimatePlaceholder": "Ex: 8, 13, 21...",
-      "finalEstimateHelp": "Final value set for this ticket"
-    },
-    "priority": {
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High",
-      "urgent": "Urgent"
-    },
-    "status": {
-      "pending": "Pending",
-      "voting": "Voting",
-      "estimated": "Estimated"
-    },
-    "errors": {
-      "titleRequired": "Title is required",
-      "createFailed": "Error creating ticket",
-      "updateFailed": "Error updating ticket",
-      "deleteFailed": "Error deleting ticket"
-    },
-    "finalEstimate": {
-      "title": "Set Final Estimate",
-      "averageVote": "Average vote",
-      "finalValue": "Final value",
-      "placeholder": "Enter final value...",
-      "help": "You can use the average as a base or set a different value",
-      "confirm": "Confirm Estimate"
-    },
-    "buttons": {
-      "edit": "Edit ticket",
-      "delete": "Delete ticket",
-      "updateEstimate": "Update estimate"
-    },
-    "hints": {
-      "selectToVote": "Click to select and vote",
-      "waitingForCreator": "Waiting for creator selection",
-      "estimated": "Ticket already estimated",
-      "voting": "Voting in progress",
-      "selectedForVoting": "Selected for voting",
-      "pendingCreator": "Click to start voting",
-      "pendingParticipant": "Waiting for creator selection",
-      "votingCreator": "Voting in progress",
-      "votingParticipant": "Vote now!",
-      "estimatedCreator": "Estimated - click to re-vote",
-      "estimatedParticipant": "Ticket already estimated",
-      "currentEstimated": "Re-voting estimated ticket"
-    }
-  },
-  "session": {
-    "endSession": {
-      "confirm": "Are you sure you want to end this session? This action cannot be undone."
-    },
-    "ended": {
-      "title": "Session Ended",
-      "message": "This Poker Planning session has been ended by the creator. Thank you for participating!",
-      "sessionId": "Session ID",
-      "closeTab": "Close Tab",
-      "goHome": "Go Home"
-    },
-    "defaultName": "Poker Planning Session",
-    "anonymous": "Anonymous",
-    "revoting": "Re-voting",
-    "units": {
-      "storyPoints": "Story Points",
-      "hours": "Hours",
-      "days": "Days"
-    },
-    "table": {
-      "disabled": "Select a ticket to start voting",
-      "noTicketSelected": "No ticket selected",
-      "noTicketSelectedCreator": "No ticket selected",
-      "noTicketSelectedParticipant": "Waiting for ticket selection",
-      "selectTicketHintCreator": "Select a ticket to start voting",
-      "selectTicketHintParticipant": "The creator needs to select a ticket first"
-    },
-    "participantLeft": {
-      "title": "Participant left",
-      "message": "{{userName}} left the session"
-    },
-    "participantJoined": {
-      "title": "Participant joined",
-      "message": "{{userName}} joined the session"
-    },
-    "errors": {
-      "startVoting": "Error starting voting",
-      "finishVoting": "Error finishing voting",
-      "setFinalEstimate": "Error setting final estimate"
-    }
+    "invalidTempToken": "Invalid temporary token or not authorized for this participant"
   },
   "loading": {
     "general": "Loading...",
@@ -370,7 +64,6 @@
     "users": "Loading users...",
     "sessions": "Loading sessions..."
   },
-  "createdBy": "Created by",
   "actions": {
     "viewDetails": "View details",
     "viewTeamDetails": "View team details",
@@ -383,7 +76,8 @@
     "activateProject": "Activate project"
   },
   "errors": {
-    "createSession": "Error creating session"
+    "createSession": "Error creating session",
+    "componentLoadError": "Error loading component"
   },
   "limits": {
     "reached": "{{resource}} limit reached (maximum: {{limit}}). Upgrade your plan to increase limits.",

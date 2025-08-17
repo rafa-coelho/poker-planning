@@ -7,6 +7,7 @@
     "dev:server": "node server.js",
     "dev:full": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "start:server": "node server.js",
     "start:full": "npm run build && concurrently \"npm run start:server\" \"npm run start\"",
@@ -22,7 +23,13 @@
     "db:push": "npx prisma db push",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f postgres"
+    "docker:logs": "docker-compose logs -f postgres",
+    "perf:analyze": "node scripts/analyze-bundle.js all",
+    "perf:bundle": "node scripts/analyze-bundle.js bundle",
+    "perf:deps": "node scripts/analyze-bundle.js deps",
+    "perf:static": "node scripts/analyze-bundle.js static",
+    "perf:report": "node scripts/analyze-bundle.js report",
+    "perf:lighthouse": "lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

@@ -17,7 +17,7 @@ interface ForgotPasswordErrors {
 }
 
 export default function ForgotPasswordPage() {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("auth");
   const [form, setForm] = useState<ForgotPasswordForm>({
     email: ''
   });
@@ -29,9 +29,9 @@ export default function ForgotPasswordPage() {
     const newErrors: ForgotPasswordErrors = {};
 
     if (!form.email.trim()) {
-      newErrors.email = t('auth.forgotPassword.errors.emailRequired');
+      newErrors.email = t('forgotPassword.errors.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = t('auth.forgotPassword.errors.invalidEmail');
+      newErrors.email = t('forgotPassword.errors.invalidEmail');
     }
 
     setErrors(newErrors);
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
 
       if (!response.ok) {
         setErrors({
-          general: data.error?.message || t('auth.common.error')
+          general: data.error?.message || t('common.error')
         });
         return;
       }
@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
       setIsSuccess(true);
     } catch (error) {
       setErrors({
-        general: t('auth.common.error')
+        general: t('common.error')
       });
     } finally {
       setIsLoading(false);
@@ -94,10 +94,10 @@ export default function ForgotPasswordPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {t('auth.forgotPassword.title')}
+              {t('forgotPassword.title')}
             </h2>
             <p className="text-gray-600">
-              {t('auth.forgotPassword.success')}
+              {t('forgotPassword.success')}
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
             >
-              {t('auth.forgotPassword.backToLogin')}
+              {t('forgotPassword.backToLogin')}
             </Link>
           </div>
         </div>
@@ -119,10 +119,10 @@ export default function ForgotPasswordPage() {
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900">
-            {t('auth.forgotPassword.title')}
+            {t('forgotPassword.title')}
           </h2>
           <p className="text-gray-600 mt-2">
-            {t('auth.forgotPassword.subtitle')}
+            {t('forgotPassword.subtitle')}
           </p>
         </div>
 
@@ -135,14 +135,14 @@ export default function ForgotPasswordPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('auth.forgotPassword.email')}
+              {t('forgotPassword.email')}
             </label>
             <input
               id="email"
               type="email"
               value={form.email}
               onChange={handleInputChange}
-              placeholder={t('auth.forgotPassword.emailPlaceholder')}
+              placeholder={t('forgotPassword.emailPlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.email ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -164,10 +164,10 @@ export default function ForgotPasswordPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {t('auth.common.loading')}
+                {t('common.loading')}
               </div>
             ) : (
-              t('auth.forgotPassword.sendButton')
+              t('forgotPassword.sendButton')
             )}
           </button>
         </form>
@@ -177,7 +177,7 @@ export default function ForgotPasswordPage() {
             href="/login"
             className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
           >
-            {t('auth.forgotPassword.backToLogin')}
+            {t('forgotPassword.backToLogin')}
           </Link>
         </div>
       </div>

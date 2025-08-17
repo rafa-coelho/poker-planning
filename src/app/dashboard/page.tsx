@@ -239,13 +239,13 @@ export default function DashboardPage() {
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-medium text-gray-900">
-              {t('sessions.recent')}
+              {t('recent')}
             </h3>
           </div>
           <div className="divide-y divide-gray-200">
             {stats.recentSessions.length === 0 ? (
               <div className="px-6 py-4 text-center text-gray-500">
-                {t('sessions.noSessions')}
+                {t('noSessions')}
               </div>
             ) : (
               stats.recentSessions.map((session) => (
@@ -279,7 +279,7 @@ export default function DashboardPage() {
                 onClick={handleNavigateToSessions}
                 className="text-sm text-blue-600 hover:text-blue-900 font-medium"
               >
-                {t('sessions.viewAll')}
+                {t('viewAll')}
               </button>
             </div>
           )}
@@ -300,7 +300,7 @@ export default function DashboardPage() {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              {t('sessions.new')}
+              {t('new')}
             </button>
             <button
               onClick={handleNavigateToSessions}
@@ -309,7 +309,7 @@ export default function DashboardPage() {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              {t('sessions.title')}
+              {t('viewSessions')}
             </button>
           </div>
         </div>

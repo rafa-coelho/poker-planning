@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
+import "@/i18n/index";
 
 interface VoteBarProps {
   cards: string[];
@@ -11,7 +12,7 @@ interface VoteBarProps {
 }
 
 export default function VoteBar({ cards, selectedCard, onSelectCard, disabled }: VoteBarProps) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("sessions");
   return (
     <div className="w-full bg-white border-t py-2 flex flex-col items-center z-50">
       <p className="text-gray-600 text-sm mb-1">{t("chooseYourCard")}</p>

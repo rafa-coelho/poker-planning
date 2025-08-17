@@ -3,11 +3,15 @@ import { SessionService } from '@/lib/services/sessionService'
 import { withTenantIsolation, TenantContext } from '@/lib/middleware/tenant'
 import { SessionStatus, VotingMode } from '@prisma/client'
 import i18next from 'i18next'
+import { cacheService } from '@/lib/services/cacheService'
+import { monitorApiResponse, monitorDatabaseQuery } from '@/lib/services/performanceService'
 
 /**
  * GET /api/sessions - Lista sessões da organização
  */
 async function listSessions(req: NextRequest, context: TenantContext) {
+  const startTime = Date.now()
+  
   try {
     const { searchParams } = new URL(req.url)
     const page = parseInt(searchParams.get('page') || '1')
@@ -19,18 +23,53 @@ async function listSessions(req: NextRequest, context: TenantContext) {
     const search = searchParams.get('search') || undefined
     const projectId = searchParams.get('projectId') || undefined
 
-    const result = await SessionService.listSessions(context.organizationId, {
-      page,
-      limit,
-      status,
-      votingMode,
-      search,
-      projectId,
-      userId: context.userId,
-      userRole: context.userRole,
-    })
+    // 🚀 Otimização: Usar cache para primeira página sem filtros
+    const useCache = page === 1 && !search && !status && !votingMode && !projectId
+    let result
 
-    return NextResponse.json({
+    if (useCache) {
+      const cacheKey = cacheService.generateKey('sessions_list', {
+        organizationId: context.organizationId,
+        page,
+        limit
+      })
+      
+      result = await cacheService.getOrSet(cacheKey, async () => {
+        const dbStartTime = Date.now()
+        const data = await SessionService.listSessions(context.organizationId, {
+          page,
+          limit,
+          status,
+          votingMode,
+          search,
+          projectId,
+          userId: context.userId,
+          userRole: context.userRole,
+        })
+        
+        const dbDuration = Date.now() - dbStartTime
+        monitorDatabaseQuery('listSessions', dbDuration, true)
+        
+        return data
+      }, 2 * 60 * 1000) // 2 minutos de cache
+    } else {
+      const dbStartTime = Date.now()
+      result = await SessionService.listSessions(context.organizationId, {
+        page,
+        limit,
+        status,
+        votingMode,
+        search,
+        projectId,
+        userId: context.userId,
+        userRole: context.userRole,
+      })
+      
+      const dbDuration = Date.now() - dbStartTime
+      monitorDatabaseQuery('listSessions', dbDuration, true)
+    }
+
+    const response = {
       success: true,
       data: result.sessions,
       pagination: {
@@ -39,9 +78,18 @@ async function listSessions(req: NextRequest, context: TenantContext) {
         totalPages: result.totalPages,
         limit,
       }
-    })
+    }
+
+    // 📊 Monitorar performance da API
+    monitorApiResponse('/api/sessions', startTime, true, 200)
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('List sessions error:', error)
+    
+    // 📊 Monitorar erro
+    monitorApiResponse('/api/sessions', startTime, false, 500)
+    
     return NextResponse.json(
       { 
         error: {

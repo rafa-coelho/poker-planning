@@ -32,7 +32,7 @@ interface Filters {
 }
 
 export default function SessionsPage() {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("sessions");
   const router = useRouter();
   const { apiService } = useAuth();
   const { clearBreadcrumbs } = useBreadcrumbs();
@@ -194,20 +194,16 @@ export default function SessionsPage() {
       minute: '2-digit'
     });
   };
-
-
-
-  console.log('Estado atual:', { sessions: sessions.length, loading, error });
   
   return (
     <div>
       <div className="mb-8">
         <PageHeader
-          title={t('sessions.title')}
-          subtitle={t('sessions.description')}
+          title={t('title')}
+          subtitle={t('description')}
           iconText="S"
           iconBg="#F59E0B"
-          primaryAction={{ label: t('sessions.new'), onClick: handleCreateSession }}
+          primaryAction={{ label: t('new'), onClick: handleCreateSession }}
         />
       </div>
 
@@ -285,8 +281,8 @@ export default function SessionsPage() {
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">{t('sessions.noSessions')}</h3>
-            <p className="mt-1 text-sm text-gray-500">{t('sessions.createFirst')}</p>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">{t('noSessions')}</h3>
+            <p className="mt-1 text-sm text-gray-500">{t('createFirst')}</p>
             <div className="mt-6">
               <button
                 onClick={handleCreateSession}
@@ -295,7 +291,7 @@ export default function SessionsPage() {
                 <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                {t('sessions.createSession')}
+                {t('createSession')}
               </button>
             </div>
           </div>
@@ -305,7 +301,7 @@ export default function SessionsPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('sessions.title')}
+                    {t('title')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {t('session.status')}
@@ -326,14 +322,14 @@ export default function SessionsPage() {
                     {t('session.createdAt')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ações
+                    {t('table.actions')}
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center">
+                    <td colSpan={8} className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                         <span className="ml-2 text-gray-600">{t('loading.sessions')}</span>
@@ -342,14 +338,14 @@ export default function SessionsPage() {
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center text-red-600">
+                    <td colSpan={8} className="px-6 py-4 text-center text-red-600">
                       {error}
                     </td>
                   </tr>
                 ) : sessions.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                      {t('sessions.noSessions')}
+                    <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
+                      {t('noSessions')}
                     </td>
                   </tr>
                 ) : (
@@ -396,7 +392,7 @@ export default function SessionsPage() {
                           onClick={() => handleEditSession(session.id)}
                           className="text-green-600 hover:text-green-900"
                         >
-                          {t('sessions.edit')}
+                          {t('edit')}
                         </button>
                       )}
                     </td>

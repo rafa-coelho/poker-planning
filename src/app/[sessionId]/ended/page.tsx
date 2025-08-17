@@ -8,7 +8,7 @@ import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import "../../../i18n/index";
 
 export default function SessionEndedPage() {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("sessions");
   const params = useParams();
   const sessionId = params.sessionId as string;
 
@@ -23,16 +23,16 @@ export default function SessionEndedPage() {
         </div>
         
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          {t("session.ended.title")}
+          {t("ended.title")}
         </h1>
         
         <p className="text-gray-600 mb-6">
-          {t("session.ended.message")}
+          {t("ended.message")}
         </p>
         
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <p className="text-sm text-gray-500">
-            {t("session.ended.sessionId")}: <span className="font-mono text-gray-700">{sessionId}</span>
+            {t("ended.sessionId")}: <span className="font-mono text-gray-700">{sessionId}</span>
           </p>
         </div>
         
@@ -41,14 +41,14 @@ export default function SessionEndedPage() {
             onClick={() => window.close()}
             className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
-            {t("session.ended.closeTab")}
+            {t("ended.closeTab")}
           </button>
           
           <button
             onClick={() => window.location.href = "/"}
             className="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
           >
-            {t("session.ended.goHome")}
+            {t("ended.goHome")}
           </button>
         </div>
       </div>

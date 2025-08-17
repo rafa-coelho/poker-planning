@@ -26,13 +26,13 @@ interface Session {
 }
 
 export default function EditSessionPage() {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("sessions");
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const { apiService } = useAuth();
   const { setBreadcrumbs } = useBreadcrumbs();
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +69,7 @@ export default function EditSessionPage() {
         { name: t('breadcrumbs.dashboard'), href: '/dashboard' },
         { name: t('breadcrumbs.sessions'), href: '/dashboard/sessions' },
         { name: session.name, href: `/dashboard/sessions/${session.id}` },
-        { name: t('sessions.edit'), href: `/dashboard/sessions/${session.id}/edit` }
+        { name: t('edit'), href: `/dashboard/sessions/${session.id}/edit` }
       ]);
     }
   }, [session, setBreadcrumbs, t]);
@@ -78,11 +78,11 @@ export default function EditSessionPage() {
     try {
       setLoading(true);
       const response = await apiService.getSession(sessionId);
-      
+
       if (response.success && response.data) {
         const sessionData = response.data;
         setSession(sessionData);
-        
+
         setFormData({
           name: sessionData.name || '',
           description: sessionData.description || '',
@@ -122,7 +122,7 @@ export default function EditSessionPage() {
         ...formData,
         projectId: formData.projectId || null,
       };
-      
+
       const response = await apiService.updateSession(sessionId, sessionData);
 
       if (response.success && response.data) {
@@ -183,9 +183,9 @@ export default function EditSessionPage() {
 
   return (
     <div>
-      <PageHeader 
-        title={t('sessions.edit')}
-        subtitle={t('sessions.editDescription')}
+      <PageHeader
+        title={t('edit')}
+        subtitle={t('editDescription')}
       />
 
       <div className="bg-white shadow rounded-lg">
@@ -193,7 +193,7 @@ export default function EditSessionPage() {
           {/* Nome da Sessão */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('sessions.name')} *
+              {t('name')} *
             </label>
             <input
               type="text"
@@ -203,14 +203,14 @@ export default function EditSessionPage() {
               onChange={handleInputChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder={t('sessions.namePlaceholder')}
+              placeholder={t('namePlaceholder')}
             />
           </div>
 
           {/* Descrição */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('sessions.descriptionLabel')}
+              {t('descriptionLabel')}
             </label>
             <textarea
               id="description"
@@ -219,14 +219,14 @@ export default function EditSessionPage() {
               onChange={handleInputChange}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder={t('sessions.descriptionPlaceholder')}
+              placeholder={t('descriptionPlaceholder')}
             />
           </div>
 
           {/* Modo de Votação */}
           <div>
             <label htmlFor="votingMode" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('sessions.votingMode')} *
+              {t('votingMode')} *
             </label>
             <select
               id="votingMode"
@@ -247,7 +247,7 @@ export default function EditSessionPage() {
           {/* Projeto */}
           <div>
             <label htmlFor="projectId" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('sessions.project')}
+              {t('project')}
             </label>
             <select
               id="projectId"
@@ -256,7 +256,7 @@ export default function EditSessionPage() {
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">{t('sessions.noProject')}</option>
+              <option value="">{t('noProject')}</option>
               {availableProjects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.name}
@@ -277,7 +277,7 @@ export default function EditSessionPage() {
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="autoReveal" className="ml-2 block text-sm text-gray-900">
-                {t('sessions.autoReveal')}
+                {t('autoReveal')}
               </label>
             </div>
 
@@ -291,7 +291,7 @@ export default function EditSessionPage() {
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="allowObservers" className="ml-2 block text-sm text-gray-900">
-                {t('sessions.allowObservers')}
+                {t('allowObservers')}
               </label>
             </div>
           </div>
@@ -303,14 +303,14 @@ export default function EditSessionPage() {
               onClick={handleCancel}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {t('common.cancel')}
+              {t('form.cancel')}
             </button>
             <button
               type="submit"
               disabled={saving}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? t('common.saving') : t('common.save')}
+              {saving ? t('form.saving') : t('form.save')}
             </button>
           </div>
         </form>

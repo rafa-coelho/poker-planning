@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Ticket, Priority } from "@prisma/client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import "@/i18n/index";
 
 interface TicketModalProps {
   isOpen: boolean;
@@ -27,7 +28,8 @@ export default function TicketModal({
   ticket, 
   isEditing 
 }: TicketModalProps) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("tickets");
+  const { t: tCommon } = useTranslation("common");
   const [formData, setFormData] = useState<CreateTicketData>({
     title: "",
     description: "",
@@ -66,7 +68,7 @@ export default function TicketModal({
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      console.error("Erro ao salvar ticket:", error);
+      console.error("Error saving ticket:", error);
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ export default function TicketModal({
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            {isEditing ? t("tickets.edit") : t("tickets.create")}
+            {isEditing ? t("edit") : t("create")}
           </h3>
           <button
             onClick={onClose}
@@ -94,44 +96,44 @@ export default function TicketModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t("tickets.form.title")}
+              {t("form.title")}
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              placeholder={t("tickets.form.titlePlaceholder")}
+              placeholder={t("form.titlePlaceholder")}
               required
             />
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t("tickets.form.description")}
+              {t("form.description")}
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              placeholder={t("tickets.form.descriptionPlaceholder")}
+              placeholder={t("form.descriptionPlaceholder")}
               rows={3}
             />
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t("tickets.form.priority")}
+              {t("form.priority")}
             </label>
             <select
               value={formData.priority}
               onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as Priority }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             >
-              <option value={Priority.LOW}>{t("tickets.priority.low")}</option>
-              <option value={Priority.MEDIUM}>{t("tickets.priority.medium")}</option>
-              <option value={Priority.HIGH}>{t("tickets.priority.high")}</option>
-              <option value={Priority.URGENT}>{t("tickets.priority.urgent")}</option>
+              <option value={Priority.LOW}>{t("priority.low")}</option>
+              <option value={Priority.MEDIUM}>{t("priority.medium")}</option>
+              <option value={Priority.HIGH}>{t("priority.high")}</option>
+              <option value={Priority.URGENT}>{t("priority.urgent")}</option>
             </select>
           </div>
           
@@ -139,17 +141,17 @@ export default function TicketModal({
           {isEditing && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("tickets.form.finalEstimate")}
+                {t("form.finalEstimate")}
               </label>
               <input
                 type="text"
                 value={formData.finalEstimate}
                 onChange={(e) => setFormData(prev => ({ ...prev, finalEstimate: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                placeholder={t("tickets.form.finalEstimatePlaceholder")}
+                placeholder={t("form.finalEstimatePlaceholder")}
               />
               <p className="text-xs text-gray-500 mt-1">
-                {t("tickets.form.finalEstimateHelp")}
+                {t("form.finalEstimateHelp")}
               </p>
             </div>
           )}
@@ -162,14 +164,14 @@ export default function TicketModal({
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={loading}
             >
-              {t("common.cancel")}
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? t("common.saving") : (isEditing ? t("tickets.update") : t("tickets.create"))}
+              {loading ? tCommon("saving") : (isEditing ? t("update") : t("create"))}
             </button>
           </div>
         </form>

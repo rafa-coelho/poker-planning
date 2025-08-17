@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { FiCopy, FiXCircle, FiUsers, FiLink } from "react-icons/fi";
 import { useAuth } from "@/lib/hooks/useAuth";
+import "@/i18n/index";
 
 interface InviteModalProps {
   inviteLink: string;
@@ -24,7 +25,7 @@ export default function InviteModal ({
   onClose,
   sessionId,
 }: InviteModalProps) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("sessions");
   const { apiService } = useAuth();
   const [activeTab, setActiveTab] = useState<'link' | 'team'>('link');
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -40,7 +41,7 @@ export default function InviteModal ({
   const fetchTeamMembers = async () => {
     try {
       setLoading(true);
-      // Buscar membros do time associado à sessão
+      // Fetch team members associated with the session
       const response = await apiService.get(`/api/sessions/${sessionId}`);
       if (response.success && (response.data as any)?.project?.teams?.[0]?.id) {
         const teamId = (response.data as any).project.teams[0].id;
@@ -50,7 +51,7 @@ export default function InviteModal ({
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar membros do time:', error);
+      console.error('Error loading team members:', error);
     } finally {
       setLoading(false);
     }
@@ -87,8 +88,8 @@ export default function InviteModal ({
 
     try {
       setLoading(true);
-      // Aqui você pode implementar o envio de convites por email
-      // Por enquanto, apenas mostrar o link para os membros selecionados
+      // Here you can implement email invitation sending
+      // For now, just show the link to selected members
       const selectedEmails = teamMembers
         .filter(m => selectedMembers.includes(m.id))
         .map(m => m.email);
@@ -166,7 +167,7 @@ export default function InviteModal ({
               </button>
             </div>
             
-            {/* Informações sobre acesso */}
+            {/* Access information */}
             <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
               <div className="flex items-start space-x-2">
                 <div className="flex-shrink-0 mt-0.5">
@@ -175,11 +176,11 @@ export default function InviteModal ({
                   </svg>
                 </div>
                 <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">Como funciona o acesso:</p>
+                  <p className="font-medium mb-1">{t("accessInfo.title")}:</p>
                   <ul className="space-y-1 text-xs">
-                    <li>• <strong>Usuários logados:</strong> Acesso direto à sessão</li>
-                    <li>• <strong>Usuários não logados:</strong> Podem participar como convidados</li>
-                    <li>• <strong>Convidados:</strong> Precisam fornecer nome e aguardar aprovação</li>
+                    <li>• <strong>{t("accessInfo.loggedUsers")}:</strong> {t("accessInfo.directAccess")}</li>
+                    <li>• <strong>{t("accessInfo.guestUsers")}:</strong> {t("accessInfo.canParticipate")}</li>
+                    <li>• <strong>{t("accessInfo.guests")}:</strong> {t("accessInfo.needApproval")}</li>
                   </ul>
                 </div>
               </div>
@@ -196,7 +197,7 @@ export default function InviteModal ({
                 onClick={onClose}
                 className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-sm transition-colors"
               >
-                {t("close") || "Close"}
+                {t("close")}
               </button>
             </div>
           </div>
@@ -210,41 +211,45 @@ export default function InviteModal ({
             
             {loading ? (
               <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-2">{t("loading")}</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-sm text-gray-600 mt-2">{t("loading")}</p>
               </div>
-            ) : teamMembers.length === 0 ? (
-              <div className="text-center py-4">
-                <FiUsers size={32} className="mx-auto text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500">{t("noTeamMembers")}</p>
-              </div>
-            ) : (
-              <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-md divide-y">
+            ) : teamMembers.length > 0 ? (
+              <div className="max-h-48 overflow-y-auto mb-4">
                 {teamMembers.map((member) => (
-                  <label
+                  <div
                     key={member.id}
-                    className="flex items-center p-3 hover:bg-gray-50 cursor-pointer"
+                    className={`flex items-center space-x-3 p-2 rounded cursor-pointer transition-colors ${
+                      selectedMembers.includes(member.id)
+                        ? 'bg-blue-50 border border-blue-200'
+                        : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => handleMemberToggle(member.id)}
                   >
                     <input
                       type="checkbox"
                       checked={selectedMembers.includes(member.id)}
-                      onChange={() => handleMemberToggle(member.id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      onChange={() => {}}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <div className="ml-3 flex-1">
-                      <p className="text-sm font-medium text-gray-900">{member.name}</p>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{member.name}</p>
                       <p className="text-xs text-gray-500">{member.email}</p>
                     </div>
-                  </label>
+                  </div>
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500">{t("noTeamMembers")}</p>
               </div>
             )}
             
-            <div className="flex justify-end space-x-2 mt-4">
+            <div className="flex justify-end space-x-2">
               <button
                 onClick={handleInviteMembers}
                 disabled={selectedMembers.length === 0 || loading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm transition-colors"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded text-sm transition-colors"
               >
                 {loading ? t("sending") : t("inviteSelected")}
               </button>
@@ -252,13 +257,11 @@ export default function InviteModal ({
                 onClick={onClose}
                 className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-sm transition-colors"
               >
-                {t("close") || "Close"}
+                {t("close")}
               </button>
             </div>
           </div>
         )}
-
-
       </div>
     </div>
   );

@@ -80,7 +80,7 @@ interface ReportData {
 type ReportTab = 'overview' | 'sessions' | 'consensus' | 'productivity';
 
 export default function ReportsPage() {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("reports");
   const { user, apiService } = useAuth();
   const { setBreadcrumbs } = useBreadcrumbs();
   
@@ -494,7 +494,7 @@ export default function ReportsPage() {
 
 // Componente da aba Visão Geral
 function OverviewTab({ reportData }: { reportData: ReportData }) {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("reports");
 
   return (
     <div className="space-y-6">
@@ -580,7 +580,7 @@ function OverviewTab({ reportData }: { reportData: ReportData }) {
 
 // Componente da aba Sessões
 function SessionsTab({ reportData }: { reportData: ReportData }) {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("reports");
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -653,7 +653,7 @@ function SessionsTab({ reportData }: { reportData: ReportData }) {
 
 // Componente da aba Consenso
 function ConsensusTab({ reportData }: { reportData: ReportData }) {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("reports");
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -720,7 +720,7 @@ function ConsensusTab({ reportData }: { reportData: ReportData }) {
 
 // Componente da aba Produtividade
 function ProductivityTab({ reportData }: { reportData: ReportData }) {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("reports");
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">

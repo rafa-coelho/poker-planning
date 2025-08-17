@@ -1,0 +1,50 @@
+{
+  "loading": "Loading projects...",
+  "title": "Projects",
+  "description": "Manage projects in your organization",
+  "new": "New Project",
+  "edit": "Edit Project",
+  "delete": "Delete Project",
+  "view": "View Project",
+  "viewAll": "View All",
+  "noProjects": "No projects found",
+  "createFirst": "Start by creating the first project",
+  "createProject": "Create Project",
+  "searchPlaceholder": "Search by name...",
+  "table": {
+    "name": "Name",
+    "description": "Description",
+    "members": "Members",
+    "teams": "Teams",
+    "sessions": "Sessions",
+    "createdAt": "Created At",
+    "createdBy": "Created by",
+    "actions": "Actions"
+  },
+  "form": {
+    "name": "Name",
+    "namePlaceholder": "Project name",
+    "description": "Description",
+    "descriptionPlaceholder": "Project description",
+    "color": "Color",
+    "preSelected": "Pre-selected team:",
+    "create": "Create Project",
+    "creating": "Creating...",
+    "update": "Update Project",
+    "updating": "Updating...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving..."
+  },
+  "messages": {
+    "projectCreated": "Project created successfully",
+    "projectUpdated": "Project updated successfully",
+    "projectDeleted": "Project deleted successfully"
+  },
+  "errors": {
+    "loadFailed": "Failed to load projects",
+    "createFailed": "Failed to create project",
+    "updateFailed": "Failed to update project",
+    "deleteFailed": "Failed to delete project"
+  }
+} 

@@ -44,7 +44,8 @@ interface Session {
 }
 
 export default function SessionDetailPage() {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("sessions");
+  const { t: tTickets } = useTranslation("tickets");
   const router = useRouter();
   const params = useParams();
   const { apiService } = useAuth();
@@ -148,13 +149,13 @@ export default function SessionDetailPage() {
   const getPriorityText = (priority: string) => {
     switch (priority) {
       case 'LOW':
-        return t('tickets.priority.low');
+        return tTickets('priority.low');
       case 'MEDIUM':
-        return t('tickets.priority.medium');
+        return tTickets('priority.medium');
       case 'HIGH':
-        return t('tickets.priority.high');
+        return tTickets('priority.high');
       case 'URGENT':
-        return t('tickets.priority.urgent');
+        return tTickets('priority.urgent');
       default:
         return priority;
     }
@@ -163,11 +164,11 @@ export default function SessionDetailPage() {
   const getTicketStatusText = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return t('tickets.status.pending');
+        return tTickets('status.pending');
       case 'VOTING':
-        return t('tickets.status.voting');
+        return tTickets('status.voting');
       case 'ESTIMATED':
-        return t('tickets.status.estimated');
+        return tTickets('status.estimated');
       default:
         return status;
     }
@@ -273,13 +274,13 @@ export default function SessionDetailPage() {
                   onClick={handleJoinSession}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
                 >
-                  {t('sessions.join')}
+                  {t('join.join')}
                 </button>
                 <button
                   onClick={handleEditSession}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
-                  {t('sessions.edit')}
+                  {t('edit')}
                 </button>
               </>
             )}
@@ -332,7 +333,7 @@ export default function SessionDetailPage() {
           {/* Tickets */}
           <div className="mt-8 bg-white shadow rounded-lg">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">{t('tickets.title')}</h2>
+              <h2 className="text-lg font-medium text-gray-900">{tTickets('title')}</h2>
             </div>
             <div className="overflow-hidden">
               {session.tickets.length === 0 ? (
@@ -344,16 +345,16 @@ export default function SessionDetailPage() {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {t('tickets.title')}
+                        {tTickets('title')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {t('tickets.priority')}
+                        {tTickets('priority')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {t('tickets.status')}
+                        {tTickets('status')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {t('tickets.finalEstimate')}
+                        {tTickets('finalEstimate')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('session.createdAt')}

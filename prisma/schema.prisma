@@ -33,6 +33,7 @@ model Organization {
   teams       Team[]
   
   @@map("organizations")
+  @@index([isActive, createdAt])
 }
 
 // 👥 Usuários
@@ -145,6 +146,8 @@ model SessionParticipant {
   leftAt    DateTime?
   
   @@unique([sessionId, userId])
+  @@index([sessionId, isActive])
+  @@index([userId, isActive])
   @@map("session_participants")
 }
 
@@ -168,6 +171,7 @@ model PublicParticipant {
   @@unique([sessionId, name])
   @@index([sessionId, status])
   @@index([expiresAt])
+  @@index([status, expiresAt])
   @@map("public_participants")
 }
 
@@ -244,6 +248,7 @@ model TeamMember {
   joinedAt  DateTime    @default(now())
   
   @@unique([teamId, userId])
+  @@index([userId, role])
   @@map("team_members")
 }
 
@@ -265,6 +270,7 @@ model ProjectMember {
   joinedAt  DateTime    @default(now())
   
   @@unique([projectId, userId])
+  @@index([userId, role])
   @@map("project_members")
 }
 
@@ -296,6 +302,8 @@ model Ticket {
   sessions    Session[] @relation("CurrentTicket")
   
   @@map("tickets")
+  @@index([sessionId, status])
+  @@index([status, createdAt])
 }
 
 // 📧 Convites
@@ -323,6 +331,9 @@ model Invite {
   acceptedAt     DateTime?
   
   @@map("invites")
+  @@index([organizationId, status])
+  @@index([token])
+  @@index([expiresAt])
 }
 
 // 📊 Enums

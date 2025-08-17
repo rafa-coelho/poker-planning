@@ -38,7 +38,7 @@ interface TeamsResponse {
 }
 
 export default function TeamsPage() {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("teams");
   const router = useRouter();
   const { apiService } = useAuth();
   

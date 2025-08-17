@@ -37,7 +37,7 @@ interface ProjectsResponse {
 }
 
 export default function ProjectsPage() {
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("projects");
   const router = useRouter();
   const { apiService, user } = useAuth();
   
