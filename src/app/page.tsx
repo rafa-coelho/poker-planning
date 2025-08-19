@@ -11,7 +11,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 export default function HomePage () {
   const router = useRouter();
-  const { t } = useTranslation("sessions");
+  const { t } = useTranslation("common");
   const { createSession } = useSession();
   const [sessionName, setSessionName] = useState("");
   const [loading, setLoading] = useState(false);

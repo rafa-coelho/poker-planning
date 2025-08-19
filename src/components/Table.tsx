@@ -3,7 +3,6 @@ import ParticipantCard from "./ParticipantCard";
 import { distributeParticipants } from "./utils";
 import { Participant, useSession } from "./useSession";
 import { useTranslation } from "react-i18next";
-import "@/i18n/index";
 
 interface TableProps {
     participants: Participant[];
@@ -28,11 +27,11 @@ export default function Table({
     canFinishVoting,
     hasSelectedTicket = false
 }: TableProps) {
-    const { t } = useTranslation("sessions");
+    const { t } = useTranslation("common");
     const { topParticipants, leftParticipants, rightParticipants, bottomParticipants } = distributeParticipants(participants);
     const { isCreator } = useSession();
 
-    // Disable table when no ticket is selected
+    // Desabilitar mesa quando não há ticket selecionado
     const isTableDisabled = !hasSelectedTicket;
 
     return (
@@ -63,14 +62,14 @@ export default function Table({
                     <div className="text-center text-gray-500">
                         <div className="text-lg font-medium mb-2">
                             {isCreator
-                                ? t("table.noTicketSelectedCreator")
-                                : t("table.noTicketSelectedParticipant")
+                                ? t("session.table.noTicketSelectedCreator")
+                                : t("session.table.noTicketSelectedParticipant")
                             }
                         </div>
                         <div className="text-sm">
                             {isCreator
-                                ? t("table.selectTicketHintCreator")
-                                : t("table.selectTicketHintParticipant")
+                                ? t("session.table.selectTicketHintCreator")
+                                : t("session.table.selectTicketHintParticipant")
                             }
                         </div>
                     </div>
@@ -89,11 +88,12 @@ export default function Table({
                                         {onFinishVoting && (
                                             <button
                                                 onClick={() => {
+                                                    console.log('🔍 Botão Finalizar Votação clicado!');
                                                     onFinishVoting();
                                                 }}
                                                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                             >
-                                                {t("finishVoting")}
+                                                Finalizar Votação
                                             </button>
                                         )}
                                     </div>

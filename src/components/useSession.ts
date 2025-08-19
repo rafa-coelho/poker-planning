@@ -9,7 +9,6 @@ import { usePublicAuth } from "@/lib/hooks/usePublicAuth";
 import { ApiService } from "@/lib/services/apiService";
 import { useTranslation } from "react-i18next";
 import { APP_CONFIG } from "@/lib/config";
-import "@/i18n/index";
 
 const HOST = process.env.NEXT_PUBLIC_SOCKET_URL || `http://${APP_CONFIG.HOST}:${APP_CONFIG.WS_PORT || 3001}`;
 
@@ -35,7 +34,7 @@ export function useSession () {
   const sessionId = params.sessionId as string;
   const { user: authUser, isAuthenticated, isLoading: authLoading, apiService } = useAuth();
   const { isPublicParticipant, publicParticipant, isInitialized: publicInitialized, setPublicParticipant } = usePublicAuth();
-  const { t } = useTranslation("sessions");
+  const { t } = useTranslation("common");
 
   const [sessionData, setSessionData] = useState<SessionState>({
     sessionId,
@@ -1124,7 +1123,7 @@ export function useSession () {
       return;
     }
     
-    if (!confirm(t("endSessionConfirm.confirm"))) return;
+    if (!confirm(t("session.endSession.confirm"))) return;
     
     try {
       const response = await apiService.updateSession(sessionId, { status: 'COMPLETED' });

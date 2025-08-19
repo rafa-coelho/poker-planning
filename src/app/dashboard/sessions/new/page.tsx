@@ -7,8 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function NewSessionPage() {
-  const { t } = useTranslation("sessions");
-  const { t: tProjects } = useTranslation("projects");
+  const { t } = useTranslation("dashboard");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { apiService } = useAuth();
@@ -30,9 +29,9 @@ export default function NewSessionPage() {
   const preSelectedTeamName = searchParams.get('teamName');
 
   const votingModes = [
-    { value: 'FIBONACCI', label: t('votingMode.fibonacci') },
-    { value: 'TSHIRT', label: t('votingMode.tshirt') },
-    { value: 'LINEAR', label: t('votingMode.linear') },
+    { value: 'FIBONACCI', label: t('votingModes.fibonacci') },
+    { value: 'TSHIRT', label: t('votingModes.tshirt') },
+    { value: 'LINEAR', label: t('votingModes.linear') },
   ];
 
   useEffect(() => {
@@ -62,7 +61,7 @@ export default function NewSessionPage() {
     try {
       const sessionData = {
         ...formData,
-        projectId: formData.projectId || undefined, // Se vazio, enviar undefined
+        projectId: formData.projectId || null, // Se vazio, enviar null
       };
       
       const response = await apiService.createSession(sessionData);
@@ -103,7 +102,7 @@ export default function NewSessionPage() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {preSelectedTeamId ? t('new') + ' - ' + (preSelectedTeamName || '') : t('newSession.title')}
+              {preSelectedTeamId ? t('sessions.new') + ' - ' + (preSelectedTeamName || '') : t('newSession.title')}
             </h1>
             <p className="mt-2 text-gray-600">
               {t('newSession.description')}
@@ -176,7 +175,7 @@ export default function NewSessionPage() {
             </label>
             {preSelectedTeamId ? (
               <div className="space-y-2">
-                <div className="text-xs text-gray-500">{tProjects('form.preSelected')} {preSelectedTeamName}</div>
+                <div className="text-xs text-gray-500">{t('projects.form.preSelected')} {preSelectedTeamName}</div>
                 <select
                   id="projectId"
                   name="projectId"

@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { toast, Toaster } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import "@/i18n/index";
 import { FiX } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 interface ParticipantNotificationProps {
   notification: { userName: string; type: 'left' | 'joined' } | null;

@@ -1,34 +1,68 @@
 {
   "copyright": "© {{year}} {{appName}}. Todos os direitos reservados.",
+  "feelingLonely": "Tá sozinho?",
+  "invitePlayers": "Convidar jogadores",
+  "pickYourCards": "Escolha suas cartas!",
+  "noCard": "Nenhuma carta?",
+  "chooseYourCard": "Escolha sua carta",
+  "flipCards": "Virar cartas",
+  "startNewVoting": "Nova votação",
+  "shareThisLink": "Compartilhe este link com seu time:",
+  "share": "Compartilhar",
   "close": "Fechar",
-  "cancel": "Cancelar",
-  "saving": "Salvando...",
-  "error": "Erro",
-  "loading": "Carregando...",
-  "noItems": "Nenhum item encontrado",
-  "tryAgain": "Tentar novamente",
+  "linkCopied": "Link copiado!",
+  "copyLink": "Copiar Link",
+  "teamMembers": "Membros do Time",
+  "selectTeamMembersToInvite": "Selecione os membros do time que deseja convidar:",
+  "noTeamMembers": "Nenhum membro do time encontrado",
+  "selectMembersToInvite": "Selecione pelo menos um membro para convidar",
+  "invitesSent": "{{count}} convite(s) enviado(s) com sucesso",
+  "errorSendingInvites": "Erro ao enviar convites",
+  "inviteSelected": "Convidar Selecionados",
+  "sending": "Enviando...",
+  "endSession": "Encerrar Sessão",
+  "backToDashboard": "Voltar ao Dashboard",
   "menu": "Menu",
   "reports": "Relatórios",
   "teams": "Times",
   "projects": "Projetos",
   "settings": "Configurações",
-  "profile": "Perfil",
-  "logout": "Sair",
   "collapse": "Recolher",
   "expand": "Expandir menu",
-  "filters": {
-    "search": "Buscar",
-    "searchPlaceholder": "Buscar...",
-    "status": "Status",
-    "allStatuses": "Todos os Status",
-    "allModes": "Todos os Modos",
-    "clear": "Limpar Filtros"
-  },
-  "pagination": {
-    "showing": "Mostrando {{from}} a {{to}} de {{total}} resultados",
-    "previous": "Anterior",
-    "next": "Próximo"
-  },
+  "sessionName": "Nome da sessão",
+  "votes": "Votos",
+  "average": "Média",
+  "agreement": "Concordância",
+  "welcomeTitle": "Bem-vindo ao Poker Planning",
+  "welcomeDescription": "Crie uma sessão e convide seu time para estimar tarefas de forma fácil!",
+  "sessionPlaceholder": "Digite um nome para a sessão...",
+  "createGame": "Criar Sessão",
+  "errorEnterSessionName": "Por favor, insira um nome para a sessão!",
+  "joinSessionTitle": "Participar da Sessão",
+  "joinSessionDescription": "Você foi convidado para participar desta sessão",
+  "yourName": "Seu Nome",
+  "namePlaceholder": "Digite seu nome completo",
+  "enterSession": "Entrar na Sessão",
+  "errorEnterName": "Por favor, digite seu nome",
+  "requestPermission": "Pedir Permissão",
+  "requestingPermission": "Solicitando permissão...",
+  "permissionRequested": "Permissão solicitada! Aguardando aprovação...",
+  "permissionApproved": "Permissão aprovada! Redirecionando...",
+  "permissionRejected": "Sua solicitação foi reprovada",
+  "sessionNotFound": "Sessão não encontrada",
+  "sessionNotActive": "Sessão não está ativa",
+  "noAccessToSession": "Você não tem acesso a esta sessão",
+  "error": "Erro",
+  "cancel": "Cancelar",
+  "approve": "Aprovar",
+  "reject": "Reprovar",
+  "pendingRequests": "Solicitações Pendentes",
+  "noPendingRequests": "Nenhuma solicitação pendente",
+  "pending": "pendente(s)",
+  "noPendingRequestsMessage": "Nenhuma solicitação pendente no momento.",
+  "requestedAt": "Solicitado em",
+  "approveDescription": "O participante será adicionado à sessão",
+  "rejectDescription": "A solicitação será removida",
   "validation": {
     "nameRequired": "Nome é obrigatório",
     "nameTooShort": "Nome deve ter pelo menos 2 caracteres",
@@ -57,6 +91,285 @@
     "tempTokenRequired": "Token temporário necessário para participantes pendentes",
     "invalidTempToken": "Token temporário inválido ou não autorizado para este participante"
   },
+      "join": {
+      "notificationMessage": "Você receberá uma notificação quando for aprovado.",
+      "howToParticipate": "Como participar desta sessão",
+      "twoOptions": "Você tem duas opções para participar:",
+      "loginOption": "Fazer Login: Acesso direto à sessão (se tiver permissão)",
+      "permissionOption": "Pedir Permissão: Solicitar acesso como convidado",
+      "sessionPlanningPoker": "Sessão de Planning Poker",
+      "checkingStatus": "Verificando status da solicitação...",
+      "approvedRedirecting": "Aprovado! Redirecionando para a sessão...",
+      "rejectedMessage": "Sua solicitação foi rejeitada.",
+      "checkStatus": "Verificar Status",
+      "backToRequest": "Voltar à Solicitação"
+    },
+  "publicParticipants": "Participantes Públicos",
+  "approved": "Aprovado",
+  "rejected": "Reprovado",
+  "login": "Fazer Login",
+  "askPermission": "Pedir Permissão",
+  "tryAgain": "Tentar Novamente",
+  "auth": {
+    "common": {
+      "loading": "Carregando...",
+      "error": "Erro interno do servidor"
+    },
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Entre na sua conta",
+      "email": "Email",
+      "password": "Senha",
+      "emailPlaceholder": "Digite seu email...",
+      "passwordPlaceholder": "Digite sua senha...",
+      "loginButton": "Entrar",
+      "submit": "Entrar",
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "register": "Registrar",
+      "registerLink": "Criar conta",
+      "errors": {
+        "requiredEmail": "Email é obrigatório",
+        "invalidEmail": "Email inválido",
+        "requiredPassword": "Senha é obrigatória",
+        "invalidCredentials": "Email ou senha inválidos",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "register": {
+      "title": "Registrar",
+      "subtitle": "Crie sua conta",
+      "name": "Nome",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar Senha",
+      "organizationName": "Nome da Organização",
+      "namePlaceholder": "Digite seu nome completo...",
+      "emailPlaceholder": "Digite seu email...",
+      "passwordPlaceholder": "Digite sua senha...",
+      "confirmPasswordPlaceholder": "Confirme sua senha...",
+      "organizationPlaceholder": "Digite o nome da sua organização...",
+      "registerButton": "Criar conta",
+      "submit": "Registrar",
+      "hasAccount": "Já tem uma conta?",
+      "login": "Entrar",
+      "loginLink": "Fazer login",
+      "errors": {
+        "nameRequired": "Nome é obrigatório",
+        "emailRequired": "Email é obrigatório",
+        "passwordRequired": "Senha é obrigatória",
+        "confirmPasswordRequired": "Confirmação de senha é obrigatória",
+        "organizationRequired": "Nome da organização é obrigatório",
+        "invalidEmail": "Email inválido",
+        "passwordTooShort": "Senha deve ter pelo menos 6 caracteres",
+        "passwordsDoNotMatch": "Senhas não coincidem",
+        "emailAlreadyExists": "Email já está em uso",
+        "organizationAlreadyExists": "Nome da organização já está em uso",
+        "validationError": "Dados inválidos",
+        "emailExists": "Email já está em uso",
+        "weakPassword": "Senha muito fraca",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "forgotPassword": {
+      "title": "Esqueceu a senha?",
+      "subtitle": "Digite seu email para receber um link de recuperação",
+      "email": "Email",
+      "emailPlaceholder": "Digite seu email...",
+      "sendButton": "Enviar link de recuperação",
+      "submit": "Enviar link de recuperação",
+      "backToLogin": "Voltar para login",
+      "success": "Se o email existir, você receberá um link de recuperação",
+      "errors": {
+        "emailRequired": "Email é obrigatório",
+        "invalidEmail": "Email inválido",
+        "userNotFound": "Usuário não encontrado",
+        "emailNotConfigured": "Serviço de email não configurado",
+        "rateLimitExceeded": "Muitas tentativas. Tente novamente em alguns minutos",
+        "resetTokenExists": "Já existe um link de recuperação válido",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "resetPassword": {
+      "title": "Reset de Senha",
+      "subtitle": "Digite sua nova senha",
+      "newPassword": "Nova Senha",
+      "newPasswordPlaceholder": "Digite sua nova senha",
+      "confirmPassword": "Confirmar Senha",
+      "confirmPasswordPlaceholder": "Confirme sua nova senha",
+      "submit": "Alterar Senha",
+      "backToLogin": "Voltar para login",
+      "passwordRequirements": "Mínimo 6 caracteres",
+      "passwordsMatch": "Senhas coincidem",
+      "success": "Senha alterada com sucesso!",
+      "invalidToken": "Token inválido ou expirado",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+      "passwordsDoNotMatch": "As senhas não coincidem",
+      "error": "Erro ao alterar senha",
+      "errors": {
+        "invalidToken": "Token inválido ou expirado",
+        "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+        "passwordsDoNotMatch": "As senhas não coincidem",
+        "tokenExpired": "Token expirado",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "invite": {
+      "title": "Aceitar Convite",
+      "subtitle": "Defina uma senha para sua conta",
+      "newPassword": "Sua Senha",
+      "newPasswordPlaceholder": "Digite uma senha segura",
+      "confirmPassword": "Confirmar Senha",
+      "confirmPasswordPlaceholder": "Confirme sua senha",
+      "submit": "Aceitar Convite",
+      "backToLogin": "Voltar para login",
+      "passwordRequirements": "Mínimo 6 caracteres",
+      "passwordsMatch": "Senhas coincidem",
+      "success": "Convite aceito! Sua conta foi configurada com sucesso.",
+      "invalidToken": "Convite inválido ou expirado",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+      "passwordsDoNotMatch": "As senhas não coincidem",
+      "error": "Erro ao aceitar convite",
+      "errors": {
+        "invalidToken": "Convite inválido ou expirado",
+        "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+        "passwordsDoNotMatch": "As senhas não coincidem",
+        "tokenExpired": "Convite expirado",
+        "inviteAlreadyUsed": "Convite já foi usado",
+        "serverError": "Erro interno do servidor"
+      }
+    }
+  },
+  "logs": {
+    "session": {
+      "loadingSessionData": "Carregando dados da sessão...",
+      "sessionDataLoaded": "Dados da sessão carregados com sucesso",
+      "sessionDataError": "Erro ao carregar dados da sessão",
+      "loadingCurrentTicket": "Carregando ticket atual...",
+      "currentTicketLoaded": "Ticket atual carregado com sucesso",
+      "currentTicketError": "Erro ao carregar ticket atual",
+      "socketConnecting": "Conectando ao WebSocket...",
+      "socketConnected": "Conectado ao WebSocket",
+      "socketDisconnected": "Desconectado do WebSocket",
+      "votingStarted": "Votação iniciada",
+      "votingStartedError": "Erro ao iniciar votação",
+      "votingFinished": "Votação finalizada",
+      "votingFinishedError": "Erro ao finalizar votação",
+      "finalEstimateSet": "Estimativa final definida",
+      "finalEstimateError": "Erro ao definir estimativa final",
+      "cardSelected": "Carta selecionada",
+      "cardsFlipped": "Cartas viradas",
+      "newVotingStarted": "Nova votação iniciada"
+    }
+  },
+  "tickets": {
+    "title": "Tickets",
+    "create": "Criar Ticket",
+    "update": "Atualizar Ticket",
+    "edit": "Editar Ticket",
+    "delete": "Excluir",
+    "deleteConfirm": "Tem certeza que deseja excluir este ticket?",
+    "startVoting": "Iniciar Votação",
+    "finishVoting": "Finalizar Votação",
+    "revote": "Re-votar",
+    "setFinalEstimate": "Definir Estimativa Final",
+    "empty": "Nenhum ticket criado ainda",
+    "form": {
+      "title": "Título",
+      "titlePlaceholder": "Digite o título do ticket",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Digite a descrição do ticket (opcional)",
+      "priority": "Prioridade",
+      "finalEstimate": "Estimativa Final",
+      "finalEstimatePlaceholder": "Ex: 8, 13, 21...",
+      "finalEstimateHelp": "Valor final definido para este ticket"
+    },
+    "priority": {
+      "low": "Baixa",
+      "medium": "Média",
+      "high": "Alta",
+      "urgent": "Urgente"
+    },
+    "status": {
+      "pending": "Pendente",
+      "voting": "Votando",
+      "estimated": "Estimado"
+    },
+    "errors": {
+      "titleRequired": "Título é obrigatório",
+      "createFailed": "Erro ao criar ticket",
+      "updateFailed": "Erro ao atualizar ticket",
+      "deleteFailed": "Erro ao deletar ticket"
+    },
+    "finalEstimate": {
+      "title": "Definir Estimativa Final",
+      "averageVote": "Média dos votos",
+      "finalValue": "Valor final",
+      "placeholder": "Digite o valor final...",
+      "help": "Você pode usar a média como base ou definir um valor diferente",
+      "confirm": "Confirmar Estimativa"
+    },
+    "buttons": {
+      "edit": "Editar ticket",
+      "delete": "Excluir ticket",
+      "updateEstimate": "Atualizar estimativa"
+    },
+    "hints": {
+      "selectToVote": "Clique para selecionar e votar",
+      "waitingForCreator": "Aguardando seleção do criador",
+      "estimated": "Ticket já estimado",
+      "voting": "Votação em andamento",
+      "selectedForVoting": "Selecionado para votação",
+      "pendingCreator": "Clique para iniciar votação",
+      "pendingParticipant": "Aguardando seleção do criador",
+      "votingCreator": "Votação em andamento",
+      "votingParticipant": "Vote agora!",
+      "estimatedCreator": "Estimado - clique para re-votar",
+      "estimatedParticipant": "Ticket já estimado",
+      "currentEstimated": "Re-votando ticket estimado"
+    }
+  },
+  "session": {
+    "endSession": {
+      "confirm": "Tem certeza que deseja encerrar esta sessão? Esta ação não pode ser desfeita."
+    },
+    "ended": {
+      "title": "Sessão Encerrada",
+      "message": "Esta sessão de Poker Planning foi encerrada pelo criador. Obrigado por participar!",
+      "sessionId": "ID da Sessão",
+      "closeTab": "Fechar Aba",
+      "goHome": "Ir para o Início"
+    },
+    "defaultName": "Sessão Poker Planning",
+    "anonymous": "Anônimo",
+    "revoting": "Re-votação",
+    "units": {
+      "storyPoints": "Story Points",
+      "hours": "Horas",
+      "days": "Dias"
+    },
+    "table": {
+      "disabled": "Selecione um ticket para começar a votar",
+      "noTicketSelected": "Nenhum ticket selecionado",
+      "noTicketSelectedCreator": "Nenhum ticket selecionado",
+      "noTicketSelectedParticipant": "Aguardando seleção de ticket",
+      "selectTicketHintCreator": "Selecione um ticket para iniciar a votação",
+      "selectTicketHintParticipant": "O criador precisa selecionar um ticket primeiro"
+    },
+    "participantLeft": {
+      "title": "Participante saiu",
+      "message": "{{userName}} saiu da sessão"
+    },
+    "participantJoined": {
+      "title": "Participante entrou",
+      "message": "{{userName}} entrou na sessão"
+    },
+    "errors": {
+      "startVoting": "Erro ao iniciar votação",
+      "finishVoting": "Erro ao finalizar votação",
+      "setFinalEstimate": "Erro ao definir estimativa final"
+    }
+  },
   "loading": {
     "general": "Carregando...",
     "teams": "Carregando times...",
@@ -64,6 +377,7 @@
     "users": "Carregando usuários...",
     "sessions": "Carregando sessões..."
   },
+  "createdBy": "Criado por",
   "actions": {
     "viewDetails": "Ver detalhes",
     "viewTeamDetails": "Ver detalhes do time",
@@ -76,8 +390,7 @@
     "activateProject": "Ativar projeto"
   },
   "errors": {
-    "createSession": "Erro ao criar a sessão",
-    "componentLoadError": "Erro ao carregar componente"
+    "createSession": "Erro ao criar a sessão"
   },
   "limits": {
     "reached": "Limite de {{resource}} atingido (máximo: {{limit}}). Faça upgrade do seu plano para aumentar os limites.",

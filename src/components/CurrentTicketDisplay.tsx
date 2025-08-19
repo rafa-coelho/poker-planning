@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import "@/i18n/index";
 import { Ticket, Priority, TicketStatus } from "@prisma/client";
 
 interface CurrentTicketDisplayProps {
@@ -20,7 +19,7 @@ export default function CurrentTicketDisplay({
   onStartVoting,
   onFinishVoting,
 }: CurrentTicketDisplayProps) {
-  const { t } = useTranslation("tickets");
+  const { t } = useTranslation();
 
   // Função para determinar o texto apropriado baseado no modo de votação
   const getEstimateText = (value: string) => {
@@ -33,10 +32,10 @@ export default function CurrentTicketDisplay({
       <div className="bg-white rounded-lg shadow p-4 text-center">
         <div className="text-gray-500">
           <p className="text-sm font-medium mb-1">
-            {t("current.noTicket")}
+            {t("tickets.current.noTicket")}
           </p>
           <p className="text-xs">
-            {t("current.selectTicket")}
+            {t("tickets.current.selectTicket")}
           </p>
         </div>
       </div>
@@ -74,13 +73,13 @@ export default function CurrentTicketDisplay({
   const getPriorityLabel = (priority: Priority) => {
     switch (priority) {
       case Priority.LOW:
-        return t("priority.low");
+        return t("tickets.priority.low");
       case Priority.MEDIUM:
-        return t("priority.medium");
+        return t("tickets.priority.medium");
       case Priority.HIGH:
-        return t("priority.high");
+        return t("tickets.priority.high");
       case Priority.URGENT:
-        return t("priority.urgent");
+        return t("tickets.priority.urgent");
       default:
         return priority;
     }
@@ -89,11 +88,11 @@ export default function CurrentTicketDisplay({
   const getStatusLabel = (status: TicketStatus) => {
     switch (status) {
       case TicketStatus.PENDING:
-        return t("status.pending");
+        return t("tickets.status.pending");
       case TicketStatus.VOTING:
-        return t("status.voting");
+        return t("tickets.status.voting");
       case TicketStatus.ESTIMATED:
-        return t("status.estimated");
+        return t("tickets.status.estimated");
       default:
         return status;
     }
@@ -104,7 +103,7 @@ export default function CurrentTicketDisplay({
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-gray-900 mb-1">
-            {t("current.title")}
+            {t("tickets.current.title")}
           </h3>
           <h4 className="text-lg font-bold text-gray-900 mb-2">
             {ticket.title}
@@ -136,7 +135,7 @@ export default function CurrentTicketDisplay({
                 onClick={onStartVoting}
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                {t("current.startVoting")}
+                {t("tickets.current.startVoting")}
               </button>
             )}
             {ticket.status === TicketStatus.VOTING && onFinishVoting && (
@@ -144,7 +143,7 @@ export default function CurrentTicketDisplay({
                 onClick={onFinishVoting}
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               >
-                {t("current.finishVoting")}
+                {t("tickets.current.finishVoting")}
               </button>
             )}
           </div>
@@ -159,10 +158,10 @@ export default function CurrentTicketDisplay({
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-blue-900">
-                {t("current.votingInProgress")}
+                {t("tickets.current.votingInProgress")}
               </p>
               <p className="text-xs text-blue-700">
-                {t("current.waitingForVotes")}
+                {t("tickets.current.waitingForVotes")}
               </p>
             </div>
           </div>
@@ -174,10 +173,10 @@ export default function CurrentTicketDisplay({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-green-900">
-                {t("current.estimationComplete")}
+                {t("tickets.current.estimationComplete")}
               </p>
               <p className="text-xs text-green-700">
-                {t("current.finalEstimate")}: {ticket.finalEstimate}
+                {t("tickets.current.finalEstimate")}: {ticket.finalEstimate}
               </p>
             </div>
             <div className="text-xl font-bold text-green-900">

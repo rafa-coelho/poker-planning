@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import "@/i18n/index";
 import { useAuth } from '@/lib/hooks/useAuth';
 
 interface Project {
@@ -31,7 +30,7 @@ interface TeamProjectModalProps {
 }
 
 export default function TeamProjectModal({ isOpen, onClose, teamId, teamName }: TeamProjectModalProps) {
-  const { t } = useTranslation("teams");
+  const { t } = useTranslation("dashboard");
   const { apiService } = useAuth();
   
   const [projects, setProjects] = useState<Project[]>([]);

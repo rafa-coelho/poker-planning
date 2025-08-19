@@ -20,7 +20,7 @@ interface RequestStatus {
 export default function JoinSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const router = useRouter();
-  const { t } = useTranslation('sessions');
+  const { t } = useTranslation('common');
   const { isAuthenticated, isLoading, apiService } = useAuth();
   const { setPublicParticipant } = usePublicAuth();
 
@@ -33,43 +33,43 @@ export default function JoinSessionPage() {
   const [requestStatus, setRequestStatus] = useState<RequestStatus | null>(null);
   
 
-  // Load saved status from localStorage
+  // Carregar status salvo do localStorage
   useEffect(() => {
-    console.log('Loading saved status from localStorage...');
+    console.log('🔍 Carregando status salvo do localStorage...');
     const savedStatus = localStorage.getItem(`publicAccess_${sessionId}`);
-    console.log('savedStatus:', savedStatus);
+    console.log('🔍 savedStatus:', savedStatus);
     
     if (savedStatus) {
       try {
         const parsed = JSON.parse(savedStatus);
-        console.log('Parsed status:', parsed);
+        console.log('🔍 Status parseado:', parsed);
         setRequestStatus(parsed);
         
-        // If approved, redirect
+        // Se foi aprovado, redirecionar
         if (parsed.status === 'approved') {
-          console.log('Status approved, redirecting...');
+          console.log('✅ Status aprovado, redirecionando...');
           router.push(`/${sessionId}`);
           return;
         }
         
-        // If rejected, clear from localStorage
+        // Se foi rejeitado, limpar do localStorage
         if (parsed.status === 'rejected') {
-          console.log('Status rejected, clearing...');
+          console.log('❌ Status rejeitado, limpando...');
           localStorage.removeItem(`publicAccess_${sessionId}`);
           setRequestStatus(null);
         }
       } catch (e) {
-        console.error('Error parsing saved status:', e);
+        console.error('❌ Erro ao parsear status salvo:', e);
         localStorage.removeItem(`publicAccess_${sessionId}`);
       }
     } else {
-      console.log('No saved status found');
+      console.log('📭 Nenhum status salvo encontrado');
     }
   }, [sessionId, router]);
 
   
 
-  // Check session permission for logged user
+  // Verificar permissão para usuário logado
   const checkSessionPermission = useCallback(async () => {
     try {
       setLoading(true);
@@ -78,15 +78,15 @@ export default function JoinSessionPage() {
       const dataResp = await apiService.getPublicAccess(sessionId);
 
       if (dataResp.success && dataResp.data) {
-        // Check if session is ended
+        // Verificar se a sessão está encerrada
         if (dataResp.data.status === 'COMPLETED' || dataResp.data.status === 'ARCHIVED' || dataResp.data.status === 'CANCELLED') {
-          console.log('Ended session detected in permission check:', dataResp.data.status);
+          console.log('Sessão encerrada detectada na verificação de permissão:', dataResp.data.status);
           router.push(`/${sessionId}/ended`);
           return;
         }
         
         if (dataResp.data.currentUser.hasAccess) {
-          // User has access - redirect to session
+          // Usuário tem acesso - redirecionar para a sessão
           router.push(`/${sessionId}`);
         } else {
           setError('noAccessToSession');
@@ -101,7 +101,7 @@ export default function JoinSessionPage() {
     }
   }, [sessionId, router]);
 
-  // Load session data for non-logged user
+  // Carregar dados da sessão para usuário não logado
   const loadSessionData = useCallback(async () => {
     try {
       setLoading(true);
@@ -110,9 +110,9 @@ export default function JoinSessionPage() {
       const resp = await apiService.getPublicAccess(sessionId);
 
       if (resp.success && resp.data) {
-        // Check if session is ended
+        // Verificar se a sessão está encerrada
         if (resp.data.status === 'COMPLETED' || resp.data.status === 'ARCHIVED' || resp.data.status === 'CANCELLED') {
-          console.log('Ended session detected in join page:', resp.data.status);
+          console.log('Sessão encerrada detectada na página de join:', resp.data.status);
           router.push(`/${sessionId}/ended`);
           return;
         }
@@ -128,27 +128,27 @@ export default function JoinSessionPage() {
     }
   }, [sessionId]);
 
-  // Check request status
+  // Verificar status da solicitação
   const checkRequestStatus = useCallback(async () => {
-    console.log('checkRequestStatus executed');
-    console.log('requestStatus:', requestStatus);
+    console.log('🔍 checkRequestStatus executado');
+    console.log('🔍 requestStatus:', requestStatus);
     
     if (!requestStatus?.participantId) {
-      console.log('checkRequestStatus: No participantId');
+      console.log('❌ checkRequestStatus: Sem participantId');
       return;
     }
 
     try {
-      console.log('Starting status check...');
+      console.log('🔄 Iniciando verificação de status...');
       
-      // Only change to 'checking' if not already 'checking'
+      // Só mudar para 'checking' se não estiver já 'checking'
       if (requestStatus.status !== 'checking') {
         setRequestStatus(prev => ({ ...prev!, status: 'checking' }));
       }
 
-      // Use the new status API that accepts public participant tokens
+      // Usar a nova API de status que aceita tokens de participantes públicos
       const tokenToUse = requestStatus.authToken || requestStatus.tempToken || '';
-      console.log('Token to use:', tokenToUse ? 'YES' : 'NO');
+      console.log('🔑 Token para usar:', tokenToUse ? 'SIM' : 'NÃO');
       
       const resp = await apiService.getPublicParticipantStatus(
         sessionId,
@@ -156,14 +156,14 @@ export default function JoinSessionPage() {
         tokenToUse
       );
 
-      console.log('API response:', resp);
+      console.log('📡 Resposta da API:', resp);
 
       if (resp.success && resp.data) {
         const participant = resp.data;
-        console.log('Participant status:', participant.status);
+        console.log('👤 Status do participante:', participant.status);
         
         if (participant.status === 'APPROVED') {
-          console.log('Guest was approved!');
+          console.log('✅ Guest foi aprovado!');
           const message = t('join.approvedRedirecting');
           const newStatus = {
             status: 'approved' as const,
@@ -178,14 +178,14 @@ export default function JoinSessionPage() {
           
           toast.success(t('permissionApproved'));
           
-          // Save public authentication token
+          // Salvar token de autenticação pública
           if (participant.authToken) {
             setPublicParticipant(participant.authToken);
           }
           
-          // Redirect will be handled by separate useEffect
+          // O redirecionamento será feito pelo useEffect separado
         } else if (participant.status === 'REJECTED') {
-          console.log('Guest was rejected!');
+          console.log('❌ Guest foi rejeitado!');
           const message = t('join.rejectedMessage');
           setRequestStatus({
             status: 'rejected',
@@ -197,81 +197,81 @@ export default function JoinSessionPage() {
           
           toast.error(t('permissionRejected'));
         } else {
-          console.log('Status still pending:', participant.status);
-          // Return to 'pending' if still pending
+          console.log('⏳ Status ainda pendente:', participant.status);
+          // Voltar para 'pending' se ainda estiver pendente
           if (requestStatus.status === 'checking') {
             setRequestStatus(prev => ({ ...prev!, status: 'pending' }));
           }
         }
       } else {
-        console.log('API response was not successful:', resp);
-        // Return to 'pending' on error
+        console.log('❌ Resposta da API não foi bem-sucedida:', resp);
+        // Voltar para 'pending' em caso de erro
         if (requestStatus.status === 'checking') {
           setRequestStatus(prev => ({ ...prev!, status: 'pending' }));
         }
       }
     } catch (err) {
-      console.error('Error checking status:', err);
-      // Return to 'pending' on error
+      console.error('❌ Erro ao verificar status:', err);
+      // Voltar para 'pending' em caso de erro
       if (requestStatus.status === 'checking') {
         setRequestStatus(prev => ({ ...prev!, status: 'pending' }));
       }
     }
   }, [requestStatus, sessionId, router, t, setPublicParticipant]);
 
-  // Periodic polling to check request status (without WebSocket)
+  // Polling periódico para verificar status da solicitação (sem WebSocket)
   useEffect(() => {
-    console.log('Polling useEffect executed');
-    console.log('requestStatus?.status:', requestStatus?.status);
-    console.log('requestStatus?.participantId:', requestStatus?.participantId);
+    console.log('🔍 Polling useEffect executado');
+    console.log('🔍 requestStatus?.status:', requestStatus?.status);
+    console.log('🔍 requestStatus?.participantId:', requestStatus?.participantId);
     
-    // Polling should continue while status is 'pending' or 'checking'
+    // Polling deve continuar enquanto status for 'pending' ou 'checking'
     if ((requestStatus?.status === 'pending' || requestStatus?.status === 'checking') && requestStatus.participantId) {
-      console.log('Starting polling for guest:', requestStatus.participantId);
+      console.log('✅ Iniciando polling para guest:', requestStatus.participantId);
       
-      // Only set up interval, no immediate call
+      // Apenas configurar o intervalo, sem chamada imediata
       const interval = setInterval(() => {
-        console.log('Executing polling...');
+        console.log('⏰ Executando polling...');
         checkRequestStatus();
-      }, 3000); // Reduced to 2 seconds for testing
+      }, 3000); // Reduzido para 2 segundos para teste
 
       return () => {
-        console.log('Clearing polling interval');
+        console.log('🧹 Limpando intervalo de polling');
         clearInterval(interval);
       };
     } else {
-      console.log('Polling not started - status:', requestStatus?.status, 'participantId:', requestStatus?.participantId);
+      console.log('❌ Polling não iniciado - status:', requestStatus?.status, 'participantId:', requestStatus?.participantId);
     }
   }, [requestStatus?.status, requestStatus?.participantId, checkRequestStatus]);
 
-  // Separate effect for redirect when approved
+  // Efeito separado para redirecionamento quando aprovado
   useEffect(() => {
     if (requestStatus?.status === 'approved') {
       router.push(`/${sessionId}`);
     }
   }, [requestStatus?.status, sessionId, router]);
 
-  // Initialize authentication check
+  // Inicializar verificação de autenticação
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated) {
-        // Logged user - check permission for session
+        // Usuário logado - verificar permissão para a sessão
         checkSessionPermission();
       } else {
-        // Non-logged user - load session data to show options
+        // Usuário não logado - carregar dados da sessão para mostrar opções
         loadSessionData();
       }
     }
   }, [isAuthenticated, isLoading]);
 
-  // Redirect to login with redirect to session
+  // Redirecionar para login com redirect para a sessão
   const handleLogin = () => {
     router.push(`/login?redirect=/${sessionId}`);
   };
 
-  // Request access as guest
+  // Solicitar acesso como convidado
   const handleAccessRequest = async () => {
-    console.log('handleAccessRequest executed');
+    console.log('🔍 handleAccessRequest executado');
     
     if (!accessForm.name.trim()) {
       setError(t('errorEnterName'));
@@ -279,12 +279,12 @@ export default function JoinSessionPage() {
     }
 
     try {
-      console.log('Sending access request...');
+      console.log('🔄 Enviando solicitação de acesso...');
       setSubmitting(true);
       setError(null);
 
       const resp = await apiService.requestPublicAccess(sessionId, accessForm);
-      console.log('Request response:', resp);
+      console.log('📡 Resposta da solicitação:', resp);
 
       if (resp.success && resp.data) {
         const newStatus = {
@@ -294,21 +294,21 @@ export default function JoinSessionPage() {
           tempToken: (resp.data as any).tempToken
         };
         
-        console.log('Status created:', newStatus);
+        console.log('✅ Status criado:', newStatus);
         setRequestStatus(newStatus);
         setShowAccessModal(false);
         
-        // Save to localStorage
+        // Salvar no localStorage
         localStorage.setItem(`publicAccess_${sessionId}`, JSON.stringify(newStatus));
-        console.log('Status saved to localStorage');
+        console.log('💾 Status salvo no localStorage');
         
         toast.success(t('permissionRequested'));
       } else {
-        console.log('Request error:', resp.error);
+        console.log('❌ Erro na solicitação:', resp.error);
         setError(resp.error?.message || 'errorEnterName');
       }
     } catch (err) {
-      console.error('Error requesting access:', err);
+      console.error('❌ Erro ao solicitar acesso:', err);
       setError('errorEnterName');
     } finally {
       setSubmitting(false);
@@ -320,7 +320,7 @@ export default function JoinSessionPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <p className="mt-4 text-gray-600">{t('loading')}</p>
+        <p className="mt-4 text-gray-600">{t('loading.general')}</p>
       </div>
     );
   }
@@ -343,7 +343,7 @@ export default function JoinSessionPage() {
     );
   }
 
-  // Pending request status
+  // Status de solicitação pendente
   if (requestStatus?.status === 'pending') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
@@ -362,7 +362,7 @@ export default function JoinSessionPage() {
     );
   }
 
-  // Checking status
+  // Status de verificação
   if (requestStatus?.status === 'checking') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
@@ -374,7 +374,7 @@ export default function JoinSessionPage() {
     );
   }
 
-  // Rejected status
+  // Status de rejeitado
   if (requestStatus?.status === 'rejected') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
@@ -404,14 +404,14 @@ export default function JoinSessionPage() {
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
       <Toaster position="top-right" reverseOrder={false} />
 
-      {/* Title */}
+      {/* Título */}
       <h1 className="text-4xl font-extrabold text-gray-800">{t('joinSessionTitle')}</h1>
       <p className="text-lg text-gray-600 mt-2 text-center">
         {t('joinSessionDescription')} <br />
         <strong>{sessionData?.name || t('join.sessionPlanningPoker')}</strong>
       </p>
 
-      {/* Access options */}
+      {/* Opções de acesso */}
       <div className="mt-8 max-w-md w-full">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
           <div className="flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mx-auto mb-4">
@@ -457,7 +457,7 @@ export default function JoinSessionPage() {
         </div>
       </div>
 
-      {/* Permission request modal */}
+      {/* Modal de solicitação de permissão */}
       {showAccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">

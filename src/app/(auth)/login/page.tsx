@@ -20,7 +20,7 @@ interface LoginErrors {
 }
 
 export default function LoginPage() {
-  const { t } = useTranslation("auth");
+  const { t } = useTranslation("common");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
@@ -44,13 +44,13 @@ export default function LoginPage() {
     const newErrors: LoginErrors = {};
 
     if (!form.email.trim()) {
-      newErrors.email = t('login.errors.requiredEmail');
+      newErrors.email = t('auth.login.errors.requiredEmail');
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = t('login.errors.invalidEmail');
+      newErrors.email = t('auth.login.errors.invalidEmail');
     }
 
     if (!form.password.trim()) {
-      newErrors.password = t('login.errors.requiredPassword');
+      newErrors.password = t('auth.login.errors.requiredPassword');
     }
 
     setErrors(newErrors);
@@ -72,7 +72,7 @@ export default function LoginPage() {
       
       if (!success) {
         setErrors({
-          general: t('login.errors.invalidCredentials')
+          general: t('auth.login.errors.invalidCredentials')
         });
         return;
       }
@@ -81,7 +81,7 @@ export default function LoginPage() {
       router.push(redirectTo || '/dashboard');
     } catch (error) {
       setErrors({
-        general: t('common.error')
+        general: t('auth.common.error')
       });
     } finally {
       setIsLoading(false);
@@ -103,10 +103,10 @@ export default function LoginPage() {
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900">
-            {t('login.title')}
+            {t('auth.login.title')}
           </h2>
           <p className="text-gray-600 mt-2">
-            {t('login.subtitle')}
+            {t('auth.login.subtitle')}
           </p>
         </div>
 
@@ -119,14 +119,14 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('login.email')}
+              {t('auth.login.email')}
             </label>
             <input
               id="email"
               type="email"
               value={form.email}
               onChange={handleInputChange('email')}
-              placeholder={t('login.emailPlaceholder')}
+              placeholder={t('auth.login.emailPlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.email ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -139,14 +139,14 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('login.password')}
+              {t('auth.login.password')}
             </label>
             <input
               id="password"
               type="password"
               value={form.password}
               onChange={handleInputChange('password')}
-              placeholder={t('login.passwordPlaceholder')}
+              placeholder={t('auth.login.passwordPlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.password ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -162,7 +162,7 @@ export default function LoginPage() {
               href="/forgot-password"
               className="text-sm text-blue-600 hover:text-blue-500 transition-colors"
             >
-              {t('login.forgotPassword')}
+              {t('auth.login.forgotPassword')}
             </Link>
           </div>
 
@@ -177,22 +177,22 @@ export default function LoginPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {t('common.loading')}
+                {t('auth.common.loading')}
               </div>
             ) : (
-              t('login.loginButton')
+              t('auth.login.loginButton')
             )}
           </button>
         </form>
 
         <div className="text-center">
           <p className="text-gray-600 text-sm">
-            {t('login.noAccount')}{' '}
+            {t('auth.login.noAccount')}{' '}
             <Link
               href="/register"
               className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
             >
-              {t('login.registerLink')}
+              {t('auth.login.registerLink')}
             </Link>
           </p>
         </div>

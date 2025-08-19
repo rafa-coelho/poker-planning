@@ -53,7 +53,7 @@ interface Project {
 }
 
 export default function TeamDetailsPage() {
-  const { t } = useTranslation("teams");
+  const { t } = useTranslation("dashboard");
   const router = useRouter();
   const params = useParams();
   const { apiService } = useAuth();

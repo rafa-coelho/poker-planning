@@ -39,7 +39,7 @@ interface Session {
 }
 
 export default function ProjectDetailsPage() {
-  const { t } = useTranslation('projects');
+  const { t } = useTranslation('dashboard');
   const params = useParams();
   const router = useRouter();
   const { apiService, user } = useAuth();

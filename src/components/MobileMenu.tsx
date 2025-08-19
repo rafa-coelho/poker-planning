@@ -11,7 +11,6 @@ import {
   Cog6ToothIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import "@/i18n/index";
 
 interface MobileMenuProps {
   isOpen: boolean;

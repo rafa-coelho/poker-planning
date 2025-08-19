@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import "@/i18n/index";
 import { Ticket } from "@prisma/client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -21,8 +20,7 @@ export default function FinalEstimateModal({
   onConfirm,
   averageVote,
 }: FinalEstimateModalProps) {
-  const { t } = useTranslation("tickets");
-  const { t: tCommon } = useTranslation("common");
+  const { t } = useTranslation("common");
   const [finalEstimate, setFinalEstimate] = useState<string>("");
 
   React.useEffect(() => {
@@ -106,7 +104,7 @@ export default function FinalEstimateModal({
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {tCommon("cancel")}
+              {t("common.cancel")}
             </button>
             <button
               type="submit"

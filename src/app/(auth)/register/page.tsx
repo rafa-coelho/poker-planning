@@ -26,7 +26,7 @@ interface RegisterErrors {
 }
 
 export default function RegisterPage() {
-  const { t } = useTranslation("auth");
+  const { t } = useTranslation("common");
   const router = useRouter();
   const { register } = useAuth();
   const [form, setForm] = useState<RegisterForm>({
@@ -43,29 +43,29 @@ export default function RegisterPage() {
     const newErrors: RegisterErrors = {};
 
     if (!form.name.trim()) {
-      newErrors.name = t('register.errors.nameRequired');
+      newErrors.name = t('auth.register.errors.nameRequired');
     }
 
     if (!form.email.trim()) {
-      newErrors.email = t('register.errors.emailRequired');
+      newErrors.email = t('auth.register.errors.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = t('register.errors.invalidEmail');
+      newErrors.email = t('auth.register.errors.invalidEmail');
     }
 
     if (!form.password.trim()) {
-      newErrors.password = t('register.errors.passwordRequired');
+      newErrors.password = t('auth.register.errors.passwordRequired');
     } else if (form.password.length < 6) {
-      newErrors.password = t('register.errors.passwordTooShort');
+      newErrors.password = t('auth.register.errors.passwordTooShort');
     }
 
     if (!form.confirmPassword.trim()) {
-      newErrors.confirmPassword = t('register.errors.confirmPasswordRequired');
+      newErrors.confirmPassword = t('auth.register.errors.confirmPasswordRequired');
     } else if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = t('register.errors.passwordsDoNotMatch');
+      newErrors.confirmPassword = t('auth.register.errors.passwordsDoNotMatch');
     }
 
     if (!form.organizationName.trim()) {
-      newErrors.organizationName = t('register.errors.organizationRequired');
+      newErrors.organizationName = t('auth.register.errors.organizationRequired');
     }
 
     setErrors(newErrors);
@@ -92,7 +92,7 @@ export default function RegisterPage() {
       
       if (!success) {
         setErrors({
-          general: t('common.error')
+          general: t('auth.common.error')
         });
         return;
       }
@@ -101,7 +101,7 @@ export default function RegisterPage() {
       router.push('/dashboard');
     } catch (error) {
       setErrors({
-        general: t('common.error')
+        general: t('auth.common.error')
       });
     } finally {
       setIsLoading(false);
@@ -123,10 +123,10 @@ export default function RegisterPage() {
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900">
-            {t('register.title')}
+            {t('auth.register.title')}
           </h2>
           <p className="text-gray-600 mt-2">
-            {t('register.subtitle')}
+            {t('auth.register.subtitle')}
           </p>
         </div>
 
@@ -139,14 +139,14 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('register.name')}
+              {t('auth.register.name')}
             </label>
             <input
               id="name"
               type="text"
               value={form.name}
               onChange={handleInputChange('name')}
-              placeholder={t('register.namePlaceholder')}
+              placeholder={t('auth.register.namePlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.name ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -159,14 +159,14 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('register.email')}
+              {t('auth.register.email')}
             </label>
             <input
               id="email"
               type="email"
               value={form.email}
               onChange={handleInputChange('email')}
-              placeholder={t('register.emailPlaceholder')}
+              placeholder={t('auth.register.emailPlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.email ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -179,14 +179,14 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('register.organizationName')}
+              {t('auth.register.organizationName')}
             </label>
             <input
               id="organizationName"
               type="text"
               value={form.organizationName}
               onChange={handleInputChange('organizationName')}
-              placeholder={t('register.organizationPlaceholder')}
+              placeholder={t('auth.register.organizationPlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.organizationName ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -199,14 +199,14 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('register.password')}
+              {t('auth.register.password')}
             </label>
             <input
               id="password"
               type="password"
               value={form.password}
               onChange={handleInputChange('password')}
-              placeholder={t('register.passwordPlaceholder')}
+              placeholder={t('auth.register.passwordPlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.password ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -219,14 +219,14 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('register.confirmPassword')}
+              {t('auth.register.confirmPassword')}
             </label>
             <input
               id="confirmPassword"
               type="password"
               value={form.confirmPassword}
               onChange={handleInputChange('confirmPassword')}
-              placeholder={t('register.confirmPasswordPlaceholder')}
+              placeholder={t('auth.register.confirmPasswordPlaceholder')}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -248,22 +248,22 @@ export default function RegisterPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {t('common.loading')}
+                {t('auth.common.loading')}
               </div>
             ) : (
-              t('register.registerButton')
+              t('auth.register.registerButton')
             )}
           </button>
         </form>
 
         <div className="text-center">
           <p className="text-gray-600 text-sm">
-            {t('register.hasAccount')}{' '}
+            {t('auth.register.hasAccount')}{' '}
             <Link
               href="/login"
               className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
             >
-              {t('register.loginLink')}
+              {t('auth.register.loginLink')}
             </Link>
           </p>
         </div>

@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import "@/i18n/index";
 
 interface VoteSummaryProps {
     votes: string[];
@@ -13,7 +12,7 @@ interface VoteSummaryProps {
 }
 
 export default function VoteSummary ({ votes, average: propAverage, totalParticipants, votedCount, votingMode }: VoteSummaryProps) {
-    const { t } = useTranslation("votes");
+    const { t } = useTranslation("common");
 
     // Debug temporário
     console.log('🔍 VoteSummary - propAverage:', propAverage, 'votingMode:', votingMode, 'votes:', votes);
@@ -108,7 +107,7 @@ VoteSummary.VoteCount = function VoteCount ({ validVotes }: { validVotes: (strin
 };
 
 VoteSummary.VoteCountCard = function VoteCountCard ({ value, count, maxVotes }: { value: string, count: number, maxVotes: number }) {
-    const { t } = useTranslation("votes");
+    const { t } = useTranslation("common");
     return (
         <div key={value} className="flex flex-col items-center mx-2">
 
@@ -133,7 +132,7 @@ VoteSummary.VoteCountCard = function VoteCountCard ({ value, count, maxVotes }: 
 
 
 VoteSummary.AgreementComponent = function AgreementComponent ({ validVotes }: { validVotes: number[] }) {
-    const { t } = useTranslation("votes");
+    const { t } = useTranslation("common");
 
     const agreement = validVotes.length > 1
         ? 1 - (Math.max(...validVotes) - Math.min(...validVotes)) / Math.max(...validVotes)

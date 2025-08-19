@@ -6,7 +6,6 @@ import { FaRegHandSpock } from "react-icons/fa";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import { SessionState } from "./useSession";
-import "@/i18n/index";
 
 interface HeaderBarProps {
   sessionData: SessionState;
@@ -21,7 +20,7 @@ interface HeaderBarProps {
 }
 
 export default function HeaderBar({ sessionData, userName, isCreator = false, onInviteOpen, onToggleSidebar, onEndSession, pendingRequestsCount = 0, onShowPendingRequests, connectionStatus = 'connected' }: HeaderBarProps) {
-  const { t } = useTranslation("sessions");
+  const { t } = useTranslation("common");
   
   return (
     <header className="w-full border-b bg-white sticky top-0 z-10">
@@ -54,9 +53,9 @@ export default function HeaderBar({ sessionData, userName, isCreator = false, on
               }`}
             />
             <span className="text-xs text-gray-500">
-              {connectionStatus === 'connected' ? t('connection.connected') :
-               connectionStatus === 'connecting' ? t('connection.connecting') :
-               t('connection.disconnected')}
+              {connectionStatus === 'connected' ? 'Conectado' :
+               connectionStatus === 'connecting' ? 'Conectando...' :
+               'Desconectado'}
             </span>
           </div>
         </div>
