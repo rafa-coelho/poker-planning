@@ -5,14 +5,13 @@ import { verifyTempParticipantToken } from '@/lib/auth/tempAuth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; participantId: string } }
+  { params }: { params: Promise<{ id: string; participantId: string }> }
 ) {
   try {
-    const sessionId = params.id;
-    const participantId = params.participantId;
+    const { id: sessionId, participantId } = await params;
 
     // Buscar o participante público primeiro
-    const participant = await (prisma as any).publicParticipant.findFirst({
+    const participant = await prisma.publicParticipant.findFirst({
       where: {
         id: participantId,
         sessionId

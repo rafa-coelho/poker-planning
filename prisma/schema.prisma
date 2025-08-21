@@ -74,6 +74,11 @@ model User {
   teamMembers    TeamMember[]
   approvedPublicParticipants PublicParticipant[] @relation("PublicParticipantApprover")
   
+  @@index([organizationId])
+  @@index([email])
+  @@index([externalId])
+  @@index([isActive])
+  @@index([createdAt])
   @@map("users")
 }
 
@@ -121,6 +126,12 @@ model Session {
   tickets        Ticket[]
   publicParticipants PublicParticipant[]
   
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([projectId])
+  @@index([publicAccessCode])
   @@map("sessions")
 }
 
@@ -145,6 +156,9 @@ model SessionParticipant {
   leftAt    DateTime?
   
   @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([isActive])
   @@map("session_participants")
 }
 
@@ -196,6 +210,10 @@ model Project {
   sessions       Session[]
   teams          Team[]
   
+  @@index([organizationId])
+  @@index([isActive])
+  @@index([createdById])
+  @@index([createdAt])
   @@map("projects")
 }
 
@@ -223,6 +241,10 @@ model Team {
   members        TeamMember[]
   projects       Project[]    // Times podem estar associados a projetos
   
+  @@index([organizationId])
+  @@index([isActive])
+  @@index([createdById])
+  @@index([createdAt])
   @@map("teams")
 }
 
@@ -244,6 +266,8 @@ model TeamMember {
   joinedAt  DateTime    @default(now())
   
   @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
   @@map("team_members")
 }
 
@@ -265,6 +289,8 @@ model ProjectMember {
   joinedAt  DateTime    @default(now())
   
   @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
   @@map("project_members")
 }
 
@@ -295,6 +321,10 @@ model Ticket {
   // Relations
   sessions    Session[] @relation("CurrentTicket")
   
+  @@index([sessionId])
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
   @@map("tickets")
 }
 
@@ -322,6 +352,12 @@ model Invite {
   createdAt      DateTime    @default(now())
   acceptedAt     DateTime?
   
+  @@index([organizationId])
+  @@index([email])
+  @@index([token])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([createdAt])
   @@map("invites")
 }
 

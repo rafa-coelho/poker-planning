@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client')
+import { PrismaClient } from '@prisma/client';
 
 class PrismaService {
   static instance = null
@@ -142,4 +142,4 @@ class PrismaService {
   }
 }
 
-module.exports = PrismaService 
+export default PrismaService; 

@@ -31,7 +31,7 @@ interface TicketManagerProps {
 interface CreateTicketData {
   title: string;
   description?: string;
-  priority: any; // Priority type is not directly imported, so using 'any' for now
+  priority: string; // Priority type is not directly imported, so using string for now
 }
 
 export default function TicketManager({

@@ -246,6 +246,6 @@ export function isWithinFeatureLimit(
  * @returns Token seguro de 32 caracteres
  */
 export function generateSecureToken(): string {
-  const crypto = require('crypto')
+  const crypto = require('crypto') as typeof import('crypto')
   return crypto.randomBytes(32).toString('hex')
 } 

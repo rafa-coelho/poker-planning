@@ -48,7 +48,7 @@ export function withTenantIsolation(
       }
 
       // Verificar token e extrair dados do usuário
-      const jwt = require('jsonwebtoken')
+      const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken')
       
       if (!APP_CONFIG.JWT_SECRET) {
         console.error('JWT_SECRET não configurado')

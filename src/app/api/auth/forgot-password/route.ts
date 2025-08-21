@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se já existe um token válido
-    if ((user as any).resetToken && (user as any).resetTokenExpiresAt && (user as any).resetTokenExpiresAt > new Date()) {
+    if (user.resetToken && user.resetTokenExpiresAt && user.resetTokenExpiresAt > new Date()) {
       return NextResponse.json(
         { 
           error: {

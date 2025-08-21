@@ -15,7 +15,7 @@ export const GET = withAuth(async (req: NextRequest, user) => {
     // 📋 Obter todos os planos
     const allPlans = planService.getAllPlans()
 
-    let response: any = {
+    const response: Record<string, unknown> = {
       plans: allPlans.map(plan => ({
         id: plan.id,
         name: plan.name,
@@ -30,7 +30,7 @@ export const GET = withAuth(async (req: NextRequest, user) => {
 
     // 📋 Include current plan information if requested
     if (includeCurrentPlan) {
-      const currentPlan = planService.getPlanInfo(user.organizationId as any)
+      const currentPlan = planService.getPlanInfo(user.organizationId as string)
       response.currentPlan = {
         id: currentPlan.id,
         name: currentPlan.name,
@@ -42,7 +42,7 @@ export const GET = withAuth(async (req: NextRequest, user) => {
 
     // 📋 Incluir planos de upgrade se solicitado
     if (includeUpgrades) {
-      const upgradePlans = planService.getUpgradePlans(user.organizationId as any)
+      const upgradePlans = planService.getUpgradePlans(user.organizationId as string)
       response.upgradePlans = upgradePlans.map(plan => ({
         id: plan.id,
         name: plan.name,
@@ -95,7 +95,7 @@ export const POST = withAuth(async (req: NextRequest, user) => {
     // 📊 Comparar planos solicitados
     const comparison = planIds.map(planId => {
       try {
-        const plan = planService.getPlanInfo(planId as any)
+        const plan = planService.getPlanInfo(planId as string)
         return {
           id: plan.id,
           name: plan.name,

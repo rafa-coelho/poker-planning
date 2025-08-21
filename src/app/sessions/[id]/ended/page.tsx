@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { FaRegHandSpock } from "react-icons/fa";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
-import "../../../i18n/index";
+import "@/i18n/index";
 
 export default function SessionEndedPage() {
   const { t } = useTranslation("common");

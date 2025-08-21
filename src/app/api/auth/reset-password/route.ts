@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     let user = null as any;
-    let isInvite = type === 'invite';
+    const isInvite = type === 'invite';
 
     if (isInvite) {
       // Processar convite
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Buscar usuário pelo metadata do convite
-      const userId = (invite.metadata as any)?.userId;
+      const userId = (invite.metadata as Record<string, unknown>)?.userId as string;
       if (userId) {
         user = await prisma.user.findUnique({
           where: { id: userId },
