@@ -1,7 +1,128 @@
 const express = require('express')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
-const PrismaService = require('./src/lib/services/prismaService')
+// Import Prisma directly since we're in a CommonJS environment
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
+
+// Simple PrismaService wrapper for CommonJS
+const PrismaService = {
+  // Carregar sessão com participantes
+  async loadSession(sessionId) {
+    try {
+      const dbSession = await prisma.session.findUnique({
+        where: { id: sessionId },
+        select: {
+          id: true,
+          name: true,
+          organizationId: true,
+          currentTicketId: true,
+          votingMode: true,
+          participants: {
+            where: { isActive: true },
+            select: {
+              id: true,
+              userId: true,
+              selectedCard: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      })
+      
+      return dbSession
+    } catch (error) {
+      console.error('Erro ao carregar sessão:', error)
+      throw error
+    }
+  },
+
+  // Persistir voto do participante
+  async persistVote(sessionId, userId, cardValue) {
+    try {
+      // Buscar o participante no banco
+      const dbParticipant = await prisma.sessionParticipant.findFirst({
+        where: {
+          sessionId: sessionId,
+          userId: userId
+        }
+      })
+      
+      if (dbParticipant) {
+        // Atualizar o voto do participante
+        await prisma.sessionParticipant.update({
+          where: { id: dbParticipant.id },
+          data: { selectedCard: cardValue }
+        })
+      } else {
+        // Se não existe, criar um registro (pode acontecer com convidados)
+        await prisma.sessionParticipant.create({
+          data: {
+            sessionId: sessionId,
+            userId: userId,
+            selectedCard: cardValue,
+            isActive: true
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Erro ao persistir voto:', error)
+      throw error
+    }
+  },
+
+  // Limpar votos de todos os participantes da sessão
+  async clearVotes(sessionId) {
+    try {
+      await prisma.sessionParticipant.updateMany({
+        where: { sessionId: sessionId },
+        data: { selectedCard: null }
+      })
+    } catch (error) {
+      console.error('Erro ao limpar votos:', error)
+      throw error
+    }
+  },
+
+  // Marcar participante como inativo
+  async markParticipantInactive(sessionId, userId) {
+    try {
+      await prisma.sessionParticipant.updateMany({
+        where: { 
+          sessionId: sessionId,
+          userId: userId
+        },
+        data: { isActive: false }
+      })
+    } catch (error) {
+      console.error('Erro ao marcar participante como inativo:', error)
+      throw error
+    }
+  },
+
+  // Atualizar ticket atual da sessão
+  async updateCurrentTicket(sessionId, ticketId) {
+    try {
+      await prisma.session.update({
+        where: { id: sessionId },
+        data: { currentTicketId: ticketId }
+      })
+    } catch (error) {
+      console.error('Erro ao atualizar ticket atual:', error)
+      throw error
+    }
+  },
+
+  // Desconectar Prisma
+  async disconnect() {
+    await prisma.$disconnect()
+  }
+}
 
 // Configuração simplificada para o servidor
 const APP_CONFIG = {

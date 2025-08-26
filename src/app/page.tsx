@@ -1,7 +1,7 @@
 "use client";
 
 import "@/i18n/index";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { usePlans } from "@/lib/hooks/usePlans";
@@ -24,7 +24,13 @@ export default function LandingPage() {
   const router = useRouter();
   const { t } = useTranslation("common");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
   const { plans, loading: plansLoading, error: plansError } = usePlans();
+
+  // Prevent hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleGetStarted = () => {
     router.push("/register");
@@ -205,7 +211,12 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {plansLoading ? (
+          {!mounted ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              <span className="ml-2 text-gray-600">{t("landing.loading.plans")}</span>
+            </div>
+          ) : plansLoading ? (
             <div className="flex justify-center items-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
               <span className="ml-2 text-gray-600">{t("landing.loading.plans")}</span>
