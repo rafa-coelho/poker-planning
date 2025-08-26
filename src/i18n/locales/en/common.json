@@ -50,6 +50,10 @@
   "permissionApproved": "Permission Approved!",
   "permissionRejected": "Permission Rejected",
   "cancel": "Cancel",
+  "saving": "Saving...",
+  "save": "Save",
+  "approve": "Approve",
+  "reject": "Reject",
   "error": "Error",
   "tryAgain": "Try Again",
   "askPermission": "Ask Permission",
@@ -515,7 +519,15 @@
       "noTicketSelectedCreator": "No ticket selected",
       "noTicketSelectedParticipant": "Waiting for ticket selection",
       "selectTicketHintCreator": "Select a ticket to start voting",
-      "selectTicketHintParticipant": "The creator needs to select a ticket first"
+      "selectTicketHintParticipant": "The creator needs to select a ticket first",
+      "votingInProgress": "Voting in progress",
+      "revealVotes": "Reveal votes",
+      "votesRevealed": "Votes revealed!",
+      "finishVoting": "Finish voting",
+      "newVoting": "New voting",
+      "countdown": "Revealing votes...",
+      "selectTicket": "Select a ticket",
+      "selectTicketDescription": "Select a ticket to start voting"
     },
     "participantLeft": {
       "title": "Participant left",
@@ -529,6 +541,16 @@
       "startVoting": "Error starting voting",
       "finishVoting": "Error finishing voting",
       "setFinalEstimate": "Error setting final estimate"
+    },
+    "voting": {
+      "selectCard": "Select your card",
+      "waitingForTicket": "Waiting for ticket to vote"
+    },
+    "cards": {
+      "uncertain": "Uncertain",
+      "break": "Break",
+      "notVoted": "Not voted",
+      "waiting": "Waiting"
     }
   },
   "loading": {

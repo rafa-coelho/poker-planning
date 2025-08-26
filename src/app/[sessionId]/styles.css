@@ -7,8 +7,8 @@
     transform: rotateY(180deg);
 }
 
-/* Exemplo: se quiser uma aparência diferente no "verso" 
-     você poderia fazer um container 3D com front/back. 
+/* Exemplo: se quiser uma aparência diferente no "verso"
+     você poderia fazer um container 3D com front/back.
      Aqui é só demonstrativo. */
 
 .my-card.voted {

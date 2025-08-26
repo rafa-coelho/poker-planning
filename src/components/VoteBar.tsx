@@ -60,19 +60,19 @@ const VoteBar = React.memo<VoteBarProps>(({ votingMode, onVote, selectedCard, is
   }, [selectedCard, isDisabled]);
 
   return (
-    <div className="vote-bar bg-white rounded-lg shadow-lg p-6">
+    <div className="w-full justify-center flex flex-col items-center vote-bar bg-white rounded-lg shadow-lg p-6">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-        {t("voting.selectCard")}
+        {t("session.voting.selectCard")}
       </h3>
       
-      <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
+      <div className="flex space-x-2">
         {votingCards.map((vote) => (
           <button
             key={vote}
             onClick={() => handleVoteClick(vote)}
             disabled={isDisabled}
             className={getCardClasses(vote)}
-            title={vote === '?' ? t("cards.uncertain") : vote === '☕' ? t("cards.break") : vote}
+            title={vote === '?' ? t("session.cards.uncertain") : vote === '☕' ? t("session.cards.break") : vote}
           >
             {vote}
           </button>
@@ -81,7 +81,7 @@ const VoteBar = React.memo<VoteBarProps>(({ votingMode, onVote, selectedCard, is
       
       {isDisabled && (
         <p className="text-sm text-gray-500 text-center mt-4">
-          {t("voting.waitingForTicket")}
+          {t("session.voting.waitingForTicket")}
         </p>
       )}
     </div>

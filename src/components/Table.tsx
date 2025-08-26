@@ -1,16 +1,10 @@
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import ParticipantCard from './ParticipantCard';
-import { useSession } from './useSession';
+"use client";
 
-interface Participant {
-  userId: string;
-  userName: string;
-  selectedCard: string | null;
-  isCurrentUser: boolean;
-  isCreator?: boolean;
-  isPublicParticipant?: boolean;
-}
+import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import ParticipantCard from "./ParticipantCard";
+import { Participant } from "./useSession";
+import { useSession } from "./useSession";
 
 interface TableProps {
   participants: Participant[];
@@ -71,7 +65,7 @@ const Table = React.memo<TableProps>(({
   onNewVoting,
   onFinishVoting,
   canFinishVoting,
-  hasSelectedTicket = false
+  hasSelectedTicket = false,
 }) => {
   const { t } = useTranslation("common");
   const { isCreator } = useSession();
@@ -86,20 +80,17 @@ const Table = React.memo<TableProps>(({
     return !hasSelectedTicket;
   }, [hasSelectedTicket]);
 
-  // Memoizar as classes do container da mesa
-  const tableContainerClasses = useMemo(() => {
-    const baseClasses = "table-container";
-    return isTableDisabled ? `${baseClasses} opacity-50 pointer-events-none` : baseClasses;
-  }, [isTableDisabled]);
-
   // Memoizar o conteúdo do centro da mesa
   const centerContent = useMemo(() => {
-    if (isTableDisabled) {
+    if (!hasSelectedTicket) {
       return (
-        <div className="text-center text-gray-500">
-          <div className="text-4xl mb-4">🎯</div>
-          <p className="text-lg font-medium">{t("table.selectTicket")}</p>
-          <p className="text-sm">{t("table.selectTicketDescription")}</p>
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            {t("session.table.selectTicket")}
+          </h3>
+          <p className="text-gray-500">
+            {t("session.table.selectTicketDescription")}
+          </p>
         </div>
       );
     }
@@ -108,7 +99,7 @@ const Table = React.memo<TableProps>(({
       return (
         <div className="text-center">
           <div className="text-6xl font-bold text-blue-600 mb-4">{countdown}</div>
-          <p className="text-lg text-gray-600">{t("table.countdown")}</p>
+          <p className="text-lg text-gray-600">{t("session.table.countdown")}</p>
         </div>
       );
     }
@@ -116,51 +107,53 @@ const Table = React.memo<TableProps>(({
     if (isRevealed) {
       return (
         <div className="text-center">
-          <div className="text-4xl mb-4">🎉</div>
-          <p className="text-lg font-medium text-green-600 mb-4">{t("table.votesRevealed")}</p>
-          <div className="space-y-2">
-            {isCreator && (
-              <>
+          <h3 className="text-lg font-semibold text-green-600 mb-2">
+            {t("session.table.votesRevealed")}
+          </h3>
+          {isCreator && (
+            <div className="space-y-2">
+              {onFinishVoting && (
                 <button
                   onClick={onFinishVoting}
                   disabled={!canFinishVoting}
                   className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
-                  {t("table.finishVoting")}
+                  {t("session.table.finishVoting")}
                 </button>
-                <button
-                  onClick={onNewVoting}
-                  className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  {t("table.newVoting")}
-                </button>
-              </>
-            )}
-          </div>
+              )}
+              <button
+                onClick={onNewVoting}
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                {t("session.table.newVoting")}
+              </button>
+            </div>
+          )}
         </div>
       );
     }
 
     return (
       <div className="text-center">
-        <div className="text-4xl mb-4">🤔</div>
-        <p className="text-lg font-medium text-gray-600 mb-4">{t("table.votingInProgress")}</p>
+        <h3 className="text-lg font-semibold text-blue-600 mb-2">
+          {t("session.table.votingInProgress")}
+        </h3>
         {isCreator && (
           <button
             onClick={onFlipCards}
             disabled={!canFlip}
             className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
-            {t("table.revealVotes")}
+            {t("session.table.revealVotes")}
           </button>
         )}
       </div>
     );
-  }, [isTableDisabled, countdown, isRevealed, isCreator, onFinishVoting, canFinishVoting, onNewVoting, onFlipCards, canFlip, t]);
+  }, [hasSelectedTicket, countdown, isRevealed, isCreator, onFinishVoting, canFinishVoting, onNewVoting, onFlipCards, canFlip, t]);
 
   return (
     <div
-      className={tableContainerClasses}
+      className={`w-full ${isTableDisabled ? 'opacity-50 pointer-events-none' : ''}`}
       style={{
         display: "grid",
         gridTemplateAreas: `
@@ -206,6 +199,6 @@ const Table = React.memo<TableProps>(({
   );
 });
 
-Table.displayName = 'Table';
+Table.displayName = "Table";
 
 export default Table;

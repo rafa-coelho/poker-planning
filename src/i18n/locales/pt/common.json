@@ -54,8 +54,10 @@
   "noAccessToSession": "Você não tem acesso a esta sessão",
   "error": "Erro",
   "cancel": "Cancelar",
+  "saving": "Salvando...",
+  "save": "Salvar",
   "approve": "Aprovar",
-  "reject": "Reprovar",
+  "reject": "Rejeitar",
   "pendingRequests": "Solicitações Pendentes",
   "noPendingRequests": "Nenhuma solicitação pendente",
   "pending": "pendente(s)",
@@ -354,7 +356,15 @@
       "noTicketSelectedCreator": "Nenhum ticket selecionado",
       "noTicketSelectedParticipant": "Aguardando seleção de ticket",
       "selectTicketHintCreator": "Selecione um ticket para iniciar a votação",
-      "selectTicketHintParticipant": "O criador precisa selecionar um ticket primeiro"
+      "selectTicketHintParticipant": "O criador precisa selecionar um ticket primeiro",
+      "votingInProgress": "Votação em andamento",
+      "revealVotes": "Revelar votos",
+      "votesRevealed": "Votos revelados!",
+      "finishVoting": "Finalizar votação",
+      "newVoting": "Nova votação",
+      "countdown": "Revelando votos...",
+      "selectTicket": "Selecione um ticket",
+      "selectTicketDescription": "Selecione um ticket para começar a votar"
     },
     "participantLeft": {
       "title": "Participante saiu",
@@ -368,6 +378,16 @@
       "startVoting": "Erro ao iniciar votação",
       "finishVoting": "Erro ao finalizar votação",
       "setFinalEstimate": "Erro ao definir estimativa final"
+    },
+    "voting": {
+      "selectCard": "Selecione sua carta",
+      "waitingForTicket": "Aguardando ticket para votação"
+    },
+    "cards": {
+      "uncertain": "Incerteza",
+      "break": "Pausa",
+      "notVoted": "Não votou",
+      "waiting": "Aguardando"
     }
   },
   "loading": {
