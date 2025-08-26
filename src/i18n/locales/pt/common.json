@@ -395,5 +395,149 @@
   "limits": {
     "reached": "Limite de {{resource}} atingido (máximo: {{limit}}). Faça upgrade do seu plano para aumentar os limites.",
     "featureNotAvailable": "A feature \"{{feature}}\" não está disponível no seu plano atual. Faça upgrade para acessar recursos avançados."
+  },
+  "landing": {
+    "hero": {
+      "title": "Poker Planning Empresarial",
+      "subtitle": "Estimativas precisas e colaborativas para times ágeis",
+      "description": "Transforme suas reuniões de estimativa com uma ferramenta moderna, intuitiva e projetada para empresas que valorizam eficiência e precisão.",
+      "ctaPrimary": "Começar Gratuitamente",
+      "ctaSecondary": "Ver Demonstração",
+      "trustedBy": "Confiado por mais de 500+ times"
+    },
+    "features": {
+      "title": "Por que escolher nosso Poker Planning?",
+      "subtitle": "Tudo que você precisa para estimativas eficientes",
+      "realTime": {
+        "title": "Votação em Tempo Real",
+        "description": "Veja os votos aparecerem instantaneamente, mantenha todos engajados e tome decisões mais rápidas."
+      },
+      "multipleModes": {
+        "title": "Múltiplos Modos de Votação",
+        "description": "Fibonacci, T-shirt, números naturais e mais. Escolha o formato que melhor se adapta ao seu time."
+      },
+      "persistentSessions": {
+        "title": "Sessões Persistentes",
+        "description": "Salve suas sessões, mantenha histórico de estimativas e acompanhe a evolução do seu time ao longo do tempo."
+      },
+      "teamManagement": {
+        "title": "Gestão de Times",
+        "description": "Organize seus times, projetos e convide membros com facilidade. Controle total sobre quem participa."
+      },
+      "reports": {
+        "title": "Relatórios Detalhados",
+        "description": "Analise tendências, identifique padrões e melhore a precisão das estimativas com relatórios inteligentes."
+      },
+      "publicSessions": {
+        "title": "Sessões Públicas",
+        "description": "Convide stakeholders externos sem criar contas. Aprovação simples e segura para participantes convidados."
+      }
+    },
+    "pricing": {
+      "title": "Planos Simples e Transparentes",
+      "subtitle": "Escolha o plano ideal para o seu time",
+      "free": {
+        "name": "Gratuito",
+        "price": "R$ 0",
+        "period": "/mês",
+        "description": "Perfeito para times pequenos começando",
+        "features": [
+          "Até 5 usuários",
+          "Sessões ilimitadas",
+          "Modo Fibonacci",
+          "Sessões públicas",
+          "Suporte por email"
+        ],
+        "cta": "Começar Gratuito"
+      },
+      "pro": {
+        "name": "Profissional",
+        "price": "R$ 29",
+        "period": "/mês",
+        "description": "Para times em crescimento",
+        "features": [
+          "Até 25 usuários",
+          "Todos os modos de votação",
+          "Relatórios avançados",
+          "Gestão de times",
+          "Integração com Slack",
+          "Suporte prioritário"
+        ],
+        "cta": "Começar Trial",
+        "popular": "Mais Popular"
+      },
+      "enterprise": {
+        "name": "Empresarial",
+        "price": "Sob consulta",
+        "period": "",
+        "description": "Para grandes organizações",
+        "features": [
+          "Usuários ilimitados",
+          "SSO e SAML",
+          "API personalizada",
+          "On-premise disponível",
+          "Gerente de conta dedicado",
+          "SLA garantido"
+        ],
+        "cta": "Falar com Vendas"
+      }
+    },
+    "testimonials": {
+      "title": "O que nossos clientes dizem",
+      "subtitle": "Times que transformaram suas estimativas",
+      "testimonial1": {
+        "text": "Reduzimos o tempo de nossas reuniões de estimativa em 60% e melhoramos significativamente a precisão das nossas previsões.",
+        "author": "Maria Silva",
+        "role": "Scrum Master",
+        "company": "TechCorp"
+      },
+      "testimonial2": {
+        "text": "A interface é intuitiva e o suporte é excepcional. Nossos stakeholders adoram poder participar sem criar contas.",
+        "author": "João Santos",
+        "role": "Product Owner",
+        "company": "Inovação Digital"
+      },
+      "testimonial3": {
+        "text": "Os relatórios nos ajudaram a identificar padrões que nunca tínhamos notado. Agora nossas estimativas são muito mais precisas.",
+        "author": "Ana Costa",
+        "role": "Tech Lead",
+        "company": "StartupXYZ"
+      }
+    },
+    "faq": {
+      "title": "Perguntas Frequentes",
+      "subtitle": "Tudo que você precisa saber",
+      "questions": [
+        {
+          "question": "Como funciona o trial gratuito?",
+          "answer": "Você pode usar todas as funcionalidades do plano Profissional por 14 dias, sem compromisso. Não é necessário cartão de crédito."
+        },
+        {
+          "question": "Posso cancelar a qualquer momento?",
+          "answer": "Sim! Você pode cancelar sua assinatura a qualquer momento através do painel de controle. Não há taxas de cancelamento."
+        },
+        {
+          "question": "Os dados são seguros?",
+          "answer": "Absolutamente. Utilizamos criptografia de ponta a ponta, backups automáticos e seguimos as melhores práticas de segurança da indústria."
+        },
+        {
+          "question": "Posso integrar com outras ferramentas?",
+          "answer": "Sim! Oferecemos integrações com Slack, Jira, Azure DevOps e outras ferramentas populares. Também temos uma API REST completa."
+        },
+        {
+          "question": "Há limite de sessões?",
+          "answer": "Não! Todos os planos incluem sessões ilimitadas. O que varia é o número de usuários e funcionalidades avançadas."
+        },
+        {
+          "question": "Oferecem suporte técnico?",
+          "answer": "Sim! Todos os planos incluem suporte por email. Planos superiores incluem suporte prioritário e chat em tempo real."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Pronto para transformar suas estimativas?",
+      "subtitle": "Junte-se a centenas de times que já melhoraram sua precisão e eficiência",
+      "button": "Começar Gratuitamente Agora"
+    }
   }
 }

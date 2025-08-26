@@ -5,10 +5,10 @@ import { generateTempParticipantToken } from '@/lib/auth/tempAuth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const sessionId = params.id;
+    const { id: sessionId } = await params;
 
     // 1. Verificar rate limiting
     const rateLimitOk = await checkPublicAccessRateLimit(request, sessionId);
@@ -97,10 +97,10 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const sessionId = params.id;
+    const { id: sessionId } = await params;
     const body = await request.json();
     const { name } = body;
 

@@ -37,7 +37,7 @@ export default function SessionPage() {
     averageVote,
     showFinalEstimateModal,
     setShowFinalEstimateModal,
-    votingCards,
+
     canVote,
     canManageTickets,
     participantNotification,
@@ -115,7 +115,7 @@ export default function SessionPage() {
               canFlip={!!selectedCard}
               onFlipCards={handleFlipCards}
               onNewVoting={handleNewVoting}
-              onFinishVoting={canManageTickets && currentTicket ? finishVoting : undefined}
+              onFinishVoting={canManageTickets && currentTicket ? () => finishVoting() : undefined}
               canFinishVoting={canManageTickets && !!currentTicket}
               hasSelectedTicket={!!currentTicket}
             />
@@ -131,10 +131,10 @@ export default function SessionPage() {
                />
              ) : (
               <VoteBar
-                cards={votingCards}
+                votingMode={sessionData.votingMode || 'FIBONACCI'}
+                onVote={handleSelectCard}
                 selectedCard={selectedCard}
-                onSelectCard={handleSelectCard}
-                disabled={!canVote}
+                isVotingInProgress={canVote}
               />
             )}
           </div>

@@ -29,7 +29,7 @@ export const GET = withTenantIsolation(async (req: NextRequest, context) => {
     }
 
     // Construir query para times do projeto
-    const where = {
+    const where: any = {
       projects: {
         some: {
           id: projectId

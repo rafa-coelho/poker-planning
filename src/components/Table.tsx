@@ -19,7 +19,7 @@ interface TableProps {
   canFlip: boolean;
   onFlipCards: () => void;
   onNewVoting: () => void;
-  onFinishVoting: () => void;
+  onFinishVoting?: () => void;
   canFinishVoting: boolean;
   hasSelectedTicket?: boolean;
 }

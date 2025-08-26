@@ -102,6 +102,150 @@
       "checkStatus": "Check Status",
       "backToRequest": "Back to Request"
     },
+  "landing": {
+    "hero": {
+      "title": "Enterprise Poker Planning",
+      "subtitle": "Accurate and collaborative estimates for agile teams",
+      "description": "Transform your estimation meetings with a modern, intuitive tool designed for companies that value efficiency and precision.",
+      "ctaPrimary": "Start Free",
+      "ctaSecondary": "Watch Demo",
+      "trustedBy": "Trusted by 500+ teams"
+    },
+    "features": {
+      "title": "Why choose our Poker Planning?",
+      "subtitle": "Everything you need for efficient estimates",
+      "realTime": {
+        "title": "Real-time Voting",
+        "description": "See votes appear instantly, keep everyone engaged and make faster decisions."
+      },
+      "multipleModes": {
+        "title": "Multiple Voting Modes",
+        "description": "Fibonacci, T-shirt, natural numbers and more. Choose the format that best fits your team."
+      },
+      "persistentSessions": {
+        "title": "Persistent Sessions",
+        "description": "Save your sessions, maintain estimation history and track your team's evolution over time."
+      },
+      "teamManagement": {
+        "title": "Team Management",
+        "description": "Organize your teams, projects and invite members easily. Full control over who participates."
+      },
+      "reports": {
+        "title": "Detailed Reports",
+        "description": "Analyze trends, identify patterns and improve estimation accuracy with intelligent reports."
+      },
+      "publicSessions": {
+        "title": "Public Sessions",
+        "description": "Invite external stakeholders without creating accounts. Simple and secure approval for invited participants."
+      }
+    },
+    "pricing": {
+      "title": "Simple and Transparent Plans",
+      "subtitle": "Choose the ideal plan for your team",
+      "free": {
+        "name": "Free",
+        "price": "$0",
+        "period": "/month",
+        "description": "Perfect for small teams getting started",
+        "features": [
+          "Up to 5 users",
+          "Unlimited sessions",
+          "Fibonacci mode",
+          "Public sessions",
+          "Email support"
+        ],
+        "cta": "Start Free"
+      },
+      "pro": {
+        "name": "Professional",
+        "price": "$29",
+        "period": "/month",
+        "description": "For growing teams",
+        "features": [
+          "Up to 25 users",
+          "All voting modes",
+          "Advanced reports",
+          "Team management",
+          "Slack integration",
+          "Priority support"
+        ],
+        "cta": "Start Trial",
+        "popular": "Most Popular"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Custom",
+        "period": "",
+        "description": "For large organizations",
+        "features": [
+          "Unlimited users",
+          "SSO and SAML",
+          "Custom API",
+          "On-premise available",
+          "Dedicated account manager",
+          "Guaranteed SLA"
+        ],
+        "cta": "Talk to Sales"
+      }
+    },
+    "testimonials": {
+      "title": "What our customers say",
+      "subtitle": "Teams that transformed their estimates",
+      "testimonial1": {
+        "text": "We reduced our estimation meeting time by 60% and significantly improved the accuracy of our forecasts.",
+        "author": "Maria Silva",
+        "role": "Scrum Master",
+        "company": "TechCorp"
+      },
+      "testimonial2": {
+        "text": "The interface is intuitive and the support is exceptional. Our stakeholders love being able to participate without creating accounts.",
+        "author": "João Santos",
+        "role": "Product Owner",
+        "company": "Digital Innovation"
+      },
+      "testimonial3": {
+        "text": "The reports helped us identify patterns we had never noticed. Now our estimates are much more accurate.",
+        "author": "Ana Costa",
+        "role": "Tech Lead",
+        "company": "StartupXYZ"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know",
+      "questions": [
+        {
+          "question": "How does the free trial work?",
+          "answer": "You can use all Professional plan features for 14 days, no commitment required. No credit card needed."
+        },
+        {
+          "question": "Can I cancel anytime?",
+          "answer": "Yes! You can cancel your subscription anytime through the control panel. No cancellation fees."
+        },
+        {
+          "question": "Is my data secure?",
+          "answer": "Absolutely. We use end-to-end encryption, automatic backups and follow industry best security practices."
+        },
+        {
+          "question": "Can I integrate with other tools?",
+          "answer": "Yes! We offer integrations with Slack, Jira, Azure DevOps and other popular tools. We also have a complete REST API."
+        },
+        {
+          "question": "Is there a session limit?",
+          "answer": "No! All plans include unlimited sessions. What varies is the number of users and advanced features."
+        },
+        {
+          "question": "Do you offer technical support?",
+          "answer": "Yes! All plans include email support. Higher plans include priority support and real-time chat."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to transform your estimates?",
+      "subtitle": "Join hundreds of teams that have already improved their accuracy and efficiency",
+      "button": "Start Free Now"
+    }
+  },
   "menu": "Menu",
   "auth": {
     "common": {

@@ -1,7 +1,7 @@
 'use client';
 
 import "@/i18n/index";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -19,7 +19,7 @@ interface LoginErrors {
   general?: string;
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const { t } = useTranslation("common");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -198,5 +198,13 @@ export default function LoginPage() {
         </div>
       </div>
     </PublicRoute>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 } 

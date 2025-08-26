@@ -629,5 +629,3 @@ export default function TeamDetailsPage() {
 
 // Modal Adicionar Usuário ao Time
 /* Render modal after component to keep file cohesion */
-// eslint-disable-next-line
-export function AddUserToTeamModalPlaceholder() { return null }

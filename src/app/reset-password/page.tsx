@@ -1,13 +1,13 @@
 'use client';
 
 import "@/i18n/index";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const { t } = useTranslation('common');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -246,5 +246,13 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 } 

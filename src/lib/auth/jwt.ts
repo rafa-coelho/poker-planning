@@ -245,7 +245,8 @@ export function isWithinFeatureLimit(
  * Gera token seguro para convites/reset de senha
  * @returns Token seguro de 32 caracteres
  */
+import crypto from 'crypto';
+
 export function generateSecureToken(): string {
-  const crypto = require('crypto') as typeof import('crypto')
-  return crypto.randomBytes(32).toString('hex')
+  return crypto.randomBytes(32).toString('hex');
 } 

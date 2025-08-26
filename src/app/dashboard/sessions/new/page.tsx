@@ -61,7 +61,7 @@ export default function NewSessionPage() {
     try {
       const sessionData = {
         ...formData,
-        projectId: formData.projectId || null, // Se vazio, enviar null
+        projectId: formData.projectId || undefined, // Se vazio, enviar undefined
       };
       
       const response = await apiService.createSession(sessionData);

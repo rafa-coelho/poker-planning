@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import jwt from 'jsonwebtoken'
 import { JWTPayload } from '@/types/auth'
 import { APP_CONFIG } from '@/lib/config'
 import { ensureSystemHealth } from '@/lib/utils/healthCheck'
@@ -48,7 +49,6 @@ export function withTenantIsolation(
       }
 
       // Verificar token e extrair dados do usuário
-      const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken')
       
       if (!APP_CONFIG.JWT_SECRET) {
         console.error('JWT_SECRET não configurado')

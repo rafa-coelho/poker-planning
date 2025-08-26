@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { planService } from '@/lib/services/planService'
 import { withAuth } from '@/lib/middleware/auth'
+import { prisma } from '@/lib/db'
 
 /**
  * GET /api/plans
@@ -30,27 +31,43 @@ export const GET = withAuth(async (req: NextRequest, user) => {
 
     // 📋 Include current plan information if requested
     if (includeCurrentPlan) {
-      const currentPlan = planService.getPlanInfo(user.organizationId as string)
-      response.currentPlan = {
-        id: currentPlan.id,
-        name: currentPlan.name,
-        description: currentPlan.description,
-        price: currentPlan.price,
-        features: currentPlan.features
+      // Buscar o plano atual da organização
+      const organization = await prisma.organization.findUnique({
+        where: { id: user.organizationId },
+        select: { plan: true }
+      })
+      
+      if (organization?.plan) {
+        const currentPlan = planService.getPlanInfo(organization.plan)
+        response.currentPlan = {
+          id: currentPlan.id,
+          name: currentPlan.name,
+          description: currentPlan.description,
+          price: currentPlan.price,
+          features: currentPlan.features
+        }
       }
     }
 
     // 📋 Incluir planos de upgrade se solicitado
     if (includeUpgrades) {
-      const upgradePlans = planService.getUpgradePlans(user.organizationId as string)
-      response.upgradePlans = upgradePlans.map(plan => ({
-        id: plan.id,
-        name: plan.name,
-        description: plan.description,
-        price: plan.price,
-        features: plan.features,
-        yearlySavings: planService.calculateYearlySavings(plan.id)
-      }))
+      // Buscar o plano atual da organização
+      const organization = await prisma.organization.findUnique({
+        where: { id: user.organizationId },
+        select: { plan: true }
+      })
+      
+      if (organization?.plan) {
+        const upgradePlans = planService.getUpgradePlans(organization.plan)
+        response.upgradePlans = upgradePlans.map(plan => ({
+          id: plan.id,
+          name: plan.name,
+          description: plan.description,
+          price: plan.price,
+          features: plan.features,
+          yearlySavings: planService.calculateYearlySavings(plan.id)
+        }))
+      }
     }
 
     return NextResponse.json(response, { status: 200 })
@@ -95,7 +112,7 @@ export const POST = withAuth(async (req: NextRequest, user) => {
     // 📊 Comparar planos solicitados
     const comparison = planIds.map(planId => {
       try {
-        const plan = planService.getPlanInfo(planId as string)
+        const plan = planService.getPlanInfo(planId as any)
         return {
           id: plan.id,
           name: plan.name,

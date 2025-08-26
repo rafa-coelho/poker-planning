@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ];
       
       // Verificar se é uma rota de join de sessão
-      const isJoinRoute = /^\/[^\/]+\/join$/.test(currentPath) || /^\/[^\/]+$/.test(currentPath); // também permitir página do board
+      const isJoinRoute = /^\/[^\/]+\/join$/.test(currentPath) || /^\/[^\/]+\/[^\/]+$/.test(currentPath); // também permitir página do board
       
       if (!publicPaths.some(path => currentPath.startsWith(path)) && !isJoinRoute) {
         window.location.href = '/login';
