@@ -244,6 +244,30 @@
       "title": "Ready to transform your estimates?",
       "subtitle": "Join hundreds of teams that have already improved their accuracy and efficiency",
       "button": "Start Free Now"
+    },
+    "loading": {
+      "plans": "Loading plans...",
+      "error": "Error loading plans",
+      "retry": "Try again"
+    },
+    "footer": {
+      "description": "Transform your estimates with our modern and intuitive tool.",
+      "product": "Product",
+      "support": "Support",
+      "company": "Company",
+      "features": "Features",
+      "pricing": "Pricing",
+      "integrations": "Integrations",
+      "api": "API",
+      "documentation": "Documentation",
+      "faq": "FAQ",
+      "contact": "Contact",
+      "status": "Status",
+      "about": "About",
+      "blog": "Blog",
+      "careers": "Careers",
+      "privacy": "Privacy",
+      "copyright": "© 2024 Poker Planning. All rights reserved."
     }
   },
   "menu": "Menu",

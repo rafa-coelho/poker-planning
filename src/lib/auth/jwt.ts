@@ -25,16 +25,41 @@ export const TOKEN_EXPIRATION = {
  * @param rememberMe Se deve usar expiração estendida
  * @returns Token JWT
  */
-export function generateAccessToken(
+export async function generateAccessToken(
   user: User, 
   organization: Organization,
   rememberMe: boolean = false
-): string {
+): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const expiration = rememberMe ? TOKEN_EXPIRATION.REMEMBER_ME : TOKEN_EXPIRATION.ACCESS_TOKEN
   
-  // 🎯 Usar PlanService para obter features do plano
-  const features = planService.getPlanFeatures(organization.plan)
+  // 🎯 Obter features do plano atual (mockado por enquanto)
+  const features = {
+    maxSessions: -1,
+    maxParticipants: -1,
+    maxTeamMembers: -1,
+    maxProjectMembers: -1,
+    hasAdvancedReports: false,
+    hasCustomBranding: false,
+    hasSSO: false,
+    hasAPI: false,
+    hasPrioritySupport: false,
+    hasCustomIntegrations: false,
+    hasAuditLogs: false,
+    hasAdvancedAnalytics: false,
+    hasCustomRoles: false,
+    hasBulkOperations: false,
+    hasDataExport: false,
+    hasWhiteLabel: false,
+    hasPublicSessions: true,
+    hasTeamManagement: true,
+    hasProjectManagement: true,
+    hasUserManagement: true,
+    hasSessionHistory: true,
+    hasVotingHistory: true,
+    maxStorageGB: 1,
+    retentionDays: 30
+  }
   
   const payload: JWTPayload = {
     userId: user.id,

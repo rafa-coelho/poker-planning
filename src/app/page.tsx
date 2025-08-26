@@ -4,24 +4,27 @@ import "@/i18n/index";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { 
-  ArrowRight, 
-  Check, 
-  Star, 
-  Users, 
-  Zap, 
-  BarChart3, 
+import { usePlans } from "@/lib/hooks/usePlans";
+import {
+  ArrowRight,
+  Check,
+  Star,
+  Users,
+  Zap,
+  BarChart3,
   Clock,
   Settings,
   Globe,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Loader2
 } from "lucide-react";
 
 export default function LandingPage() {
   const router = useRouter();
   const { t } = useTranslation("common");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const { plans, loading: plansLoading, error: plansError } = usePlans();
 
   const handleGetStarted = () => {
     router.push("/register");
@@ -201,108 +204,79 @@ export default function LandingPage() {
               {t("landing.pricing.subtitle")}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Free Plan */}
-            <div className="bg-white p-8 rounded-xl shadow-sm border">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {t("landing.pricing.free.name")}
-              </h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">
-                  {t("landing.pricing.free.price")}
-                </span>
-                <span className="text-gray-600">
-                  {t("landing.pricing.free.period")}
-                </span>
-              </div>
-              <p className="text-gray-600 mb-8">
-                {t("landing.pricing.free.description")}
-              </p>
-                             <ul className="space-y-4 mb-8">
-                 {(t("landing.pricing.free.features", { returnObjects: true }) as string[]).map((feature: string, index: number) => (
-                   <li key={index} className="flex items-center">
-                     <Check className="w-5 h-5 text-green-500 mr-3" />
-                     <span className="text-gray-700">{feature}</span>
-                   </li>
-                 ))}
-               </ul>
-              <button
-                onClick={handleGetStarted}
-                className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-              >
-                {t("landing.pricing.free.cta")}
-              </button>
-            </div>
 
-            {/* Pro Plan */}
-            <div className="bg-white p-8 rounded-xl shadow-lg border-2 border-blue-500 relative">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                  {t("landing.pricing.pro.popular")}
-                </span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {t("landing.pricing.pro.name")}
-              </h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">
-                  {t("landing.pricing.pro.price")}
-                </span>
-                <span className="text-gray-600">
-                  {t("landing.pricing.pro.period")}
-                </span>
-              </div>
-              <p className="text-gray-600 mb-8">
-                {t("landing.pricing.pro.description")}
-              </p>
-                             <ul className="space-y-4 mb-8">
-                 {(t("landing.pricing.pro.features", { returnObjects: true }) as string[]).map((feature: string, index: number) => (
-                   <li key={index} className="flex items-center">
-                     <Check className="w-5 h-5 text-green-500 mr-3" />
-                     <span className="text-gray-700">{feature}</span>
-                   </li>
-                 ))}
-               </ul>
+          {plansLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              <span className="ml-2 text-gray-600">{t("landing.loading.plans")}</span>
+            </div>
+          ) : plansError ? (
+            <div className="text-center py-12">
+              <p className="text-red-600 mb-4">{t("landing.loading.error")}</p>
               <button
-                onClick={handleGetStarted}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               >
-                {t("landing.pricing.pro.cta")}
+                {t("landing.loading.retry")}
               </button>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`bg-white p-8 rounded-xl shadow-sm border ${plan.popular ? 'shadow-lg border-2 border-blue-500 relative' : ''
+                    }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                        {t("landing.pricing.pro.popular")}
+                      </span>
+                    </div>
+                  )}
 
-            {/* Enterprise Plan */}
-            <div className="bg-white p-8 rounded-xl shadow-sm border">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {t("landing.pricing.enterprise.name")}
-              </h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">
-                  {t("landing.pricing.enterprise.price")}
-                </span>
-                <span className="text-gray-600">
-                  {t("landing.pricing.enterprise.period")}
-                </span>
-              </div>
-              <p className="text-gray-600 mb-8">
-                {t("landing.pricing.enterprise.description")}
-              </p>
-                             <ul className="space-y-4 mb-8">
-                 {(t("landing.pricing.enterprise.features", { returnObjects: true }) as string[]).map((feature: string, index: number) => (
-                   <li key={index} className="flex items-center">
-                     <Check className="w-5 h-5 text-green-500 mr-3" />
-                     <span className="text-gray-700">{feature}</span>
-                   </li>
-                 ))}
-               </ul>
-              <button
-                onClick={handleWatchDemo}
-                className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-              >
-                {t("landing.pricing.enterprise.cta")}
-              </button>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {plan.name}
+                  </h3>
+
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold text-gray-900">
+                      {plan.price === 0 ? 'Gratuito' : `R$ ${plan.price}`}
+                    </span>
+                    <span className="text-gray-600">
+                      {plan.period === 'monthly' ? '/mês' : '/ano'}
+                    </span>
+                  </div>
+
+                  <p className="text-gray-600 mb-8">
+                    {plan.description}
+                  </p>
+
+                  <ul className="space-y-4 mb-8">
+                    {plan.features
+                      .filter(feature => feature.included)
+                      .map((feature, index) => (
+                        <li key={index} className="flex items-center">
+                          <Check className="w-5 h-5 text-green-500 mr-3" />
+                          <span className="text-gray-700">{feature.name}</span>
+                        </li>
+                      ))}
+                  </ul>
+
+                  <button
+                    onClick={plan.id === 'enterprise' ? handleWatchDemo : handleGetStarted}
+                    className={`w-full py-3 rounded-lg font-semibold transition-colors ${plan.popular
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-900 text-white hover:bg-gray-800'
+                      }`}
+                  >
+                    {plan.cta}
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -325,9 +299,9 @@ export default function LandingPage() {
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                                 <p className="text-gray-700 mb-6 italic">
-                   &ldquo;{testimonial.text}&rdquo;
-                 </p>
+                <p className="text-gray-700 mb-6 italic">
+                  &ldquo;{testimonial.text}&rdquo;
+                </p>
                 <div>
                   <p className="font-semibold text-gray-900">{testimonial.author}</p>
                   <p className="text-gray-600">{testimonial.role}</p>
@@ -350,28 +324,28 @@ export default function LandingPage() {
               {t("landing.faq.subtitle")}
             </p>
           </div>
-                     <div className="space-y-4">
-             {(t("landing.faq.questions", { returnObjects: true }) as Array<{question: string, answer: string}>).map((faq, index: number) => (
-               <div key={index} className="bg-white rounded-lg shadow-sm border">
-                 <button
-                   onClick={() => toggleFaq(index)}
-                   className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
-                 >
-                   <span className="font-semibold text-gray-900">{faq.question}</span>
-                   {openFaq === index ? (
-                     <ChevronUp className="w-5 h-5 text-gray-500" />
-                   ) : (
-                     <ChevronDown className="w-5 h-5 text-gray-500" />
-                   )}
-                 </button>
-                 {openFaq === index && (
-                   <div className="px-6 pb-4">
-                     <p className="text-gray-600">{faq.answer}</p>
-                   </div>
-                 )}
-               </div>
-             ))}
-           </div>
+          <div className="space-y-4">
+            {(t("landing.faq.questions", { returnObjects: true }) as Array<{ question: string, answer: string }>).map((faq, index: number) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm border">
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+                >
+                  <span className="font-semibold text-gray-900">{faq.question}</span>
+                  {openFaq === index ? (
+                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                  )}
+                </button>
+                {openFaq === index && (
+                  <div className="px-6 pb-4">
+                    <p className="text-gray-600">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -401,39 +375,39 @@ export default function LandingPage() {
             <div>
               <h3 className="text-xl font-bold mb-4">Poker Planning</h3>
               <p className="text-gray-400">
-                Transforme suas estimativas com nossa ferramenta moderna e intuitiva.
+                {t("landing.footer.description")}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Produto</h4>
+              <h4 className="font-semibold mb-4">{t("landing.footer.product")}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Preços</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Integrações</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.features")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.pricing")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.integrations")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.api")}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Suporte</h4>
+              <h4 className="font-semibold mb-4">{t("landing.footer.support")}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Documentação</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contato</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.documentation")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.faq")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.contact")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.status")}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Empresa</h4>
+              <h4 className="font-semibold mb-4">{t("landing.footer.company")}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Sobre</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Carreiras</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacidade</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.about")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.blog")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.careers")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t("landing.footer.privacy")}</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>© 2024 Poker Planning. Todos os direitos reservados.</p>
+            <p>{t("landing.footer.copyright")}</p>
           </div>
         </div>
       </footer>

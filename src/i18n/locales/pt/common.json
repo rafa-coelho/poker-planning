@@ -538,6 +538,30 @@
       "title": "Pronto para transformar suas estimativas?",
       "subtitle": "Junte-se a centenas de times que já melhoraram sua precisão e eficiência",
       "button": "Começar Gratuitamente Agora"
+    },
+    "loading": {
+      "plans": "Carregando planos...",
+      "error": "Erro ao carregar planos",
+      "retry": "Tentar novamente"
+    },
+    "footer": {
+      "description": "Transforme suas estimativas com nossa ferramenta moderna e intuitiva.",
+      "product": "Produto",
+      "support": "Suporte",
+      "company": "Empresa",
+      "features": "Features",
+      "pricing": "Preços",
+      "integrations": "Integrações",
+      "api": "API",
+      "documentation": "Documentação",
+      "faq": "FAQ",
+      "contact": "Contato",
+      "status": "Status",
+      "about": "Sobre",
+      "blog": "Blog",
+      "careers": "Carreiras",
+      "privacy": "Privacidade",
+      "copyright": "© 2024 Poker Planning. Todos os direitos reservados."
     }
   }
 }

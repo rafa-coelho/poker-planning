@@ -14,18 +14,19 @@ export const GET = withAuth(async (req: NextRequest, user) => {
     const includeUpgrades = url.searchParams.get('includeUpgrades') === 'true'
 
     // 📋 Obter todos os planos
-    const allPlans = planService.getAllPlans()
+    const response = await planService.getPlans()
+    const allPlans = response.data || []
 
-    const response: Record<string, unknown> = {
+    const plansResponse: Record<string, unknown> = {
       plans: allPlans.map(plan => ({
         id: plan.id,
         name: plan.name,
         description: plan.description,
         price: plan.price,
         features: plan.features,
-        isPopular: plan.isPopular,
-        isEnterprise: plan.isEnterprise,
-        trialDays: plan.trialDays
+        popular: plan.popular,
+        period: plan.period,
+        currency: plan.currency
       }))
     }
 
@@ -38,13 +39,16 @@ export const GET = withAuth(async (req: NextRequest, user) => {
       })
       
       if (organization?.plan) {
-        const currentPlan = planService.getPlanInfo(organization.plan)
-        response.currentPlan = {
-          id: currentPlan.id,
-          name: currentPlan.name,
-          description: currentPlan.description,
-          price: currentPlan.price,
-          features: currentPlan.features
+        const currentPlanResponse = await planService.getPlanById(organization.plan)
+        if (currentPlanResponse.success && currentPlanResponse.data && currentPlanResponse.data.length > 0) {
+          const currentPlan = currentPlanResponse.data[0]
+          plansResponse.currentPlan = {
+            id: currentPlan.id,
+            name: currentPlan.name,
+            description: currentPlan.description,
+            price: currentPlan.price,
+            features: currentPlan.features
+          }
         }
       }
     }
@@ -58,19 +62,12 @@ export const GET = withAuth(async (req: NextRequest, user) => {
       })
       
       if (organization?.plan) {
-        const upgradePlans = planService.getUpgradePlans(organization.plan)
-        response.upgradePlans = upgradePlans.map(plan => ({
-          id: plan.id,
-          name: plan.name,
-          description: plan.description,
-          price: plan.price,
-          features: plan.features,
-          yearlySavings: planService.calculateYearlySavings(plan.id)
-        }))
+        // TODO: Implementar lógica de upgrade plans
+        plansResponse.upgradePlans = []
       }
     }
 
-    return NextResponse.json(response, { status: 200 })
+    return NextResponse.json(plansResponse, { status: 200 })
 
   } catch (error) {
     console.error('Get plans error:', error)
@@ -110,19 +107,26 @@ export const POST = withAuth(async (req: NextRequest, user) => {
     }
 
     // 📊 Comparar planos solicitados
-    const comparison = planIds.map(planId => {
+    const comparison = await Promise.all(planIds.map(async (planId) => {
       try {
-        const plan = planService.getPlanInfo(planId as any)
-        return {
-          id: plan.id,
-          name: plan.name,
-          description: plan.description,
-          price: plan.price,
-          features: plan.features,
-          isPopular: plan.isPopular,
-          isEnterprise: plan.isEnterprise,
-          trialDays: plan.trialDays,
-          yearlySavings: planService.calculateYearlySavings(plan.id)
+        const planResponse = await planService.getPlanById(planId as string)
+        if (planResponse.success && planResponse.data && planResponse.data.length > 0) {
+          const plan = planResponse.data[0]
+          return {
+            id: plan.id,
+            name: plan.name,
+            description: plan.description,
+            price: plan.price,
+            features: plan.features,
+            popular: plan.popular,
+            period: plan.period,
+            currency: plan.currency
+          }
+        } else {
+          return {
+            id: planId,
+            error: 'Plano não encontrado'
+          }
         }
       } catch (error) {
         return {
@@ -130,7 +134,7 @@ export const POST = withAuth(async (req: NextRequest, user) => {
           error: 'Plano não encontrado'
         }
       }
-    })
+    }))
 
     return NextResponse.json({
       comparison,

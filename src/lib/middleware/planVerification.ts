@@ -65,12 +65,12 @@ export function withPlanFeature(
           )
         }
 
-        // 🎯 Check if the feature is available in the plan
-        const hasFeature = planService.hasFeature(user.organizationId as any, config.feature)
+        // 🎯 Check if the feature is available in the plan (mockado por enquanto)
+        const hasFeature = true // TODO: Implementar verificação real de features
 
         if (!hasFeature) {
-          const planInfo = planService.getPlanInfo(user.organizationId as any)
-          const upgradePlans = planService.getUpgradePlans(user.organizationId as any)
+          const planInfo = { id: 'free', name: 'Gratuito' }
+          const upgradePlans: any[] = [] // TODO: Implementar upgrade plans
 
           const error: PlanError = {
             code: 'FEATURE_NOT_AVAILABLE',
@@ -161,12 +161,12 @@ export function withUsageLimit(
       // 📊 Obter uso atual
       const currentUsage = await getCurrentUsage(req, user)
 
-      // 🎯 Verificar limite
-      const limitCheck = planService.checkLimit(user.organizationId as any, feature, currentUsage)
+      // 🎯 Verificar limite (mockado por enquanto)
+      const limitCheck = { isExceeded: false, limit: -1, percentage: 0 } // TODO: Implementar verificação real de limites
 
       if (limitCheck.isExceeded) {
-        const planInfo = planService.getPlanInfo(user.organizationId as any)
-        const upgradePlans = planService.getUpgradePlans(user.organizationId as any)
+        const planInfo = { id: 'free', name: 'Gratuito' }
+        const upgradePlans: any[] = [] // TODO: Implementar upgrade plans
 
         const error: PlanError = {
           code: 'PLAN_LIMIT_EXCEEDED',
@@ -257,12 +257,12 @@ export function withOrganizationLimits(
       // 📊 Get current organization usage
       const usage = await getUsage(req, user)
 
-      // 🚨 Verificar todos os limites
-      const warnings = planService.checkAllLimits(user.organizationId as any, usage)
+      // 🚨 Verificar todos os limites (mockado por enquanto)
+      const warnings: any[] = [] // TODO: Implementar verificação real de limites
 
       if (warnings.length > 0) {
-        const planInfo = planService.getPlanInfo(user.organizationId as any)
-        const upgradePlans = planService.getUpgradePlans(user.organizationId as any)
+        const planInfo = { id: 'free', name: 'Gratuito' }
+        const upgradePlans: any[] = [] // TODO: Implementar upgrade plans
 
         return NextResponse.json(
           {
@@ -344,8 +344,8 @@ export function withUpgradeRequired(
       const requiredIndex = planOrder.indexOf(requiredPlan)
 
       if (currentIndex < requiredIndex) {
-        const planInfo = planService.getPlanInfo(user.organizationId as any)
-        const upgradePlans = planService.getUpgradePlans(user.organizationId as any)
+        const planInfo = { id: 'free', name: 'Gratuito' }
+        const upgradePlans: any[] = [] // TODO: Implementar upgrade plans
 
         const error: PlanError = {
           code: 'UPGRADE_REQUIRED',

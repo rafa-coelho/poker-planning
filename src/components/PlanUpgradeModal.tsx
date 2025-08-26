@@ -66,13 +66,27 @@ export default function PlanUpgradeModal({
   const getSelectedPlanPrice = () => {
     if (!selectedPlan) return 0
     const plan = plans.find(p => p.id === selectedPlan)
-    return plan ? planService.calculatePrice(plan.id as any, billingCycle === 'yearly') : 0
+    if (!plan) return 0
+    
+    const price = typeof plan.price === 'number' ? plan.price : 0
+    
+    if (billingCycle === 'yearly') {
+      // Calcular preço anual com 20% de desconto
+      return Math.round(price * 12 * 0.8)
+    }
+    return price
   }
 
   // 💰 Calcular economia anual
   const getYearlySavings = () => {
     if (!selectedPlan || billingCycle !== 'yearly') return 0
-    return planService.calculateYearlySavings(selectedPlan as any)
+    const plan = plans.find(p => p.id === selectedPlan)
+    if (!plan) return 0
+    
+    const price = typeof plan.price === 'number' ? plan.price : 0
+    const monthlyTotal = price * 12
+    const yearlyPrice = Math.round(price * 12 * 0.8)
+    return monthlyTotal - yearlyPrice
   }
 
   // 🎯 Obter mensagem baseada no trigger
@@ -228,14 +242,14 @@ export default function PlanUpgradeModal({
                         {/* Price */}
                         <div className="mb-4">
                           <div className="text-3xl font-bold text-gray-900">
-                            R$ {planService.calculatePrice(plan.id as any, billingCycle === 'yearly')}
+                            R$ {typeof plan.price === 'object' ? plan.price.monthly : plan.price}
                             <span className="text-lg font-normal text-gray-600">
                               {billingCycle === 'yearly' ? t('plans.perYear') : t('plans.perMonth')}
                             </span>
                           </div>
-                          {billingCycle === 'yearly' && planService.calculateYearlySavings(plan.id as any) > 0 && (
+                          {billingCycle === 'yearly' && getYearlySavings() > 0 && (
                             <p className="text-green-600 text-sm mt-1">
-                              {t('plans.yearlySavings', { amount: planService.calculateYearlySavings(plan.id as any) })}
+                              {t('plans.yearlySavings', { amount: getYearlySavings() })}
                             </p>
                           )}
                         </div>

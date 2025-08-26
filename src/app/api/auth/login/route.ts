@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
 
     // Gerar tokens
     const tokenId = generateTokenId()
-    const accessToken = generateAccessToken(user, user.organization, rememberMe)
+    const accessToken = await generateAccessToken(user, user.organization, rememberMe)
     const refreshToken = generateRefreshToken(user.id, user.organization.id, tokenId)
 
     // Atualizar lastLoginAt

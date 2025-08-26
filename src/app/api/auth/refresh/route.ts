@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
 
     // Gerar novos tokens
     const newTokenId = generateTokenId()
-    const newAccessToken = generateAccessToken(user, user.organization, false)
+    const newAccessToken = await generateAccessToken(user, user.organization, false)
     const newRefreshToken = generateRefreshToken(user.id, user.organization.id, newTokenId)
 
     // Em uma implementação futura, poderíamos:
