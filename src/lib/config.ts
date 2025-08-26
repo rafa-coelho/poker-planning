@@ -78,6 +78,18 @@ export const APP_CONFIG = {
   SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || '',
   DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL || '',
   
+  // Messaging (futuro)
+  MESSAGE_BROKER_URL: process.env.MESSAGE_BROKER_URL || 'redis://localhost:6379',
+  MESSAGE_BROKER_TYPE: process.env.MESSAGE_BROKER_TYPE || 'redis',
+  
+  // API Externa
+  API_RATE_LIMIT: parseInt(process.env.API_RATE_LIMIT || '100', 10),
+  API_RATE_LIMIT_WINDOW: parseInt(process.env.API_RATE_LIMIT_WINDOW || '60000', 10),
+  
+  // SSO (futuro)
+  SSO_ENABLED: process.env.SSO_ENABLED === 'true',
+  SSO_PROVIDERS: process.env.SSO_PROVIDERS?.split(',') || ['google', 'microsoft'],
+  
   // Desenvolvimento
   ENABLE_SWAGGER: process.env.ENABLE_SWAGGER === 'true',
   ENABLE_DEBUG_MODE: process.env.ENABLE_DEBUG_MODE === 'true',

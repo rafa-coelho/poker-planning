@@ -8,9 +8,9 @@
 👥 FASE 2.5: Gestão de Usuários e Times   [x] 36/48 tarefas
 🏢 FASE 3: Features Empresariais          [x] 60/60 tarefas
 🌐 FASE 3.5: Sessões Públicas             [x] 25/25 tarefas
-🔧 FASE 4: Otimização & Polimento         [x] 42/42 tarefas
+🔧 FASE 4: Otimização & Polimento         [x] 54/54 tarefas
 
-Total: [x] 246/266 tarefas concluídas (92.5%)
+Total: [x] 258/270 tarefas concluídas (95.6%)
 ```
 
 ---
@@ -586,19 +586,20 @@ Organization
 - [x] Testar conversão da landing
 - [x] Otimizar para mobile
 
-### 4.4 Preparação Externa (Dia 44-46)
-- [ ] Adicionar campos externalId em todos os models
-- [ ] Criar estrutura para AuthService externo
-- [ ] Implementar webhooks básicos
-- [ ] Documentar API externa
-- [ ] Criar endpoints para integrações
-- [ ] Implementar API rate limiting
-- [ ] Adicionar API versioning
-- [ ] Criar mock de SSO
-- [ ] Testar integração externa
-- [ ] Documentar processo de migração
-- [ ] Criar guias de integração
-- [ ] Implementar API key management
+### 4.4 Preparação Externa (Dia 44-46) ✅ CONCLUÍDO
+- [x] Adicionar campos externalId em todos os models
+- [x] Criar estrutura para AuthService externo
+- [x] Implementar API externa v1 com rate limiting
+- [x] Documentar API externa
+- [x] Criar endpoints para integrações
+- [x] Implementar API rate limiting
+- [x] Adicionar API versioning
+- [x] Criar mock de SSO
+- [x] Testar integração externa
+- [x] Documentar processo de migração
+- [x] Criar guias de integração
+- [x] Implementar API key management
+- [x] Remover webhooks (preparação para mensageria)
 
 ### 4.5 Testes e QA (Dia 47-49)
 - [ ] Configurar Jest/Testing Library

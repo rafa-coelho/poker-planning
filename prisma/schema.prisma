@@ -21,6 +21,10 @@ model Organization {
   domain      String?  // Para SSO futuro
   isActive    Boolean  @default(true)
   
+  // External integration (futuro AuthService/Billing)
+  externalId     String?      @unique
+  externalSource String?      // "authservice", "billing", "sso"
+  
   // Audit fields
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -32,6 +36,7 @@ model Organization {
   projects    Project[]
   teams       Team[]
   
+  @@index([externalId])
   @@map("organizations")
 }
 
@@ -113,6 +118,10 @@ model Session {
   currentTicket   Ticket?      @relation("CurrentTicket", fields: [currentTicketId], references: [id])
   isRevealed     Boolean       @default(false)
   
+  // External integration (futuro integrações)
+  externalId     String?      @unique
+  externalSource String?      // "jira", "azure", "github"
+  
   // Audit fields
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -132,6 +141,7 @@ model Session {
   @@index([createdById])
   @@index([projectId])
   @@index([publicAccessCode])
+  @@index([externalId])
   @@map("sessions")
 }
 
@@ -201,6 +211,10 @@ model Project {
   createdById    String
   createdBy      User        @relation("ProjectCreator", fields: [createdById], references: [id])
   
+  // External integration (futuro integrações)
+  externalId     String?      @unique
+  externalSource String?      // "jira", "azure", "github"
+  
   // Audit fields
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -214,6 +228,7 @@ model Project {
   @@index([isActive])
   @@index([createdById])
   @@index([createdAt])
+  @@index([externalId])
   @@map("projects")
 }
 
@@ -233,6 +248,10 @@ model Team {
   createdById    String
   createdBy      User        @relation("TeamCreator", fields: [createdById], references: [id])
   
+  // External integration (futuro integrações)
+  externalId     String?      @unique
+  externalSource String?      // "jira", "azure", "github"
+  
   // Audit fields
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -245,6 +264,7 @@ model Team {
   @@index([isActive])
   @@index([createdById])
   @@index([createdAt])
+  @@index([externalId])
   @@map("teams")
 }
 
@@ -314,6 +334,10 @@ model Ticket {
   votingStartedAt  DateTime?
   votingEndedAt    DateTime?
   
+  // External integration (futuro integrações)
+  externalId     String?      @unique
+  externalSource String?      // "jira", "azure", "github"
+  
   // Audit fields
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -325,6 +349,7 @@ model Ticket {
   @@index([status])
   @@index([priority])
   @@index([createdAt])
+  @@index([externalId])
   @@map("tickets")
 }
 
