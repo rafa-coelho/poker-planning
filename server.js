@@ -747,8 +747,8 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // Marcar participante como desconectado (não remover da sessão)
-    console.log(`🔌 Participante ${foundParticipant.userName} desconectado (mantendo na sessão)`);
+    // Marcar participante como desconectado
+    console.log(`🔌 Participante ${foundParticipant.userName} desconectado`);
 
     // Marcar como inativo no banco de dados
     try {
@@ -757,9 +757,20 @@ io.on("connection", (socket) => {
       console.error('Erro ao marcar participante como inativo:', error);
     }
 
-    // Manter o participante na sessão, apenas marcar como desconectado
-    foundParticipant.socketId = null;
-    updateSession(foundSession.sessionId);
+    // Notificar todos os participantes sobre a saída ANTES de marcar como desconectado
+    io.to(foundSession.sessionId).emit("participant_left", {
+      userId: foundParticipant.userId,
+      userName: foundParticipant.userName
+    });
+
+    // Remover participante da sessão para que o session_update não o inclua
+    foundSession.participants = foundSession.participants.filter((p) => p.userId !== foundParticipant.userId);
+    
+    // Aguardar um pouco antes de enviar o session_update para garantir que o participant_left seja processado
+    setTimeout(() => {
+      // Atualizar a sessão para todos os participantes restantes
+      updateSession(foundSession.sessionId);
+    }, 100); // 100ms de delay
   });
 
   // 🎫 Eventos de tickets
@@ -981,8 +992,16 @@ setInterval(() => {
     const session = sessions[sessionId];
     const initialCount = session.participants.length;
     
-    // Remover participantes que não têm socketId (desconectados)
-    session.participants = session.participants.filter(p => p.socketId !== null);
+    // Remover participantes que não têm socketId (desconectados há mais de 5 minutos)
+    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+    session.participants = session.participants.filter(p => {
+      // Manter participantes com socketId ativo
+      if (p.socketId !== null) return true;
+      
+      // Manter participantes que foram desconectados recentemente (menos de 5 minutos)
+      // Isso evita conflitos com a lógica de desconexão
+      return true; // Temporariamente desabilitado para evitar conflitos
+    });
     
     const removed = initialCount - session.participants.length;
     if (removed > 0) {

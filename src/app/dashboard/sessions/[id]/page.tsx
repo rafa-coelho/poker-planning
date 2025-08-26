@@ -350,7 +350,7 @@ export default function SessionDetailPage() {
                         {t('tickets.priority')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {t('tickets.status')}
+                        {t('tickets.status.title')}
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {t('tickets.finalEstimate')}

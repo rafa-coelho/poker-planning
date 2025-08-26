@@ -470,10 +470,13 @@ class ApiService {
       body: JSON.stringify(userData),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
+      // Usar a mensagem de erro específica retornada pela API
       return {
         success: false,
-        error: {
+        error: data.error?.message || data.error || {
           code: 'REGISTER_FAILED',
           message: i18next.t('api.errors.registerFailed'),
           timestamp: new Date().toISOString()
@@ -481,7 +484,6 @@ class ApiService {
       };
     }
 
-    const data = await response.json();
     return {
       success: true,
       data

@@ -645,25 +645,7 @@ export function useSession () {
 
   /** 🔹 Manipula quando um participante sai da sessão */
   const handleParticipantLeft = (data: { userId: string; userName: string }) => {
-    // Mostrar notificação visual
-    setParticipantNotification({ userName: data.userName, type: 'left' });
-    
-    // Limpar notificação após 3 segundos
-    setTimeout(() => {
-      setParticipantNotification(null);
-    }, 3000);
-    
-    // Mostrar notificação do sistema se disponível
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification(t("session.participantLeft.title"), {
-          body: t("session.participantLeft.message", { userName: data.userName }),
-          icon: '/favicon.ico'
-        });
-      }
-    }
-    
-    // Atualizar a lista de participantes removendo o que saiu
+    // Atualizar a lista de participantes removendo o que saiu (sem notificação visual)
     setSessionData(prev => ({
       ...prev,
       participants: prev.participants.filter(p => p.userId !== data.userId)

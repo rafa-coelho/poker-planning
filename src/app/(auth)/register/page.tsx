@@ -83,17 +83,27 @@ export default function RegisterPage() {
     setErrors({});
 
     try {
-      const success = await register({
+      const result = await register({
         name: form.name,
         email: form.email,
         password: form.password,
         organizationName: form.organizationName
       });
-      
-      if (!success) {
-        setErrors({
-          general: t('auth.common.error')
-        });
+
+      if (!result.success) {
+        if (result.error?.includes('Email já está em uso') || result.error?.includes('Email is already in use')) {
+          setErrors({
+            email: t('auth.register.errors.emailAlreadyExists')
+          });
+        } else if (result.error?.includes('Senha não atende') || result.error?.includes('Password too weak')) {
+          setErrors({
+            password: t('auth.register.errors.weakPassword')
+          });
+        } else {
+          setErrors({
+            general: result.error || t('auth.common.error')
+          });
+        }
         return;
       }
 

@@ -288,7 +288,17 @@
     "new": "New Ticket",
     "edit": "Edit Ticket",
     "delete": "Delete Ticket",
-    "noTickets": "No tickets created yet"
+    "noTickets": "No tickets created yet",
+    "status": {
+      "title": "Status",
+      "pending": "Pending",
+      "voting": "Voting",
+      "estimated": "Estimated"
+    },
+    "startVoting": "Start Voting",
+    "finishVoting": "Finish Voting",
+    "finalEstimate": "Final Estimate",
+    "votes": "Votes"
   },
   "voting": {
     "title": "Voting",

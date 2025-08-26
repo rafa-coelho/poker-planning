@@ -360,6 +360,7 @@
     "priority.high": "Alta",
     "priority.urgent": "Urgente",
     "status": {
+      "title": "Status",
       "pending": "Pendente",
       "voting": "Votando",
       "estimated": "Estimado"
