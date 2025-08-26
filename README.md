@@ -21,7 +21,6 @@ Uma aplicação robusta de **Poker Planning** transformada em uma solução empr
 - ⚡ **Real-time Otimizado** - WebSocket escalável
 - 💰 **Paywall Ready** - Limitações por plano
 - 🌍 **Internacionalização** - PT/EN (expansível)
-- 🔓 **Modo Aberto** - Versão simplificada sem autenticação
 
 ## 🚀 Demo
 
@@ -254,37 +253,6 @@ Documentação completa disponível em [`docs/`](./docs/):
 - **[Schema do Banco](./docs/SCHEMA_BANCO_DADOS.md)** - Estrutura completa do PostgreSQL
 - **[API Endpoints](./docs/API_ENDPOINTS.md)** - Documentação da API REST
 - **[Checklist](./docs/CHECKLIST_IMPLEMENTACAO.md)** - Lista de tarefas detalhada
-- **[Modo Aberto](./docs/MODO_ABERTO.md)** - Versão simplificada sem autenticação
-
-## 🔓 Modo Aberto
-
-A aplicação agora suporta um **Modo Aberto** que permite criar e participar de sessões de Poker Planning sem necessidade de autenticação ou persistência de dados.
-
-### ✨ Características do Modo Aberto
-
-- 🚀 **Sem Autenticação** - Crie e participe sem criar conta
-- ⚡ **Rápido e Simples** - Interface focada apenas no essencial
-- 🗑️ **Dados Temporários** - Limpeza automática após 24 horas
-- 🔒 **Isolado** - Não interfere com dados empresariais
-
-### 🚀 Como Usar
-
-```bash
-# Habilitar modo aberto
-OPEN_MODE_ENABLED=true
-
-# Criar sessão via API
-curl -X POST /api/open/sessions \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Sprint Planning", "creatorName": "João"}'
-
-# Acessar sessão
-GET /api/open/sessions/{sessionId}
-```
-
-### 📚 Documentação Completa
-
-Para mais detalhes sobre o modo aberto, consulte a [documentação completa](./docs/MODO_ABERTO.md).
 
 ## 🚀 Roadmap de Implementação
 

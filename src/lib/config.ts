@@ -51,13 +51,6 @@ export const APP_CONFIG = {
   ENABLE_PASSWORD_RESET: process.env.ENABLE_PASSWORD_RESET !== 'false', // true por padrão
   ENABLE_EMAIL_VERIFICATION: process.env.ENABLE_EMAIL_VERIFICATION === 'true', // false por padrão
   
-  // Modo Aberto (Open Mode)
-  OPEN_MODE_ENABLED: process.env.OPEN_MODE_ENABLED === 'true', // false por padrão
-  OPEN_MODE_SESSION_TTL: parseInt(process.env.OPEN_MODE_SESSION_TTL || '86400', 10), // 24 horas em segundos
-  OPEN_MODE_MAX_PARTICIPANTS: parseInt(process.env.OPEN_MODE_MAX_PARTICIPANTS || '50', 10),
-  OPEN_MODE_MAX_SESSIONS_PER_IP: parseInt(process.env.OPEN_MODE_MAX_SESSIONS_PER_IP || '10', 10),
-  OPEN_MODE_CLEANUP_INTERVAL: parseInt(process.env.OPEN_MODE_CLEANUP_INTERVAL || '3600', 10), // 1 hora em segundos
-  
   // Multi-tenancy
   DEFAULT_ORGANIZATION_PLAN: process.env.DEFAULT_ORGANIZATION_PLAN || 'FREE',
   
@@ -107,16 +100,10 @@ export const APP_CONFIG = {
  */
 export function validateConfig(): void {
   const requiredConfigs = [
-    'DATABASE_URL'
+    'DATABASE_URL',
+    'JWT_SECRET', 
+    'JWT_REFRESH_SECRET'
   ]
-
-  // Se o modo aberto estiver habilitado, algumas configurações são opcionais
-  if (APP_CONFIG.OPEN_MODE_ENABLED) {
-    console.log('🔓 Modo aberto habilitado - algumas validações serão relaxadas')
-  } else {
-    // No modo empresarial, JWT é obrigatório
-    requiredConfigs.push('JWT_SECRET', 'JWT_REFRESH_SECRET')
-  }
 
   const missingConfigs = requiredConfigs.filter(config => !process.env[config])
 
@@ -156,14 +143,4 @@ export function getEnvConfig<T extends keyof typeof ENV_CONFIG.development>(
   return ENV_CONFIG[env]?.[key] ?? ENV_CONFIG.development[key]
 }
 
-/**
- * Inicializa serviços baseados na configuração
- */
-export function initializeServices() {
-  // Inicializar limpeza automática se o modo aberto estiver habilitado
-  if (APP_CONFIG.OPEN_MODE_ENABLED) {
-    const { CleanupService } = require('./services/cleanupService')
-    CleanupService.scheduleCleanup()
-    console.log('🔓 Modo aberto habilitado - serviços inicializados')
-  }
-} 
+ 

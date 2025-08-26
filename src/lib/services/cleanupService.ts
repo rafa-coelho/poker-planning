@@ -1,5 +1,3 @@
-import { APP_CONFIG } from '@/lib/config'
-import { OpenSessionService } from './openSessionService'
 import { prisma } from '@/lib/db'
 
 /**
@@ -16,12 +14,6 @@ export class CleanupService {
     let totalCleaned = 0
 
     try {
-      // Limpar sessões abertas expiradas
-      if (APP_CONFIG.OPEN_MODE_ENABLED) {
-        const openSessionsCleaned = await OpenSessionService.cleanupExpiredSessions()
-        totalCleaned += openSessionsCleaned
-      }
-
       // Limpar participantes públicos expirados
       const publicParticipantsCleaned = await this.cleanupExpiredPublicParticipants()
       totalCleaned += publicParticipantsCleaned
@@ -42,7 +34,6 @@ export class CleanupService {
         totalCleaned,
         duration,
         details: {
-          openSessions: APP_CONFIG.OPEN_MODE_ENABLED ? await OpenSessionService.cleanupExpiredSessions() : 0,
           publicParticipants: publicParticipantsCleaned,
           invites: invitesCleaned,
           resetTokens: resetTokensCleaned
@@ -139,22 +130,7 @@ export class CleanupService {
     }
   }
 
-  /**
-   * Agenda limpeza automática
-   */
-  static scheduleCleanup() {
-    if (!APP_CONFIG.OPEN_MODE_ENABLED) {
-      return
-    }
 
-    const intervalMs = APP_CONFIG.OPEN_MODE_CLEANUP_INTERVAL * 1000
-
-    setInterval(async () => {
-      await this.runCleanup()
-    }, intervalMs)
-
-    console.log(`🕐 Limpeza automática agendada para executar a cada ${APP_CONFIG.OPEN_MODE_CLEANUP_INTERVAL} segundos`)
-  }
 
   /**
    * Executa limpeza manual (para testes ou comandos administrativos)

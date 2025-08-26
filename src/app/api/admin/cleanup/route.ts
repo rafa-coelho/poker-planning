@@ -70,11 +70,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        openModeEnabled: APP_CONFIG.OPEN_MODE_ENABLED,
-        cleanupInterval: APP_CONFIG.OPEN_MODE_CLEANUP_INTERVAL,
-        sessionTTL: APP_CONFIG.OPEN_MODE_SESSION_TTL,
-        maxParticipants: APP_CONFIG.OPEN_MODE_MAX_PARTICIPANTS,
-        maxSessionsPerIP: APP_CONFIG.OPEN_MODE_MAX_SESSIONS_PER_IP,
         environment: APP_CONFIG.NODE_ENV
       },
       message: 'Cleanup status retrieved successfully'
