@@ -93,6 +93,9 @@ export const APP_CONFIG = {
   // Desenvolvimento
   ENABLE_SWAGGER: process.env.ENABLE_SWAGGER === 'true',
   ENABLE_DEBUG_MODE: process.env.ENABLE_DEBUG_MODE === 'true',
+  
+  // Modo Aberto
+  OPEN_MODE: process.env.OPEN_MODE === 'true' || process.env.NEXT_PUBLIC_OPEN_MODE === 'true',
 } as const
 
 /**

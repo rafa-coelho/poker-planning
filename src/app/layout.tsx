@@ -1,6 +1,7 @@
 import './globals.css';
 import { AuthProvider } from '@/lib/hooks/useAuth';
 import { PublicAuthProvider } from '@/lib/hooks/usePublicAuth';
+import { OpenModeProvider } from '@/lib/hooks/useOpenMode';
 import { BreadcrumbProvider } from '@/lib/context/breadcrumbContext';
 import { APP_CONFIG } from '@/lib/config';
 
@@ -19,9 +20,11 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <PublicAuthProvider>
-            <BreadcrumbProvider>
-              {children}
-            </BreadcrumbProvider>
+            <OpenModeProvider>
+              <BreadcrumbProvider>
+                {children}
+              </BreadcrumbProvider>
+            </OpenModeProvider>
           </PublicAuthProvider>
         </AuthProvider>
       </body>

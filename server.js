@@ -372,7 +372,7 @@ io.on("connection", (socket) => {
   });
 
   // 🚪 Entrar na sala
-  socket.on("join_room", async ({ sessionId, userId, userName, sessionName, organizationId, votingMode }) => {
+  socket.on("join_room", async ({ sessionId, userId, userName, sessionName, organizationId, votingMode, mode }) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('error', { message: 'Rate limit exceeded' });
       return;
@@ -385,8 +385,8 @@ io.on("connection", (socket) => {
     socket.sessionId = sessionId;
     socket.organizationId = organizationId;
 
-    // Validar acesso por organização
-    if (!validateOrganizationAccess(socket, sessionId, organizationId)) {
+    // Validar acesso por organização (pular se for modo aberto)
+    if (mode !== 'open' && !validateOrganizationAccess(socket, sessionId, organizationId)) {
       return;
     }
 
@@ -401,9 +401,23 @@ io.on("connection", (socket) => {
 
     // Inicializar sessão se não existir
     if (!sessions[sessionId]) {
-      // Carregar dados do banco de dados
-      try {
-        const dbSession = await PrismaService.loadSession(sessionId);
+      // Se for modo aberto, não carregar do banco principal
+      if (mode === 'open') {
+        sessions[sessionId] = {
+          sessionId,
+          sessionName: sessionName || "Sessão Poker Planning",
+          organizationId: null, // Modo aberto não tem organização
+          participants: [],
+          isRevealed: false,
+          currentTicketId: null,
+          votingMode: votingMode,
+          lastActivity: Date.now()
+        };
+        console.log(`📊 Sessão aberta criada: ${sessionId}`);
+      } else {
+        // Carregar dados do banco de dados (modo normal)
+        try {
+          const dbSession = await PrismaService.loadSession(sessionId);
 
         if (dbSession) {
           // Converter participantes do banco para o formato da sessão
@@ -454,6 +468,7 @@ io.on("connection", (socket) => {
         };
       }
     }
+  }
 
     // Atualizar participante existente ou adicionar novo
     const existingParticipant = sessions[sessionId].participants.find(p => p.userId === userId);
@@ -472,6 +487,12 @@ io.on("connection", (socket) => {
         selectedCard: null
       });
       console.log(`➕ Novo participante adicionado: ${userName} (${userId})`);
+      
+      // Emitir evento de participante juntado
+      io.to(sessionId).emit('participant_joined', {
+        userId,
+        userName
+      });
     }
 
     // Limpar participantes inativos (que não têm socketId) quando alguém se reconecta
@@ -537,12 +558,20 @@ io.on("connection", (socket) => {
     if (participant) {
       participant.selectedCard = cardValue;
 
-      // Persistir voto no banco de dados
-      try {
-        await PrismaService.persistVote(sessionId, userId, cardValue);
-      } catch (error) {
-        console.error('Erro ao persistir voto no banco:', error);
+      // Persistir voto no banco de dados (apenas se não for modo aberto)
+      if (organizationId !== null) {
+        try {
+          await PrismaService.persistVote(sessionId, userId, cardValue);
+        } catch (error) {
+          console.error('Erro ao persistir voto no banco:', error);
+        }
       }
+
+      // Emitir evento de atualização de voto
+      io.to(sessionId).emit('vote_update', {
+        userId,
+        cardValue
+      });
 
       updateSession(sessionId);
     }
@@ -644,11 +673,13 @@ io.on("connection", (socket) => {
     sessions[sessionId].isRevealed = false;
     sessions[sessionId].participants.forEach((p) => (p.selectedCard = null));
 
-    // Limpar votos no banco de dados
-    try {
-      await PrismaService.clearVotes(sessionId);
-    } catch (error) {
-      console.error('Erro ao limpar votos no banco:', error);
+    // Limpar votos no banco de dados (apenas se não for modo aberto)
+    if (organizationId !== null) {
+      try {
+        await PrismaService.clearVotes(sessionId);
+      } catch (error) {
+        console.error('Erro ao limpar votos no banco:', error);
+      }
     }
 
     // Limpar participantes inativos (que não têm socketId)
@@ -657,6 +688,9 @@ io.on("connection", (socket) => {
       console.log(`🧹 Removendo ${sessions[sessionId].participants.length - activeParticipants.length} participantes inativos`);
       sessions[sessionId].participants = activeParticipants;
     }
+
+    // Emitir evento de nova votação
+    io.to(sessionId).emit('new_voting');
 
     updateSession(sessionId);
   });
@@ -822,11 +856,13 @@ io.on("connection", (socket) => {
       session.currentTicketId = data.ticketId || null;
     }
 
-    // Persistir no banco de dados
-    try {
-      await PrismaService.updateCurrentTicket(data.sessionId, data.ticketId || null);
-    } catch (error) {
-      console.error('Erro ao persistir currentTicketId no banco:', error);
+    // Persistir no banco de dados (apenas se não for modo aberto)
+    if (data.organizationId !== null) {
+      try {
+        await PrismaService.updateCurrentTicket(data.sessionId, data.ticketId || null);
+      } catch (error) {
+        console.error('Erro ao persistir currentTicketId no banco:', error);
+      }
     }
 
     // Emitir apenas o evento específico - não updateSession para evitar condição de corrida

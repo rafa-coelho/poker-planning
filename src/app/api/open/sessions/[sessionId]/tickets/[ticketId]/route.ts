@@ -1,0 +1,226 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { APP_CONFIG } from '@/lib/config';
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { sessionId: string; ticketId: string } }
+) {
+  // Verificar se o modo aberto está habilitado
+  if (!APP_CONFIG.OPEN_MODE) {
+    return NextResponse.json(
+      { error: 'Modo aberto não está habilitado' },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const { sessionId, ticketId } = params;
+
+    // Verificar se a sessão existe e não expirou
+    const session = await prisma.openSession.findUnique({
+      where: { id: sessionId }
+    });
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Sessão não encontrada' },
+        { status: 404 }
+      );
+    }
+
+    if (session.expiresAt < new Date()) {
+      return NextResponse.json(
+        { error: 'Sessão expirada' },
+        { status: 410 }
+      );
+    }
+
+    // Buscar ticket
+    const ticket = await prisma.openTicket.findFirst({
+      where: { 
+        id: ticketId,
+        sessionId 
+      },
+      include: {
+        votes: {
+          include: {
+            participant: true
+          }
+        }
+      }
+    });
+
+    if (!ticket) {
+      return NextResponse.json(
+        { error: 'Ticket não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      ticket
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar ticket:', error);
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { sessionId: string; ticketId: string } }
+) {
+  // Verificar se o modo aberto está habilitado
+  if (!APP_CONFIG.OPEN_MODE) {
+    return NextResponse.json(
+      { error: 'Modo aberto não está habilitado' },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const { sessionId, ticketId } = params;
+    const body = await req.json();
+    const { title, description, finalEstimate, averageVote } = body;
+
+    // Verificar se a sessão existe e não expirou
+    const session = await prisma.openSession.findUnique({
+      where: { id: sessionId }
+    });
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Sessão não encontrada' },
+        { status: 404 }
+      );
+    }
+
+    if (session.expiresAt < new Date()) {
+      return NextResponse.json(
+        { error: 'Sessão expirada' },
+        { status: 410 }
+      );
+    }
+
+    // Buscar ticket
+    const existingTicket = await prisma.openTicket.findFirst({
+      where: { 
+        id: ticketId,
+        sessionId 
+      }
+    });
+
+    if (!existingTicket) {
+      return NextResponse.json(
+        { error: 'Ticket não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Atualizar ticket
+    const updateData: any = {};
+    if (title !== undefined) updateData.title = title.trim();
+    if (description !== undefined) updateData.description = description?.trim() || null;
+    if (finalEstimate !== undefined) updateData.finalEstimate = finalEstimate;
+    if (averageVote !== undefined) updateData.averageVote = averageVote;
+
+    const ticket = await prisma.openTicket.update({
+      where: { id: ticketId },
+      data: updateData,
+      include: {
+        votes: {
+          include: {
+            participant: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json({
+      success: true,
+      ticket,
+      message: 'Ticket atualizado com sucesso'
+    });
+
+  } catch (error) {
+    console.error('Erro ao atualizar ticket:', error);
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { sessionId: string; ticketId: string } }
+) {
+  // Verificar se o modo aberto está habilitado
+  if (!APP_CONFIG.OPEN_MODE) {
+    return NextResponse.json(
+      { error: 'Modo aberto não está habilitado' },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const { sessionId, ticketId } = params;
+
+    // Verificar se a sessão existe e não expirou
+    const session = await prisma.openSession.findUnique({
+      where: { id: sessionId }
+    });
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Sessão não encontrada' },
+        { status: 404 }
+      );
+    }
+
+    if (session.expiresAt < new Date()) {
+      return NextResponse.json(
+        { error: 'Sessão expirada' },
+        { status: 410 }
+      );
+    }
+
+    // Verificar se o ticket existe
+    const existingTicket = await prisma.openTicket.findFirst({
+      where: { 
+        id: ticketId,
+        sessionId 
+      }
+    });
+
+    if (!existingTicket) {
+      return NextResponse.json(
+        { error: 'Ticket não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Deletar ticket (cascade irá deletar os votos também)
+    await prisma.openTicket.delete({
+      where: { id: ticketId }
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Ticket deletado com sucesso'
+    });
+
+  } catch (error) {
+    console.error('Erro ao deletar ticket:', error);
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
+  }
+}

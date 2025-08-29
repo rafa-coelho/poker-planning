@@ -451,3 +451,106 @@ enum InviteStatus {
   EXPIRED
   CANCELLED
 }
+
+// 🎯 Modo Aberto - Sessões Temporárias
+model OpenSession {
+  id             String        @id @default(uuid())
+  name           String
+  description    String?
+  votingMode     VotingMode    @default(FIBONACCI)
+  autoReveal     Boolean       @default(false)
+  allowObservers Boolean       @default(true)
+  isRevealed     Boolean       @default(false)
+  
+  // Criador da sessão
+  creatorName    String
+  creatorIp      String?
+  creatorUserAgent String?
+  
+  // Ticket atual sendo votado
+  currentTicketId String?
+  currentTicket   OpenTicket?  @relation("CurrentTicket", fields: [currentTicketId], references: [id])
+  
+  // Expiração automática
+  expiresAt      DateTime      @default(dbgenerated("NOW() + INTERVAL '24 hours'"))
+  
+  // Audit fields
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  // Relations
+  participants   OpenSessionParticipant[]
+  tickets        OpenTicket[]
+  
+  @@index([expiresAt])
+  @@index([createdAt])
+  @@map("open_sessions")
+}
+
+// 👥 Participantes do Modo Aberto
+model OpenSessionParticipant {
+  id             String        @id @default(uuid())
+  sessionId      String
+  name           String
+  selectedCard   String?
+  isActive       Boolean       @default(true)
+  
+  // Informações de conexão
+  ipAddress      String?
+  userAgent      String?
+  
+  // Audit fields
+  joinedAt       DateTime      @default(now())
+  lastSeenAt     DateTime      @default(now())
+  
+  // Relations
+  session        OpenSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  votes          OpenVote[]
+  
+  @@index([sessionId])
+  @@index([isActive])
+  @@map("open_session_participants")
+}
+
+// 🎫 Tickets do Modo Aberto
+model OpenTicket {
+  id             String        @id @default(uuid())
+  sessionId      String
+  title          String
+  description    String?
+  finalEstimate  String?
+  averageVote    String?
+  
+  // Audit fields
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  // Relations
+  session        OpenSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  votes          OpenVote[]
+  currentSession OpenSession[] @relation("CurrentTicket")
+  
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("open_tickets")
+}
+
+// 🗳️ Votos do Modo Aberto
+model OpenVote {
+  id             String        @id @default(uuid())
+  ticketId       String
+  participantId  String
+  card           String
+  
+  // Audit fields
+  createdAt      DateTime      @default(now())
+  
+  // Relations
+  ticket         OpenTicket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  participant    OpenSessionParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  
+  @@unique([ticketId, participantId])
+  @@index([ticketId])
+  @@index([participantId])
+  @@map("open_votes")
+}
