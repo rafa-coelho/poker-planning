@@ -5,7 +5,7 @@
 
 export const APP_CONFIG = {
   // Informações da aplicação
-  APP_NAME: process.env.APP_NAME || 'Poker Planning',
+  APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || 'Poker Planning',
   APP_VERSION: process.env.APP_VERSION || '1.0.0',
   APP_DESCRIPTION: process.env.APP_DESCRIPTION || 'Plataforma de Poker Planning para estimativas ágeis',
   
@@ -95,7 +95,7 @@ export const APP_CONFIG = {
   ENABLE_DEBUG_MODE: process.env.ENABLE_DEBUG_MODE === 'true',
   
   // Modo Aberto
-  OPEN_MODE: process.env.OPEN_MODE === 'true' || process.env.NEXT_PUBLIC_OPEN_MODE === 'true',
+  OPEN_MODE: process.env.NEXT_PUBLIC_OPEN_MODE == 'true',
 } as const
 
 /**

@@ -38,10 +38,10 @@ export default function OpenModeJoinPage() {
         if (result.success) {
           setSessionData(result.session);
         } else {
-          setError(result.error || 'Sessão não encontrada');
+          setError(result.error || t("openMode.join.sessionNotFound"));
         }
       } catch (err) {
-        setError('Erro ao carregar dados da sessão');
+        setError(t("openMode.join.error"));
       } finally {
         setLoading(false);
       }
@@ -56,7 +56,7 @@ export default function OpenModeJoinPage() {
     e.preventDefault();
     
     if (!participantName.trim()) {
-      setError('Por favor, informe seu nome');
+      setError(t("openMode.join.nameRequired"));
       return;
     }
 
@@ -70,7 +70,7 @@ export default function OpenModeJoinPage() {
         router.push(`/open/${sessionId}`);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao entrar na sessão');
+      setError(err.message || t("openMode.join.joinError"));
     } finally {
       setSubmitting(false);
     }
@@ -81,7 +81,7 @@ export default function OpenModeJoinPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-        <p className="mt-4 text-gray-600">Carregando sessão...</p>
+        <p className="mt-4 text-gray-600">{t("openMode.join.loading")}</p>
       </div>
     );
   }
@@ -91,13 +91,13 @@ export default function OpenModeJoinPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
-          <h1 className="text-xl font-semibold text-red-800 mb-2">Erro</h1>
+          <h1 className="text-xl font-semibold text-red-800 mb-2">{t("error")}</h1>
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => router.push('/open')}
             className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
           >
-            Voltar ao Início
+            {t("backToDashboard")}
           </button>
         </div>
       </div>
@@ -112,14 +112,14 @@ export default function OpenModeJoinPage() {
           onClick={() => router.push('/open')}
           className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
         >
-          ← Voltar
+          ← {t("backToDashboard")}
         </button>
       </div>
 
       {/* Título */}
-      <h1 className="text-4xl font-extrabold text-gray-800">Entrar na Sessão</h1>
+      <h1 className="text-4xl font-extrabold text-gray-800">{t("openMode.join.title")}</h1>
       <p className="text-lg text-gray-600 mt-2 text-center">
-        {sessionData?.name || 'Sessão de Poker Planning'}
+        {sessionData?.name || t("session.defaultName")}
       </p>
 
       {sessionData?.description && (
@@ -131,28 +131,19 @@ export default function OpenModeJoinPage() {
       {/* Informações da Sessão */}
       <div className="mt-6 bg-white rounded-lg shadow-sm border p-6 max-w-md w-full">
         <div className="mb-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Informações da Sessão</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t("openMode.join.sessionInfo")}</h3>
           <div className="space-y-2 text-sm text-gray-600">
             <div className="flex justify-between">
-              <span>Modo de Votação:</span>
+              <span>{t("openMode.createModal.votingMode")}:</span>
               <span className="font-medium">
-                {sessionData?.votingMode === 'FIBONACCI' && 'Fibonacci'}
-                {sessionData?.votingMode === 'T_SHIRT' && 'T-Shirt'}
-                {sessionData?.votingMode === 'LINEAR' && 'Linear'}
+                {sessionData?.votingMode === 'FIBONACCI' && t("openMode.createModal.votingModes.fibonacci")}
+                {sessionData?.votingMode === 'T_SHIRT' && t("openMode.createModal.votingModes.tshirt")}
+                {sessionData?.votingMode === 'LINEAR' && t("openMode.createModal.votingModes.linear")}
               </span>
             </div>
             <div className="flex justify-between">
-              <span>Participantes:</span>
+              <span>{t("loading.users")}:</span>
               <span className="font-medium">{sessionData?.participants?.length || 0}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Expira em:</span>
-              <span className="font-medium">
-                {sessionData?.expiresAt ? 
-                  new Date(sessionData.expiresAt).toLocaleString('pt-BR') : 
-                  '24 horas'
-                }
-              </span>
             </div>
           </div>
         </div>
@@ -161,7 +152,7 @@ export default function OpenModeJoinPage() {
         <form onSubmit={handleJoinSession}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Seu Nome *
+              {t("openMode.join.name")} *
             </label>
             <input
               type="text"
@@ -169,7 +160,7 @@ export default function OpenModeJoinPage() {
               value={participantName}
               onChange={(e) => setParticipantName(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              placeholder="Como você quer ser chamado"
+              placeholder={t("openMode.join.namePlaceholder")}
               required
             />
           </div>
@@ -185,7 +176,7 @@ export default function OpenModeJoinPage() {
             disabled={submitting || !participantName.trim()}
             className="w-full bg-green-600 text-white py-3 px-6 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors font-medium"
           >
-            {submitting ? 'Entrando...' : 'Entrar na Sessão'}
+            {submitting ? t("openMode.join.joining") : t("openMode.join.join")}
           </button>
         </form>
       </div>

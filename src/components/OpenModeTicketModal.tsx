@@ -73,7 +73,7 @@ export default function OpenModeTicketModal({
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      console.error("Erro ao salvar ticket:", error);
+      console.error(t("tickets.errors.createFailed"), error);
     } finally {
       setLoading(false);
     }

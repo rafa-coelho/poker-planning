@@ -18,6 +18,7 @@ const PrismaService = {
           organizationId: true,
           currentTicketId: true,
           votingMode: true,
+          isRevealed: true, // Incluir estado isRevealed
           participants: {
             where: { isActive: true },
             select: {
@@ -39,6 +40,30 @@ const PrismaService = {
     } catch (error) {
       console.error('Erro ao carregar sessão:', error)
       throw error
+    }
+  },
+
+  // Carregar sessão do modo aberto
+  async loadOpenSession(sessionId) {
+    try {
+      const dbSession = await prisma.openSession.findUnique({
+        where: { id: sessionId },
+        include: {
+          participants: {
+            where: { isActive: true },
+            orderBy: { joinedAt: 'asc' }
+          },
+          tickets: {
+            orderBy: { createdAt: 'desc' }
+          },
+          currentTicket: true
+        }
+      });
+      
+      return dbSession;
+    } catch (error) {
+      console.error('Erro ao carregar sessão aberta:', error);
+      throw error;
     }
   },
 
@@ -102,6 +127,32 @@ const PrismaService = {
     } catch (error) {
       console.error('Erro ao marcar participante como inativo:', error)
       throw error
+    }
+  },
+
+  // Atualizar estado isRevealed no banco (modo normal)
+  async updateSessionRevealedState(sessionId, isRevealed) {
+    try {
+      await prisma.session.update({
+        where: { id: sessionId },
+        data: { isRevealed }
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar estado isRevealed:', error);
+      throw error;
+    }
+  },
+
+  // Atualizar estado isRevealed no banco (modo aberto)
+  async updateOpenSessionRevealedState(sessionId, isRevealed) {
+    try {
+      await prisma.openSession.update({
+        where: { id: sessionId },
+        data: { isRevealed }
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar estado isRevealed (modo aberto):', error);
+      throw error;
     }
   },
 
@@ -276,8 +327,18 @@ function updateSession(sessionId) {
   const session = sessions[sessionId];
   if (session) {
     session.lastActivity = Date.now();
+    
+    // Converter participantes para o formato esperado pelo frontend
+    const formattedParticipants = session.participants.map(p => ({
+      id: p.userId,
+      name: p.userName,
+      selectedCard: p.selectedCard,
+      isCurrentUser: false // Será definido no frontend baseado no localStorage
+    }));
+    
     io.to(sessionId).emit("session_update", {
       ...session,
+      participants: formattedParticipants,
       currentTicketId: session.currentTicketId || null
     });
   }
@@ -378,6 +439,7 @@ io.on("connection", (socket) => {
       return;
     }
 
+    console.log(`🔍 JOIN_ROOM - Iniciando: sessionId=${sessionId}, userId=${userId}, userName=${userName}, mode=${mode}, organizationId=${organizationId}`);
     logEvent('JOIN_ROOM', socket.id, { sessionId, userId, userName, organizationId });
 
     // Armazenar informações do usuário no socket
@@ -400,20 +462,65 @@ io.on("connection", (socket) => {
     socket.join(sessionId);
 
     // Inicializar sessão se não existir
+    console.log(`🔍 JOIN_ROOM - Verificando se sessão existe: ${sessionId}, exists=${!!sessions[sessionId]}`);
     if (!sessions[sessionId]) {
-      // Se for modo aberto, não carregar do banco principal
+      console.log(`🔍 JOIN_ROOM - Sessão não existe, criando... mode=${mode}`);
+      // Se for modo aberto, carregar do banco ou criar nova
       if (mode === 'open') {
-        sessions[sessionId] = {
-          sessionId,
-          sessionName: sessionName || "Sessão Poker Planning",
-          organizationId: null, // Modo aberto não tem organização
-          participants: [],
-          isRevealed: false,
-          currentTicketId: null,
-          votingMode: votingMode,
-          lastActivity: Date.now()
-        };
-        console.log(`📊 Sessão aberta criada: ${sessionId}`);
+        try {
+          // Tentar carregar sessão existente do banco
+          const dbSession = await PrismaService.loadOpenSession(sessionId);
+          
+          if (dbSession) {
+            // Converter participantes do banco para o formato da sessão
+            const participants = dbSession.participants.map(p => ({
+              userId: p.id,
+              userName: p.name,
+              socketId: null, // Será definido quando o participante se conectar
+              isCurrentUser: false,
+              selectedCard: p.selectedCard
+            }));
+
+            sessions[sessionId] = {
+              sessionId: dbSession.id,
+              sessionName: dbSession.name || "Sessão Poker Planning",
+              organizationId: null, // Modo aberto não tem organização
+              participants: participants,
+              isRevealed: dbSession.isRevealed || false, // Preservar estado do banco
+              currentTicketId: dbSession.currentTicketId,
+              votingMode: dbSession.votingMode,
+              lastActivity: Date.now()
+            };
+            console.log(`📊 Sessão aberta carregada do banco: ${sessionId}, isRevealed: ${dbSession.isRevealed}`);
+          } else {
+            // Criar nova sessão aberta se não existir no banco
+            sessions[sessionId] = {
+              sessionId,
+              sessionName: sessionName || "Sessão Poker Planning",
+              organizationId: null, // Modo aberto não tem organização
+              participants: [],
+              isRevealed: false,
+              currentTicketId: null,
+              votingMode: votingMode,
+              lastActivity: Date.now()
+            };
+            console.log(`📊 Nova sessão aberta criada: ${sessionId}`);
+          }
+        } catch (error) {
+          console.error('Erro ao carregar sessão aberta:', error);
+          // Fallback para nova sessão em caso de erro
+          sessions[sessionId] = {
+            sessionId,
+            sessionName: sessionName || "Sessão Poker Planning",
+            organizationId: null, // Modo aberto não tem organização
+            participants: [],
+            isRevealed: false,
+            currentTicketId: null,
+            votingMode: votingMode,
+            lastActivity: Date.now()
+          };
+          console.log(`📊 Sessão aberta criada como fallback: ${sessionId}`);
+        }
       } else {
         // Carregar dados do banco de dados (modo normal)
         try {
@@ -434,7 +541,7 @@ io.on("connection", (socket) => {
             sessionName: dbSession.name || sessionName || "Sessão Poker Planning",
             organizationId: dbSession.organizationId || organizationId,
             participants: participants,
-            isRevealed: false,
+            isRevealed: dbSession.isRevealed || false, // Preservar estado do banco
             currentTicketId: dbSession.currentTicketId,
             votingMode: dbSession.votingMode || votingMode,
             lastActivity: Date.now()
@@ -471,6 +578,7 @@ io.on("connection", (socket) => {
   }
 
     // Atualizar participante existente ou adicionar novo
+    console.log(`🔍 JOIN_ROOM - Adicionando participante: userId=${userId}, userName=${userName}`);
     const existingParticipant = sessions[sessionId].participants.find(p => p.userId === userId);
     if (existingParticipant) {
       // Atualizar socketId e userName do participante existente
@@ -487,6 +595,7 @@ io.on("connection", (socket) => {
         selectedCard: null
       });
       console.log(`➕ Novo participante adicionado: ${userName} (${userId})`);
+      console.log(`🔍 JOIN_ROOM - Total de participantes na sessão: ${sessions[sessionId].participants.length}`);
       
       // Emitir evento de participante juntado
       io.to(sessionId).emit('participant_joined', {
@@ -597,6 +706,19 @@ io.on("connection", (socket) => {
     session.participants.forEach((p) => (p.selectedCard = null));
     session.isRevealed = false;
 
+    // Persistir estado no banco
+    try {
+      if (organizationId === null) {
+        // Modo aberto
+        await PrismaService.updateOpenSessionRevealedState(sessionId, false);
+      } else {
+        // Modo normal  
+        await PrismaService.updateSessionRevealedState(sessionId, false);
+      }
+    } catch (error) {
+      console.error('Erro ao persistir estado isRevealed=false (voting_started):', error);
+    }
+
     // Limpar votos no banco de dados
     try {
       await PrismaService.clearVotes(sessionId);
@@ -647,9 +769,23 @@ io.on("connection", (socket) => {
     io.to(sessionId).emit("flip_cards");
 
     // Após 3 segundos, revelar as cartas
-    setTimeout(() => {
+    setTimeout(async () => {
       if (sessions[sessionId]) {
         sessions[sessionId].isRevealed = true;
+        
+        // Persistir estado no banco
+        try {
+          if (organizationId === null) {
+            // Modo aberto
+            await PrismaService.updateOpenSessionRevealedState(sessionId, true);
+          } else {
+            // Modo normal
+            await PrismaService.updateSessionRevealedState(sessionId, true);
+          }
+        } catch (error) {
+          console.error('Erro ao persistir estado isRevealed=true:', error);
+        }
+        
         updateSession(sessionId);
       }
     }, 3000);
@@ -672,6 +808,19 @@ io.on("connection", (socket) => {
 
     sessions[sessionId].isRevealed = false;
     sessions[sessionId].participants.forEach((p) => (p.selectedCard = null));
+
+    // Persistir estado no banco
+    try {
+      if (organizationId === null) {
+        // Modo aberto
+        await PrismaService.updateOpenSessionRevealedState(sessionId, false);
+      } else {
+        // Modo normal
+        await PrismaService.updateSessionRevealedState(sessionId, false);
+      }
+    } catch (error) {
+      console.error('Erro ao persistir estado isRevealed=false:', error);
+    }
 
     // Limpar votos no banco de dados (apenas se não for modo aberto)
     if (organizationId !== null) {
@@ -774,10 +923,27 @@ io.on("connection", (socket) => {
     rateLimitMap.delete(socket.id);
     heartbeatMap.delete(socket.id);
 
-    // Se é o último participante, deletar a sessão
+    // Se é o último participante, deletar a sessão (com delay para OpenMode)
     if (foundSession.participants.length === 1) {
-      console.log(`🗑️ Último participante saiu, deletando sessão ${foundSession.sessionId}`);
-      delete sessions[foundSession.sessionId];
+      console.log(`🗑️ Último participante saiu, agendando deleção da sessão ${foundSession.sessionId}`);
+      
+      // Para OpenMode, adicionar delay antes de deletar
+      if (foundSession.organizationId === null) {
+        console.log(`⏰ OpenMode: aguardando 30 segundos antes de deletar sessão ${foundSession.sessionId}`);
+        setTimeout(() => {
+          // Verificar se ainda não há participantes
+          if (sessions[foundSession.sessionId] && sessions[foundSession.sessionId].participants.length === 0) {
+            console.log(`🗑️ Deletando sessão OpenMode após delay: ${foundSession.sessionId}`);
+            delete sessions[foundSession.sessionId];
+          } else {
+            console.log(`✅ Sessão OpenMode ${foundSession.sessionId} foi reativada, cancelando deleção`);
+          }
+        }, 30000); // 30 segundos de delay
+      } else {
+        // Para sessões normais, deletar imediatamente
+        console.log(`🗑️ Deletando sessão normal: ${foundSession.sessionId}`);
+        delete sessions[foundSession.sessionId];
+      }
       return;
     }
 
@@ -814,11 +980,16 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (!validateOrganizationAccess(socket, data.sessionId, data.organizationId)) {
+    console.log(`🔍 TICKET_CREATED - Validando acesso: sessionId=${data.sessionId}, organizationId=${data.organizationId}`);
+    const hasAccess = validateOrganizationAccess(socket, data.sessionId, data.organizationId);
+    console.log(`🔍 TICKET_CREATED - Acesso ${hasAccess ? 'PERMITIDO' : 'NEGADO'}`);
+    
+    if (!hasAccess) {
       return;
     }
 
     logEvent('TICKET_CREATED', socket.id, { sessionId: data.sessionId, ticketId: data.ticket?.id });
+    console.log(`🔍 TICKET_CREATED - Re-emitindo para sala: ${data.sessionId}`);
     // Simplesmente re-emitir para todos na sala
     io.to(data.sessionId).emit("ticket_created", { ticket: data.ticket });
   });
@@ -844,7 +1015,11 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (!validateOrganizationAccess(socket, data.sessionId, data.organizationId)) {
+    console.log(`🔍 TICKET_SELECTED - Validando acesso: sessionId=${data.sessionId}, organizationId=${data.organizationId}`);
+    const hasAccess = validateOrganizationAccess(socket, data.sessionId, data.organizationId);
+    console.log(`🔍 TICKET_SELECTED - Acesso ${hasAccess ? 'PERMITIDO' : 'NEGADO'}`);
+    
+    if (!hasAccess) {
       return;
     }
 
@@ -854,6 +1029,9 @@ io.on("connection", (socket) => {
     const session = sessions[data.sessionId];
     if (session) {
       session.currentTicketId = data.ticketId || null;
+      console.log(`🔍 TICKET_SELECTED - Sessão atualizada: currentTicketId=${session.currentTicketId}`);
+    } else {
+      console.log(`🔍 TICKET_SELECTED - Sessão não encontrada: ${data.sessionId}`);
     }
 
     // Persistir no banco de dados (apenas se não for modo aberto)
@@ -866,6 +1044,7 @@ io.on("connection", (socket) => {
     }
 
     // Emitir apenas o evento específico - não updateSession para evitar condição de corrida
+    console.log(`🔍 TICKET_SELECTED - Re-emitindo para sala: ${data.sessionId}`);
     io.to(data.sessionId).emit("ticket_selected", { ticketId: data.ticketId });
   });
 
@@ -977,6 +1156,20 @@ io.on("connection", (socket) => {
       console.log(`🗑️ Sessão ${data.sessionId} removida da memória após encerramento`);
     }
   });
+});
+
+// Endpoint para emitir eventos de tickets (chamado pela API do Next.js)
+expressApp.post('/emit-event', express.json(), (req, res) => {
+  const { eventName, sessionId, data } = req.body;
+  
+  if (!eventName || !sessionId) {
+    return res.status(400).json({ error: 'eventName e sessionId são obrigatórios' });
+  }
+  
+  console.log(`🎫 SERVER: Emitindo evento ${eventName} para sala ${sessionId}:`, data);
+  io.to(sessionId).emit(eventName, data);
+  
+  res.json({ success: true, eventName, sessionId });
 });
 
 // Rota de health check

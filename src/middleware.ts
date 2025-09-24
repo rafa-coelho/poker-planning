@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Verificar se o modo aberto está habilitado
-  const openMode = process.env.OPEN_MODE === 'true';
+  const openMode = process.env.NEXT_PUBLIC_OPEN_MODE == 'true';
   
   if (openMode) {
     // No modo aberto, redirecionar rotas protegidas para a raiz

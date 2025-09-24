@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { FiCopy, FiXCircle, FiUsers, FiLink } from "react-icons/fi";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { APP_CONFIG } from "@/lib/config";
 
 interface InviteModalProps {
   inviteLink: string;
@@ -30,6 +31,7 @@ export default function InviteModal ({
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const isOpenMode = APP_CONFIG.OPEN_MODE;
 
   useEffect(() => {
     if (activeTab === 'team') {
@@ -65,7 +67,7 @@ export default function InviteModal ({
 
   function shareLink () {
     if (navigator.share) {
-      navigator.share({ title: "Planning Poker", url: inviteLink });
+      navigator.share({ title: APP_CONFIG.APP_NAME, url: inviteLink });
     } else {
       copyLink();
     }
@@ -117,32 +119,33 @@ export default function InviteModal ({
           {t("invitePlayers")}
         </h2>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200 mb-4">
-          <button
-            onClick={() => setActiveTab('link')}
-            className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'link' 
-                ? 'border-blue-500 text-blue-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <FiLink size={16} />
-            <span>{t("copyLink")}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('team')}
-            className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'team' 
-                ? 'border-blue-500 text-blue-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <FiUsers size={16} />
-            <span>{t("teamMembers")}</span>
-          </button>
-
-        </div>
+        {/* Tabs (hidden in Open Mode) */}
+        {!isOpenMode && (
+          <div className="flex border-b border-gray-200 mb-4">
+            <button
+              onClick={() => setActiveTab('link')}
+              className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'link' 
+                  ? 'border-blue-500 text-blue-600' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <FiLink size={16} />
+              <span>{t("copyLink")}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('team')}
+              className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'team' 
+                  ? 'border-blue-500 text-blue-600' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <FiUsers size={16} />
+              <span>{t("teamMembers")}</span>
+            </button>
+          </div>
+        )}
 
         {/* Tab Content */}
         {activeTab === 'link' && (
@@ -166,24 +169,32 @@ export default function InviteModal ({
               </button>
             </div>
             
-            {/* Informações sobre acesso */}
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
-              <div className="flex items-start space-x-2">
-                <div className="flex-shrink-0 mt-0.5">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">Como funciona o acesso:</p>
-                  <ul className="space-y-1 text-xs">
-                    <li>• <strong>Usuários logados:</strong> Acesso direto à sessão</li>
-                    <li>• <strong>Usuários não logados:</strong> Podem participar como convidados</li>
-                    <li>• <strong>Convidados:</strong> Precisam fornecer nome e aguardar aprovação</li>
-                  </ul>
+            {/* Informações sobre acesso (omit in Open Mode) */}
+            {!isOpenMode && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
+                <div className="flex items-start space-x-2">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium mb-1">{t("inviteModal.accessInfo.title")}</p>
+                    <ul className="space-y-1 text-xs">
+                      <li>
+                        • <strong>{t("inviteModal.accessInfo.items.loggedIn.title")}</strong>: {t("inviteModal.accessInfo.items.loggedIn.description")}
+                      </li>
+                      <li>
+                        • <strong>{t("inviteModal.accessInfo.items.notLoggedIn.title")}</strong>: {t("inviteModal.accessInfo.items.notLoggedIn.description")}
+                      </li>
+                      <li>
+                        • <strong>{t("inviteModal.accessInfo.items.guests.title")}</strong>: {t("inviteModal.accessInfo.items.guests.description")}
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             
             <div className="flex justify-end space-x-2">
               <button
@@ -202,7 +213,7 @@ export default function InviteModal ({
           </div>
         )}
 
-        {activeTab === 'team' && (
+        {!isOpenMode && activeTab === 'team' && (
           <div>
             <p className="text-sm text-gray-600 mb-3">
               {t("selectTeamMembersToInvite")}
@@ -254,7 +265,7 @@ export default function InviteModal ({
               >
                 {t("close") || "Close"}
               </button>
-            </div>
+            </div> 
           </div>
         )}
 

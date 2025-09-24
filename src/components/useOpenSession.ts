@@ -23,6 +23,7 @@ export interface OpenSessionState {
   currentTicketId?: string | null;
   votingMode?: string;
   expiresAt?: string;
+  tickets?: any[];
 }
 
 export function useOpenSession() {
@@ -67,12 +68,32 @@ export function useOpenSession() {
           return;
         }
 
-        // Carregar dados do usuário do localStorage
+        // Carregar dados do usuário do localStorage PRIMEIRO
+        let userFromStorage = null;
+        let stateFromStorage = null;
         if (typeof window !== 'undefined') {
           const savedUser = localStorage.getItem(`openModeUser_${sessionId}`);
+          const savedState = localStorage.getItem(`openModeState_${sessionId}`);
+          
+          console.log('Tentando carregar usuário do localStorage:', savedUser);
           if (savedUser) {
-            const user = JSON.parse(savedUser);
-            setCurrentUser(user);
+            userFromStorage = JSON.parse(savedUser);
+            console.log('Usuário carregado do localStorage:', userFromStorage);
+            setCurrentUser(userFromStorage);
+          } else {
+            console.log('Nenhum usuário encontrado no localStorage para sessionId:', sessionId);
+          }
+
+          if (savedState) {
+            stateFromStorage = JSON.parse(savedState);
+            console.log('Estado carregado do localStorage:', stateFromStorage);
+            
+            // Verificar se o estado não é muito antigo (max 1 hora)
+            const oneHour = 60 * 60 * 1000;
+            if (Date.now() - stateFromStorage.lastUpdated > oneHour) {
+              localStorage.removeItem(`openModeState_${sessionId}`);
+              stateFromStorage = null;
+            }
           }
         }
 
@@ -80,16 +101,88 @@ export function useOpenSession() {
           sessionId: session.id,
           sessionName: session.name,
           participants: session.participants.map((p: any) => ({
-            id: p.id,
-            name: p.name,
+            id: p.id || p.userId, // Garantir consistência de estrutura  
+            name: p.name || p.userName, // Garantir consistência de estrutura
             selectedCard: p.selectedCard || null,
-            isCurrentUser: currentUser?.id === p.id
+            isCurrentUser: userFromStorage?.id === (p.id || p.userId)
           })),
-          isRevealed: session.isRevealed,
+          // Priorizar estado do localStorage se disponível (F5 protection)
+          isRevealed: stateFromStorage?.isRevealed ?? session.isRevealed,
           currentTicketId: session.currentTicketId,
           votingMode: session.votingMode,
-          expiresAt: session.expiresAt
+          expiresAt: session.expiresAt,
+          tickets: session.tickets || [],
         });
+
+        console.log('🎯 Sessão carregada - currentTicketId:', session.currentTicketId);
+        console.log('🎯 Sessão carregada - currentTicket:', session.currentTicket);
+
+        // Recuperar averageVote do localStorage se disponível
+        if (stateFromStorage?.averageVote) {
+          setAverageVote(stateFromStorage.averageVote);
+        }
+
+        // Preservar estado de isRevealed no localStorage para persistir F5
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`openModeState_${sessionId}`, JSON.stringify({
+            isRevealed: session.isRevealed,
+            averageVote: session.averageVote || null,
+            lastUpdated: Date.now()
+          }));
+        }
+
+        // Marcar como criador APENAS se ainda não houver criador definido
+        if (typeof window !== 'undefined' && userFromStorage) {
+          const creatorData = localStorage.getItem(`openModeCreator_${sessionId}`);
+          
+          // Se não há criador definido, verificar se este é o primeiro participante
+          if (!creatorData && session.participants.length > 0) {
+            // Verificar se este usuário é o participante mais antigo (pela data de entrada)
+            const sortedParticipants = session.participants.sort((a: any, b: any) => 
+              new Date(a.joinedAt || a.createdAt).getTime() - new Date(b.joinedAt || b.createdAt).getTime()
+            );
+            
+            const firstParticipant = sortedParticipants[0];
+            if ((firstParticipant.id || firstParticipant.userId) === userFromStorage.id) {
+              localStorage.setItem(`openModeCreator_${sessionId}`, JSON.stringify({
+                userId: userFromStorage.id,
+                userName: userFromStorage.name,
+                timestamp: Date.now()
+              }));
+              console.log('🏆 Usuário marcado como criador da sessão (primeiro a entrar):', userFromStorage.id);
+            }
+          } else if (creatorData) {
+            const creator = JSON.parse(creatorData);
+            console.log('🏆 Criador já definido:', creator.userId);
+            
+            // Verificar se o criador ainda está na sessão
+            const creatorStillInSession = session.participants.some((p: any) => 
+              (p.id || p.userId) === creator.userId
+            );
+            
+            if (!creatorStillInSession) {
+              console.log('⚠️ Criador original não está mais na sessão, passando liderança');
+              localStorage.removeItem(`openModeCreator_${sessionId}`);
+              
+              // Se este usuário é o primeiro da lista, ele vira o novo criador
+              if (session.participants.length > 0) {
+                const sortedParticipants = session.participants.sort((a: any, b: any) => 
+                  new Date(a.joinedAt || a.createdAt).getTime() - new Date(b.joinedAt || b.createdAt).getTime()
+                );
+                
+                const firstParticipant = sortedParticipants[0];
+                if ((firstParticipant.id || firstParticipant.userId) === userFromStorage.id) {
+                  localStorage.setItem(`openModeCreator_${sessionId}`, JSON.stringify({
+                    userId: userFromStorage.id,
+                    userName: userFromStorage.name,
+                    timestamp: Date.now()
+                  }));
+                  console.log('🏆 Liderança transferida para o primeiro participante ativo:', userFromStorage.id);
+                }
+              }
+            }
+          }
+        }
 
         // Carregar ticket atual se houver
         if (session.currentTicket) {
@@ -102,8 +195,7 @@ export function useOpenSession() {
           setInviteLink(`${window.location.origin}/open/${sessionId}/join`);
         }
 
-        // Inicializar WebSocket
-        initializeWebSocket();
+        // WebSocket será inicializado quando currentUser estiver disponível
       } else {
         console.error('Erro ao carregar sessão:', result.error);
         router.push('/open');
@@ -112,14 +204,16 @@ export function useOpenSession() {
       console.error('Erro ao carregar dados da sessão:', error);
       router.push('/open');
     }
-  }, [sessionId, router, currentUser]);
+  }, [sessionId, router]);
 
   // Inicializar WebSocket
   const initializeWebSocket = useCallback(() => {
     if (socketRef.current) {
+      console.log('🔌 useOpenSession: Desconectando socket anterior');
       socketRef.current.disconnect();
     }
 
+    console.log('🔌 useOpenSession: Iniciando nova conexão WebSocket');
     setConnectionStatus('connecting');
 
     const socket = io(HOST, {
@@ -130,20 +224,40 @@ export function useOpenSession() {
     });
 
     socket.on('connect', () => {
-      console.log('Conectado ao WebSocket (modo aberto)');
+      console.log('✅ useOpenSession: Conectado ao WebSocket (modo aberto)');
       setConnectionStatus('connected');
       
+      // Obter usuário do localStorage dinamicamente
+      let userFromStorage = null;
+      if (typeof window !== 'undefined') {
+        const savedUser = localStorage.getItem(`openModeUser_${sessionId}`);
+        if (savedUser) {
+          userFromStorage = JSON.parse(savedUser);
+        }
+      }
+      
       // Juntar à sala da sessão
-      if (currentUser) {
+      if (userFromStorage) {
+        console.log('🏠 useOpenSession: Emitindo join_room:', {
+          sessionId,
+          userId: userFromStorage.id,
+          userName: userFromStorage.name,
+          sessionName: sessionData.sessionName,
+          organizationId: null,
+          votingMode: sessionData.votingMode,
+          mode: 'open'
+        });
         socket.emit('join_room', {
           sessionId,
-          userId: currentUser.id,
-          userName: currentUser.name,
+          userId: userFromStorage.id,
+          userName: userFromStorage.name,
           sessionName: sessionData.sessionName,
           organizationId: null, // Modo aberto não tem organização
           votingMode: sessionData.votingMode,
           mode: 'open' // Indicar que é modo aberto
         });
+      } else {
+        console.log('🔍 useOpenSession: Usuário não encontrado no localStorage para join_room');
       }
     });
 
@@ -153,10 +267,34 @@ export function useOpenSession() {
     });
 
     socket.on('session_update', (data) => {
-      setSessionData(prev => ({
-        ...prev,
-        ...data
-      }));
+      // Obter usuário atual do localStorage para preservar isCurrentUser
+      let userFromStorage = null;
+      if (typeof window !== 'undefined') {
+        const savedUser = localStorage.getItem(`openModeUser_${sessionId}`);
+        if (savedUser) {
+          userFromStorage = JSON.parse(savedUser);
+        }
+      }
+
+      setSessionData(prev => {
+        // Preservar estado crítico que não deve ser perdido no F5
+        const updatedData = {
+          ...prev,
+          ...data
+        };
+
+        // Garantir que isCurrentUser seja mantido corretamente
+        if (data.participants && userFromStorage) {
+          updatedData.participants = data.participants.map((p: any) => ({
+            id: p.id || p.userId, // Garantir consistência de estrutura
+            name: p.name || p.userName, // Garantir consistência de estrutura
+            selectedCard: p.selectedCard || null,
+            isCurrentUser: userFromStorage.id === (p.id || p.userId)
+          }));
+        }
+
+        return updatedData;
+      });
     });
 
     socket.on('participant_joined', (data) => {
@@ -165,13 +303,22 @@ export function useOpenSession() {
         type: 'joined'
       });
       
+      // Obter usuário atual do localStorage para comparação
+      let userFromStorage = null;
+      if (typeof window !== 'undefined') {
+        const savedUser = localStorage.getItem(`openModeUser_${sessionId}`);
+        if (savedUser) {
+          userFromStorage = JSON.parse(savedUser);
+        }
+      }
+      
       setSessionData(prev => ({
         ...prev,
         participants: [...prev.participants, {
           id: data.userId,
           name: data.userName,
           selectedCard: null,
-          isCurrentUser: false
+          isCurrentUser: userFromStorage?.id === data.userId
         }]
       }));
     });
@@ -209,6 +356,8 @@ export function useOpenSession() {
           } else {
             clearInterval(interval);
             setSessionData(prev => {
+              let calculatedAverage = null;
+              
               if (prev) {
                 // Calcular média dos votos
                 const validVotes = prev.participants
@@ -224,12 +373,22 @@ export function useOpenSession() {
                   const numericVotes = validVotes.filter((v: any) => typeof v === 'number');
                   if (numericVotes.length > 0) {
                     const avg = numericVotes.reduce((sum: number, vote: number) => sum + vote, 0) / numericVotes.length;
-                    setAverageVote(avg.toFixed(1));
+                    calculatedAverage = avg.toFixed(1);
                   } else {
                     // Se não há votos numéricos, usar o primeiro voto como string
-                    setAverageVote(validVotes[0].toString());
+                    calculatedAverage = validVotes[0].toString();
                   }
+                  setAverageVote(calculatedAverage);
                 }
+              }
+              
+              // Salvar estado no localStorage
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(`openModeState_${sessionId}`, JSON.stringify({
+                  isRevealed: true,
+                  averageVote: calculatedAverage,
+                  lastUpdated: Date.now()
+                }));
               }
               
               return {
@@ -237,6 +396,7 @@ export function useOpenSession() {
                 isRevealed: true
               };
             });
+            
             return null;
           }
         });
@@ -250,14 +410,50 @@ export function useOpenSession() {
       }));
       setSelectedCard(null);
       setAverageVote(null);
+      
+      // Salvar estado no localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`openModeState_${sessionId}`, JSON.stringify({
+          isRevealed: false,
+          averageVote: null,
+          lastUpdated: Date.now()
+        }));
+      }
     });
 
     socket.on('ticket_selected', (data) => {
+      console.log('🎫 ticket_selected recebido:', data);
+      
       // Atualizar o ticket atual
       setSessionData(prev => ({
         ...prev,
         currentTicketId: data.ticketId
       }));
+      
+      // Se há um ticket selecionado, carregar seus dados
+      if (data.ticketId) {
+        // Buscar o ticket na lista de tickets ou fazer uma requisição
+        // Por enquanto, vamos assumir que o ticket será carregado via session_update
+      } else {
+        // Se ticketId é null, limpar o currentTicket
+        setCurrentTicket(null);
+        currentTicketRef.current = null;
+      }
+    });
+
+    socket.on('ticket_created', (data) => {
+      console.log('Ticket criado via WebSocket:', data);
+      // O OpenModeTicketManager já vai atualizar via seus próprios listeners
+    });
+
+    socket.on('ticket_updated', (data) => {
+      console.log('Ticket atualizado via WebSocket:', data);
+      // O OpenModeTicketManager já vai atualizar via seus próprios listeners
+    });
+
+    socket.on('ticket_deleted', (data) => {
+      console.log('Ticket deletado via WebSocket:', data);
+      // O OpenModeTicketManager já vai atualizar via seus próprios listeners
     });
 
     socketRef.current = socket;
@@ -296,7 +492,7 @@ export function useOpenSession() {
     if (!socketRef.current) return;
 
     socketRef.current.emit('new_voting', { 
-      sessionId,
+      sessionId, 
       organizationId: null // Modo aberto não tem organização
     });
   }, [sessionId]);
@@ -337,10 +533,33 @@ export function useOpenSession() {
 
       if (response.ok) {
         setShowFinalEstimateModal(false);
+        
         // Recarregar ticket atualizado
         const result = await response.json();
         setCurrentTicket(result.ticket);
         currentTicketRef.current = result.ticket;
+        
+        // Desselecionar o ticket após finalizar a votação
+        console.log('🎯 Finalizando votação e desselecionando ticket');
+        if (socketRef.current) {
+          socketRef.current.emit('ticket_selected', {
+            sessionId,
+            ticketId: null, // Desselecionar ticket
+            organizationId: null
+          });
+        }
+        
+        // Limpar estado de votação
+        setSelectedCard(null);
+        setAverageVote(null);
+        
+        // Emitir nova votação para resetar estado para todos os participantes
+        if (socketRef.current) {
+          socketRef.current.emit('new_voting', { 
+            sessionId, 
+            organizationId: null 
+          });
+        }
       }
     } catch (error) {
       console.error('Erro ao definir estimativa final:', error);
@@ -363,7 +582,7 @@ export function useOpenSession() {
         method: 'DELETE',
       });
 
-      socketRef.current.emit('endSession', { sessionId });
+      socketRef.current.emit('session_ended', { sessionId });
       router.push('/open');
     } catch (error) {
       console.error('Erro ao encerrar sessão:', error);
@@ -380,6 +599,47 @@ export function useOpenSession() {
       }
     };
   }, [loadSessionData]);
+
+  // Inicializar WebSocket assim que a sessão estiver disponível
+  useEffect(() => {
+    if (sessionData.sessionId) {
+      initializeWebSocket();
+    }
+  }, [sessionData.sessionId, initializeWebSocket]);
+
+  // Atualizar currentTicket quando currentTicketId mudar
+  useEffect(() => {
+    console.log('🎫 useOpenSession: currentTicketId mudou para:', sessionData.currentTicketId);
+    
+    if (sessionData.currentTicketId) {
+      // Só buscar se o ID for diferente do ticket atual
+      if (sessionData.currentTicketId !== currentTicket?.id) {
+        // Buscar o ticket atualizado via API
+        const fetchCurrentTicket = async () => {
+          try {
+            console.log('🎫 useOpenSession: Buscando ticket:', sessionData.currentTicketId);
+            const response = await fetch(`/api/open/sessions/${sessionId}/tickets/${sessionData.currentTicketId}`);
+            const result = await response.json();
+            console.log('🎫 useOpenSession: Resposta da API:', result);
+            
+            if (result.success && result.ticket) {
+              console.log('🎫 useOpenSession: Definindo currentTicket:', result.ticket);
+              setCurrentTicket(result.ticket);
+              currentTicketRef.current = result.ticket;
+            }
+          } catch (error) {
+            console.error('❌ Erro ao carregar ticket atual:', error);
+          }
+        };
+        fetchCurrentTicket();
+      }
+    } else if (!sessionData.currentTicketId && currentTicket) {
+      // Se não há ticket selecionado, limpar o currentTicket
+      console.log('🎫 useOpenSession: Limpando currentTicket');
+      setCurrentTicket(null);
+      currentTicketRef.current = null;
+    }
+  }, [sessionData.currentTicketId, currentTicket?.id, sessionId]);
 
   // Auto-hide notification
   useEffect(() => {
@@ -405,6 +665,7 @@ export function useOpenSession() {
     participantNotification,
     setParticipantNotification,
     connectionStatus,
+    socketRef,
     handleSelectCard,
     handleFlipCards,
     handleNewVoting,

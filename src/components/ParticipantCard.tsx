@@ -16,45 +16,52 @@ export default function ParticipantCard({
   const style = getParticipantCardStyle();
 
   function getParticipantCardStyle() {
-    // Usuário logado - sempre destacado
+    // Usuário logado - destaque mais forte
     if (participant.isCurrentUser) {
       if (participant.selectedCard) {
         return isRevealed
-          ? "border-4 border-blue-400 bg-blue-500 text-white"
-          : "border-4 border-blue-400 bg-blue-600 text-white";
+          ? "border-4 border-blue-500 bg-blue-600 text-white shadow-lg"
+          : "border-4 border-blue-500 bg-blue-700 text-white shadow-lg";
       }
-      return "border-4 border-blue-400 bg-white text-blue-600";
+      return "border-4 border-blue-500 bg-blue-50 text-blue-700 shadow-lg";
     }
 
-    // Outros usuários - estilos normais
+    // Outros usuários - cores mais suaves e agradáveis
     if (participant.selectedCard) {
       return isRevealed
-        ? "bg-blue-400 text-white border border-blue-400"
-        : "bg-blue-500 text-white border border-blue-500";
+        ? "bg-emerald-100 text-emerald-800 border-2 border-emerald-300 shadow-md"
+        : "bg-indigo-100 text-indigo-700 border-2 border-indigo-300 shadow-md";
     }
 
-    return "border border-blue-400 bg-white text-blue-600";
+    return "border-2 border-gray-200 bg-gray-50 text-gray-400";
   }
 
   function getCardContent() {
-    if (!participant.selectedCard || (!isRevealed && !participant.isCurrentUser)) {
-      return "";
+    // Só mostra conteúdo se for o usuário atual e tiver carta selecionada
+    if (participant.isCurrentUser && participant.selectedCard) {
+      return participant.selectedCard;
     }
-    return participant.selectedCard;
+    
+    // Se está revelado e tem carta, mostra para todos
+    if (isRevealed && participant.selectedCard) {
+      return participant.selectedCard;
+    }
+    
+    return "";
   }
 
   return (
     <div className="flex flex-col items-center">
       <div
-        className={`w-12 h-16 rounded flex items-center justify-center text-xl font-bold ${style}`}
+        className={`w-12 h-16 rounded flex items-center justify-center text-lg font-bold ${style}`}
       >
         {content}
       </div>
       <span
         className={`mt-1 font-medium ${
           participant.isCurrentUser
-            ? "text-blue-600 font-bold text-md"
-            : "text-gray-800 text-sm"
+            ? "text-blue-700 font-bold text-base"
+            : "text-gray-700 text-sm"
         }`}
       >
         {participant.userName}

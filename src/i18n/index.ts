@@ -18,8 +18,7 @@ i18n
         dashboard: ptDashboard
       },
     },
-    lng: 'pt', // Português como padrão
-    fallbackLng: 'pt',
+    fallbackLng: 'en',
     interpolation: { escapeValue: false },
     react: {
       useSuspense: false, // Importante para Next.js

@@ -4,7 +4,6 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import ParticipantCard from "./ParticipantCard";
 import { Participant } from "./useSession";
-import { useSession } from "./useSession";
 
 interface TableProps {
   participants: Participant[];
@@ -16,6 +15,7 @@ interface TableProps {
   onFinishVoting?: () => void;
   canFinishVoting: boolean;
   hasSelectedTicket?: boolean;
+  isCreator: boolean;
 }
 
 // Função para distribuir participantes em posições da mesa
@@ -66,9 +66,9 @@ const Table = React.memo<TableProps>(({
   onFinishVoting,
   canFinishVoting,
   hasSelectedTicket = false,
+  isCreator,
 }) => {
   const { t } = useTranslation("common");
-  const { isCreator } = useSession();
 
   // Memoizar a distribuição de participantes
   const { topParticipants, leftParticipants, rightParticipants, bottomParticipants } = useMemo(() => {
@@ -82,13 +82,15 @@ const Table = React.memo<TableProps>(({
 
   // Memoizar o conteúdo do centro da mesa
   const centerContent = useMemo(() => {
+    console.log('🎯 Table: hasSelectedTicket =', hasSelectedTicket);
+    
     if (!hasSelectedTicket) {
       return (
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          <h3 className="text-base font-semibold text-gray-700 mb-2">
             {t("session.table.selectTicket")}
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-sm">
             {t("session.table.selectTicketDescription")}
           </p>
         </div>
@@ -98,8 +100,8 @@ const Table = React.memo<TableProps>(({
     if (countdown !== null) {
       return (
         <div className="text-center">
-          <div className="text-6xl font-bold text-blue-600 mb-4">{countdown}</div>
-          <p className="text-lg text-gray-600">{t("session.table.countdown")}</p>
+          <div className="text-4xl font-bold text-blue-600 mb-4">{countdown}</div>
+          <p className="text-sm text-gray-600">{t("session.table.countdown")}</p>
         </div>
       );
     }
@@ -107,7 +109,7 @@ const Table = React.memo<TableProps>(({
     if (isRevealed) {
       return (
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-green-600 mb-2">
+          <h3 className="text-base font-semibold text-green-600 mb-2">
             {t("session.table.votesRevealed")}
           </h3>
           {isCreator && (
@@ -135,7 +137,7 @@ const Table = React.memo<TableProps>(({
 
     return (
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-blue-600 mb-2">
+        <h3 className="text-base font-semibold text-blue-600 mb-2">
           {t("session.table.votingInProgress")}
         </h3>
         {isCreator && (

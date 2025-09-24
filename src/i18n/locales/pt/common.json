@@ -72,13 +72,6 @@
     "nameInvalidChars": "Nome contém caracteres inválidos",
     "nameNotAllowed": "Nome não permitido"
   },
-  "logs": {
-    "loadTicket": "Erro ao carregar ticket",
-    "loadPendingRequests": "Erro ao carregar solicitações pendentes",
-    "processRequest": "Erro ao processar solicitação",
-    "endSession": "Erro ao encerrar sessão",
-    "websocketError": "Erro de WebSocket"
-  },
   "api": {
     "rateLimitExceeded": "Muitas tentativas de acesso. Tente novamente em alguns minutos.",
     "sessionNotFound": "Sessão não encontrada ou não permite acesso público.",
@@ -409,6 +402,11 @@
     "activateTeam": "Ativar time",
     "activateProject": "Ativar projeto"
   },
+  "connection": {
+    "connected": "Conectado",
+    "connecting": "Conectando...",
+    "disconnected": "Desconectado"
+  },
   "errors": {
     "createSession": "Erro ao criar a sessão"
   },
@@ -582,6 +580,117 @@
       "careers": "Carreiras",
       "privacy": "Privacidade",
       "copyright": "© 2024 Poker Planning. Todos os direitos reservados."
+    }
+  },
+  "common": {
+    "create": "Criar",
+    "tryAgain": "Tentar Novamente"
+  },
+  "inviteModal": {
+    "accessInfo": {
+      "title": "Como funciona o acesso:",
+      "items": {
+        "loggedIn": {
+          "title": "Usuários logados",
+          "description": "Acesso direto à sessão"
+        },
+        "notLoggedIn": {
+          "title": "Usuários não logados",
+          "description": "Podem participar como convidados"
+        },
+        "guests": {
+          "title": "Convidados",
+          "description": "Precisam fornecer nome e aguardar aprovação"
+        }
+      }
+    }
+  },
+  "openMode": {
+    "landing": {
+      "title": "Poker Planning",
+      "subtitle": "Modo Aberto",
+      "hero": {
+        "title": "Poker Planning Gratuito",
+        "subtitle": "Crie e participe de sessões de estimativa sem cadastro",
+        "description": "Ideal para reuniões rápidas, workshops e testes. Sem persistência, sem complicação.",
+        "createSession": "Criar Sessão"
+      },
+      "features": {
+        "title": "Como Funciona",
+        "subtitle": "Simples, rápido e sem complicações",
+        "realTime": {
+          "title": "Votação em Tempo Real",
+          "description": "Veja os votos dos participantes em tempo real"
+        },
+        "participation": {
+          "title": "Participação Imediata",
+          "description": "Entre na sessão sem necessidade de cadastro"
+        },
+        "temporary": {
+          "title": "Sessões Temporárias",
+          "description": "Sessões que expiram automaticamente"
+        },
+        "modes": {
+          "title": "Múltiplos Modos",
+          "description": "Fibonacci, T-shirt, Linear e Custom"
+        }
+      },
+      "cta": {
+        "title": "Pronto para começar?",
+        "subtitle": "Crie sua primeira sessão em menos de 1 minuto",
+        "button": "Criar Sessão Agora"
+      },
+      "footer": {
+        "title": "Poker Planning - Modo Aberto | Versão gratuita para uso temporário",
+        "subtitle": "Para uso empresarial com persistência e recursos avançados, acesse a versão completa"
+      }
+    },
+    "createModal": {
+      "title": "Criar Nova Sessão",
+      "sessionName": "Nome da Sessão *",
+      "sessionNamePlaceholder": "Ex: Sprint Planning - Feature X",
+      "description": "Descrição (opcional)",
+      "descriptionPlaceholder": "Breve descrição da sessão",
+      "creatorName": "Seu Nome *",
+      "creatorNamePlaceholder": "Como você quer ser chamado",
+      "votingMode": "Modo de Votação",
+      "votingModes": {
+        "fibonacci": "Fibonacci (0, 1, 2, 3, 5, 8, 13, 21)",
+        "tshirt": "T-Shirt (XS, S, M, L, XL, XXL)",
+        "linear": "Linear (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)"
+      },
+      "cancel": "Cancelar",
+      "create": "Criar Sessão",
+      "creating": "Criando..."
+    },
+    "join": {
+      "title": "Participar da Sessão",
+      "loading": "Carregando dados da sessão...",
+      "error": "Erro ao carregar dados da sessão",
+      "sessionNotFound": "Sessão não encontrada",
+      "name": "Seu Nome",
+      "namePlaceholder": "Digite seu nome para participar",
+      "nameRequired": "Por favor, informe seu nome",
+      "join": "Entrar na Sessão",
+      "joining": "Entrando...",
+      "joinError": "Erro ao entrar na sessão",
+      "sessionInfo": "Informações da Sessão"
+    },
+    "session": {
+      "loading": "Carregando sessão...",
+      "expired": {
+        "title": "Sessão Expirada",
+        "message": "Esta sessão expirou e não está mais disponível.",
+        "duration": "As sessões no modo aberto têm duração limitada de 24 horas.",
+        "about": "Sobre o Modo Aberto",
+        "createNew": "Criar Nova Sessão"
+      }
+    },
+    "errors": {
+      "createSession": "Erro ao criar sessão",
+      "sessionNotFound": "Sessão não encontrada",
+      "loadSessionData": "Erro ao carregar dados da sessão",
+      "joinSession": "Erro ao entrar na sessão"
     }
   }
 }

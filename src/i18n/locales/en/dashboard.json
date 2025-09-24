@@ -271,16 +271,76 @@
     "description": "Create a new planning poker session",
     "name": "Session Name",
     "namePlaceholder": "Enter session name",
-    "description": "Description",
+    "descriptionLabel": "Description",
     "descriptionPlaceholder": "Enter a description (optional)",
     "project": "Project",
     "projectPlaceholder": "Select a project (optional)",
     "votingMode": "Voting Mode",
     "autoReveal": "Auto Reveal",
     "allowObservers": "Allow Observers",
+    "optional": "optional",
+    "noProject": "No project selected",
     "create": "Create Session",
     "creating": "Creating...",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "error": "Error creating session",
+    "serverError": "Error connecting to the server"
+  },
+  "votingModes": {
+    "fibonacci": "Fibonacci (1, 2, 3, 5, 8, 13, 21)",
+    "tshirt": "T-Shirt (XS, S, M, L, XL, XXL)",
+    "linear": "Linear (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "backToList": "Back to List"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving..."
+  },
+  "stats": {
+    "title": "Statistics",
+    "sessions": "Sessions",
+    "participants": "Participants",
+    "tickets": "Tickets",
+    "users": "Users"
+  },
+  "session": {
+    "info": "Session Information",
+    "status": "Status",
+    "votingMode": "Voting Mode",
+    "createdBy": "Created by",
+    "createdAt": "Created at",
+    "participants": "Participants",
+    "tickets": "Tickets",
+    "noTickets": "No tickets created yet",
+    "quickActions": "Quick Actions",
+    "settings": "Settings",
+    "autoReveal": "Auto Reveal",
+    "observers": "Observers",
+    "timer": "Timer",
+    "disabled": "Disabled",
+    "enabled": "Enabled",
+    "allowed": "Allowed",
+    "blocked": "Blocked",
+    "noParticipants": "No participants found"
+  },
+  "status": {
+    "active": "Active",
+    "completed": "Completed",
+    "archived": "Archived"
+  },
+  "votingMode": {
+    "fibonacci": "Fibonacci",
+    "tshirt": "T-Shirt",
+    "linear": "Linear"
+  },
+  "role": {
+    "moderator": "Moderator",
+    "voter": "Voter",
+    "observer": "Observer"
   },
   "tickets": {
     "title": "Tickets",

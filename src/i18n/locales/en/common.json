@@ -72,13 +72,6 @@
     "nameInvalidChars": "Name contains invalid characters",
     "nameNotAllowed": "Name not allowed"
   },
-  "logs": {
-    "loadTicket": "Error loading ticket",
-    "loadPendingRequests": "Error loading pending requests",
-    "processRequest": "Error processing request",
-    "endSession": "Error ending session",
-    "websocketError": "WebSocket error"
-  },
   "api": {
     "rateLimitExceeded": "Too many access attempts. Try again in a few minutes.",
     "sessionNotFound": "Session not found or does not allow public access.",
@@ -274,7 +267,6 @@
       "copyright": "© 2024 Poker Planning. All rights reserved."
     }
   },
-  "menu": "Menu",
   "auth": {
     "common": {
       "loading": "Loading...",
@@ -572,11 +564,127 @@
     "activateTeam": "Activate team",
     "activateProject": "Activate project"
   },
+  "connection": {
+    "connected": "Connected",
+    "connecting": "Connecting...",
+    "disconnected": "Disconnected"
+  },
   "errors": {
     "createSession": "Error creating session"
   },
   "limits": {
     "reached": "{{resource}} limit reached (maximum: {{limit}}). Upgrade your plan to increase limits.",
     "featureNotAvailable": "The \"{{feature}}\" feature is not available in your current plan. Upgrade to access advanced features."
+  },
+  "common": {
+    "create": "Create",
+    "tryAgain": "Try Again"
+  },
+  "inviteModal": {
+    "accessInfo": {
+      "title": "How access works:",
+      "items": {
+        "loggedIn": {
+          "title": "Logged-in users",
+          "description": "Direct access to the session"
+        },
+        "notLoggedIn": {
+          "title": "Not logged-in users",
+          "description": "Can participate as guests"
+        },
+        "guests": {
+          "title": "Guests",
+          "description": "Must provide a name and wait for approval"
+        }
+      }
+    }
+  },
+  "openMode": {
+    "landing": {
+      "title": "Poker Planning",
+      "subtitle": "Open Mode",
+      "hero": {
+        "title": "Free Poker Planning",
+        "subtitle": "Create and join estimation sessions without registration",
+        "description": "Perfect for quick meetings, workshops and testing. No persistence, no complications.",
+        "createSession": "Create Session"
+      },
+      "features": {
+        "title": "How it Works",
+        "subtitle": "Simple, fast and without complications",
+        "realTime": {
+          "title": "Real-time Voting",
+          "description": "See participant votes in real time"
+        },
+        "participation": {
+          "title": "Immediate Participation",
+          "description": "Join sessions without registration"
+        },
+        "temporary": {
+          "title": "Temporary Sessions",
+          "description": "Sessions that expire automatically"
+        },
+        "modes": {
+          "title": "Multiple Modes",
+          "description": "Fibonacci, T-shirt, Linear and Custom"
+        }
+      },
+      "cta": {
+        "title": "Ready to get started?",
+        "subtitle": "Create your first session in less than 1 minute",
+        "button": "Create Session Now"
+      },
+      "footer": {
+        "title": "Poker Planning - Open Mode | Free version for temporary use",
+        "subtitle": "For enterprise use with persistence and advanced features, access the full version"
+      }
+    },
+    "createModal": {
+      "title": "Create New Session",
+      "sessionName": "Session Name *",
+      "sessionNamePlaceholder": "Ex: Sprint Planning - Feature X",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Brief session description",
+      "creatorName": "Your Name *",
+      "creatorNamePlaceholder": "How you want to be called",
+      "votingMode": "Voting Mode",
+      "votingModes": {
+        "fibonacci": "Fibonacci (0, 1, 2, 3, 5, 8, 13, 21)",
+        "tshirt": "T-Shirt (XS, S, M, L, XL, XXL)",
+        "linear": "Linear (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)"
+      },
+      "cancel": "Cancel",
+      "create": "Create Session",
+      "creating": "Creating..."
+    },
+    "join": {
+      "title": "Join Session",
+      "loading": "Loading session data...",
+      "error": "Error loading session data",
+      "sessionNotFound": "Session not found",
+      "name": "Your Name",
+      "namePlaceholder": "Enter your name to participate",
+      "nameRequired": "Please enter your name",
+      "join": "Join Session",
+      "joining": "Joining...",
+      "joinError": "Error joining session",
+      "sessionInfo": "Session Information"
+    },
+    "session": {
+      "loading": "Loading session...",
+      "expired": {
+        "title": "Session Expired",
+        "message": "This session has expired and is no longer available.",
+        "duration": "Open mode sessions have a limited duration of 24 hours.",
+        "about": "About Open Mode",
+        "createNew": "Create New Session"
+      }
+    },
+    "errors": {
+      "createSession": "Error creating session",
+      "sessionNotFound": "Session not found",
+      "loadSessionData": "Error loading session data",
+      "joinSession": "Error joining session"
+    }
   }
 }

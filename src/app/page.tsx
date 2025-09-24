@@ -37,50 +37,62 @@ function OpenModeLandingPageContent() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
 
   // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
+
   const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     setLoading(true);
     setError(null);
 
     try {
+      const requestBody = {
+        ...formData,
+        autoReveal: false,
+        allowObservers: true,
+      };
+      
       const response = await fetch('/api/open/sessions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          autoReveal: false,
-          allowObservers: true,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao criar sessão');
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Erro ao criar sessão: ${response.status}`);
       }
 
-             const result = await response.json();
+      const result = await response.json();
+      console.log('Resultado da criação:', result);
        
-       // Salvar dados do usuário criador no localStorage
-       if (result.participant && typeof window !== 'undefined') {
-         localStorage.setItem(`openModeUser_${result.sessionId}`, JSON.stringify({
-           id: result.participant.id,
-           name: result.participant.name
-         }));
-       }
-       
-       // Redirecionar diretamente para o board da sessão (não para o join)
-       router.push(`/open/${result.sessionId}`);
+      // Salvar dados do usuário criador no localStorage
+      if (result.participant && typeof window !== 'undefined') {
+        const userData = {
+          id: result.participant.id,
+          name: result.participant.name
+        };
+        localStorage.setItem(`openModeUser_${result.sessionId}`, JSON.stringify(userData));
+        console.log('Dados salvos no localStorage:', userData);
+      }
+      
+      // Definir redirecionamento para ser executado no useEffect
+      console.log('Definindo redirecionamento para:', `/open/${result.sessionId}`);
+      router.replace(`/open/${result.sessionId}`);
+      
     } catch (err) {
-      setError("Erro ao criar sessão. Tente novamente.");
-    } finally {
-      setLoading(false);
+      console.error('Erro ao criar sessão:', err);
+      setError(`Erro ao criar sessão: ${err instanceof Error ? err.message : 'Erro desconhecido'}`);
     }
   };
 
@@ -92,26 +104,39 @@ function OpenModeLandingPageContent() {
     }));
   };
 
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setError(null);
+    setLoading(false);
+    // Resetar o formulário
+    setFormData({
+      name: "",
+      description: "",
+      creatorName: "",
+      votingMode: "FIBONACCI" as const,
+    });
+  };
+
   const features = [
     {
       icon: Zap,
-      title: "Votação em Tempo Real",
-      description: "Veja os votos dos participantes em tempo real"
+      title: t("openMode.landing.features.realTime.title"),
+      description: t("openMode.landing.features.realTime.description")
     },
     {
       icon: Users,
-      title: "Participação Imediata",
-      description: "Entre na sessão sem necessidade de cadastro"
+      title: t("openMode.landing.features.participation.title"),
+      description: t("openMode.landing.features.participation.description")
     },
     {
       icon: Clock,
-      title: "Sessões Temporárias",
-      description: "Sessões que expiram automaticamente"
+      title: t("openMode.landing.features.temporary.title"),
+      description: t("openMode.landing.features.temporary.description")
     },
     {
       icon: Settings,
-      title: "Múltiplos Modos",
-      description: "Fibonacci, T-shirt, Linear e Custom"
+      title: t("openMode.landing.features.modes.title"),
+      description: t("openMode.landing.features.modes.description")
     }
   ];
 
@@ -127,9 +152,9 @@ function OpenModeLandingPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-blue-600">Poker Planning</h1>
+              <h1 className="text-2xl font-bold text-blue-600">{APP_CONFIG.APP_NAME}</h1>
               <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                Modo Aberto
+                {t("openMode.landing.subtitle")}
               </span>
             </div>
           </div>
@@ -141,13 +166,13 @@ function OpenModeLandingPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Poker Planning Gratuito
+              {t("openMode.landing.hero.title")}
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Crie e participe de sessões de estimativa sem cadastro
+              {t("openMode.landing.hero.subtitle")}
             </p>
             <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-              Ideal para reuniões rápidas, workshops e testes. Sem persistência, sem complicação.
+              {t("openMode.landing.hero.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
@@ -155,7 +180,7 @@ function OpenModeLandingPageContent() {
                 className="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors flex items-center gap-2"
               >
                 <Play className="w-5 h-5" />
-                Criar Sessão
+                {t("openMode.landing.hero.createSession")}
               </button>
             </div>
           </div>
@@ -167,10 +192,10 @@ function OpenModeLandingPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Como Funciona
+              {t("openMode.landing.features.title")}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Simples, rápido e sem complicações
+              {t("openMode.landing.features.subtitle")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -195,17 +220,17 @@ function OpenModeLandingPageContent() {
       <section className="py-20 bg-green-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
-            Pronto para começar?
+            {t("openMode.landing.cta.title")}
           </h2>
           <p className="text-xl text-green-100 mb-8">
-            Crie sua primeira sessão em menos de 1 minuto
+            {t("openMode.landing.cta.subtitle")}
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
             className="bg-white text-green-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
           >
             <Play className="w-5 h-5" />
-            Criar Sessão Agora
+            {t("openMode.landing.cta.button")}
           </button>
         </div>
       </section>
@@ -214,17 +239,24 @@ function OpenModeLandingPageContent() {
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-gray-400">
-            Poker Planning - Modo Aberto | Versão gratuita para uso temporário
+            {t("openMode.landing.footer.title")}
           </p>
         </div>
       </footer>
 
       {/* Modal de Criação de Sessão */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseModal();
+            }
+          }}
+        >
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Criar Nova Sessão
+              {t("openMode.createModal.title")}
             </h3>
 
             {error && (
@@ -236,7 +268,7 @@ function OpenModeLandingPageContent() {
             <form onSubmit={handleCreateSession}>
               <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome da Sessão *
+                  {t("openMode.createModal.sessionName")}
                 </label>
                 <input
                   type="text"
@@ -245,14 +277,14 @@ function OpenModeLandingPageContent() {
                   value={formData.name}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="Ex: Sprint Planning - Feature X"
+                  placeholder={t("openMode.createModal.sessionNamePlaceholder")}
                   required
                 />
               </div>
 
               <div className="mb-4">
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição (opcional)
+                  {t("openMode.createModal.description")}
                 </label>
                 <textarea
                   id="description"
@@ -260,14 +292,14 @@ function OpenModeLandingPageContent() {
                   value={formData.description}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="Breve descrição da sessão"
+                  placeholder={t("openMode.createModal.descriptionPlaceholder")}
                   rows={3}
                 />
               </div>
 
               <div className="mb-4">
                 <label htmlFor="creatorName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Seu Nome *
+                  {t("openMode.createModal.creatorName")}
                 </label>
                 <input
                   type="text"
@@ -276,14 +308,14 @@ function OpenModeLandingPageContent() {
                   value={formData.creatorName}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="Como você quer ser chamado"
+                  placeholder={t("openMode.createModal.creatorNamePlaceholder")}
                   required
                 />
               </div>
 
               <div className="mb-6">
                 <label htmlFor="votingMode" className="block text-sm font-medium text-gray-700 mb-1">
-                  Modo de Votação
+                  {t("openMode.createModal.votingMode")}
                 </label>
                 <select
                   id="votingMode"
@@ -292,26 +324,34 @@ function OpenModeLandingPageContent() {
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 >
-                  <option value="FIBONACCI">Fibonacci (0, 1, 2, 3, 5, 8, 13, 21)</option>
-                  <option value="TSHIRT">T-Shirt (XS, S, M, L, XL, XXL)</option>
-                  <option value="LINEAR">Linear (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)</option>
+                  <option value="FIBONACCI">{t("openMode.createModal.votingModes.fibonacci")}</option>
+                  <option value="TSHIRT">{t("openMode.createModal.votingModes.tshirt")}</option>
+                  <option value="LINEAR">{t("openMode.createModal.votingModes.linear")}</option>
                 </select>
               </div>
 
               <div className="flex space-x-3">
                 <button
                   type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                  onClick={handleCloseModal}
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition disabled:opacity-50"
                 >
-                  Cancelar
+                  {t("openMode.createModal.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition"
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition flex items-center justify-center"
                 >
-                  {loading ? "Criando..." : "Criar Sessão"}
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      {t("openMode.createModal.creating")}
+                    </>
+                  ) : (
+                    t("openMode.createModal.create")
+                  )}
                 </button>
               </div>
             </form>
@@ -334,15 +374,8 @@ export default function LandingPage() {
     setMounted(true);
   }, []);
 
-  // Debug: verificar se o modo aberto está habilitado
-  console.log('=== DEBUG OPEN MODE ===');
-  console.log('OPEN_MODE:', APP_CONFIG.OPEN_MODE);
-  console.log('process.env.OPEN_MODE:', process.env.OPEN_MODE);
-  console.log('mounted:', mounted);
-  console.log('========================');
   // Se estiver no modo aberto, mostrar a landing page do modo aberto
   if (APP_CONFIG.OPEN_MODE) {
-    console.log('Renderizando modo aberto');
     return <OpenModeLandingPageContent />;
   }
 
@@ -423,26 +456,26 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-blue-600">Poker Planning</h1>
+              <h1 className="text-2xl font-bold text-blue-600">{APP_CONFIG.APP_NAME}</h1>
             </div>
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleWatchDemo}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
-                Demo
+                {t("landing.hero.ctaSecondary")}
               </button>
               <button
                 onClick={() => router.push("/login")}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
-                Login
+                {t("login")}
               </button>
               <button
                 onClick={handleGetStarted}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
               >
-                Começar
+                {t("landing.hero.ctaPrimary")}
               </button>
             </div>
           </div>
@@ -562,31 +595,29 @@ export default function LandingPage() {
                   )}
 
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    {plan.name}
+                    {t(`landing.pricing.${plan.id}.name`)}
                   </h3>
 
                   <div className="mb-6">
                     <span className="text-4xl font-bold text-gray-900">
-                      {plan.price === 0 ? 'Gratuito' : `R$ ${plan.price}`}
+                      {plan.id === 'free' ? t('landing.pricing.free.price') : plan.id === 'enterprise' ? t('landing.pricing.enterprise.price') : `R$ ${plan.price}`}
                     </span>
                     <span className="text-gray-600">
-                      {plan.period === 'monthly' ? '/mês' : '/ano'}
+                      {plan.id === 'enterprise' ? '' : plan.id === 'free' ? t('landing.pricing.free.period') : t('landing.pricing.pro.period')}
                     </span>
                   </div>
 
                   <p className="text-gray-600 mb-8">
-                    {plan.description}
+                    {t(`landing.pricing.${plan.id}.description`)}
                   </p>
 
                   <ul className="space-y-4 mb-8">
-                    {plan.features
-                      .filter(feature => feature.included)
-                      .map((feature, index) => (
-                        <li key={index} className="flex items-center">
-                          <Check className="w-5 h-5 text-green-500 mr-3" />
-                          <span className="text-gray-700">{feature.name}</span>
-                        </li>
-                      ))}
+                    {(t(`landing.pricing.${plan.id}.features`, { returnObjects: true }) as string[]).map((feature, index) => (
+                      <li key={index} className="flex items-center">
+                        <Check className="w-5 h-5 text-green-500 mr-3" />
+                        <span className="text-gray-700">{feature}</span>
+                      </li>
+                    ))}
                   </ul>
 
                   <button
@@ -596,7 +627,7 @@ export default function LandingPage() {
                       : 'bg-gray-900 text-white hover:bg-gray-800'
                       }`}
                   >
-                    {plan.cta}
+                    {t(`landing.pricing.${plan.id}.cta`)}
                   </button>
                 </div>
               ))}
@@ -698,7 +729,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">Poker Planning</h3>
+              <h3 className="text-xl font-bold mb-4">{APP_CONFIG.APP_NAME}</h3>
               <p className="text-gray-400">
                 {t("landing.footer.description")}
               </p>

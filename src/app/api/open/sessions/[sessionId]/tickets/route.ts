@@ -57,6 +57,28 @@ export async function POST(
       },
     });
 
+    // Emitir evento WebSocket via servidor WebSocket
+    console.log('🎫 API: Emitindo evento ticket_created via HTTP');
+    try {
+      const wsResponse = await fetch('http://localhost:3001/emit-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: 'ticket_created',
+          sessionId: sessionId,
+          data: { sessionId, ticket }
+        })
+      });
+      
+      if (wsResponse.ok) {
+        console.log('🎫 API: Evento ticket_created emitido com sucesso');
+      } else {
+        console.log('❌ API: Falha ao emitir evento ticket_created');
+      }
+    } catch (error) {
+      console.log('❌ API: Erro ao emitir evento ticket_created:', error);
+    }
+
     return NextResponse.json({
       success: true,
       ticket,

@@ -142,6 +142,25 @@ export async function PATCH(
       }
     });
 
+    // Emitir evento WebSocket via servidor WebSocket
+    try {
+      const wsResponse = await fetch('http://localhost:3001/emit-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: 'ticket_updated',
+          sessionId: sessionId,
+          data: { sessionId, ticket }
+        })
+      });
+      
+      if (wsResponse.ok) {
+        console.log('🎫 API: Evento ticket_updated emitido com sucesso');
+      }
+    } catch (error) {
+      console.log('❌ API: Erro ao emitir evento ticket_updated:', error);
+    }
+
     return NextResponse.json({
       success: true,
       ticket,
@@ -210,6 +229,25 @@ export async function DELETE(
     await prisma.openTicket.delete({
       where: { id: ticketId }
     });
+
+    // Emitir evento WebSocket via servidor WebSocket
+    try {
+      const wsResponse = await fetch('http://localhost:3001/emit-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: 'ticket_deleted',
+          sessionId: sessionId,
+          data: { sessionId, ticketId }
+        })
+      });
+      
+      if (wsResponse.ok) {
+        console.log('🎫 API: Evento ticket_deleted emitido com sucesso');
+      }
+    } catch (error) {
+      console.log('❌ API: Erro ao emitir evento ticket_deleted:', error);
+    }
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "../../../i18n/index";
 import { useTranslation } from "react-i18next";
 import { useParams, useRouter } from "next/navigation";
@@ -21,7 +21,7 @@ export default function OpenModeSessionPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const params = useParams();
   const router = useRouter();
   const sessionId = params.sessionId as string;
@@ -45,6 +45,7 @@ export default function OpenModeSessionPage() {
     participantNotification,
     setParticipantNotification,
     connectionStatus,
+    socketRef,
     handleSelectCard,
     handleFlipCards,
     handleNewVoting,
@@ -55,20 +56,56 @@ export default function OpenModeSessionPage() {
     handleEndSession,
   } = useOpenSession();
 
+  // No OpenMode, o criador é determinado de forma mais robusta
+  // Verifica se é o criador baseado no localStorage - NÃO usar fallback por ordem
+  const canManageTickets = useMemo(() => {
+    if (!currentUser || sessionData.participants.length === 0) return false;
+    
+    // Verifica se está marcado como criador no localStorage
+    const creatorData = typeof window !== 'undefined' 
+      ? localStorage.getItem(`openModeCreator_${sessionId}`)
+      : null;
+    
+    if (creatorData) {
+      try {
+        const creator = JSON.parse(creatorData);
+        const isCreator = creator.userId === currentUser.id;
+        console.log('🏆 Verificando criador:', { 
+          currentUserId: currentUser.id, 
+          creatorId: creator.userId, 
+          isCreator 
+        });
+        return isCreator;
+      } catch {
+        console.log('❌ Erro ao parsear dados do criador');
+      }
+    }
+    
+    // Se não há criador definido, ninguém pode gerenciar (evita transferência acidental)
+    console.log('⚠️ Nenhum criador definido no localStorage');
+    return false;
+  }, [currentUser, sessionData.participants, sessionId]);
+
   // Verificar se o usuário está na sessão
   useEffect(() => {
-    if (sessionData.sessionId && !currentUser) {
-      // Se não há usuário, redirecionar para join
-      router.push(`/open/${sessionId}/join`);
+    // Só redirecionar se a sessão foi carregada completamente E não há usuário
+    if (sessionData.sessionId && sessionData.sessionName) {
+              // Verificar se há usuário no localStorage
+        const savedUser = typeof window !== 'undefined' ? localStorage.getItem(`openModeUser_${sessionId}`) : null;
+      
+      if (!savedUser) {
+        // Se não há usuário, redirecionar para join
+        router.push(`/open/${sessionId}/join`);
+      }
     }
-  }, [sessionData.sessionId, currentUser, sessionId, router]);
+  }, [sessionData.sessionId, sessionData.sessionName, sessionId, router]);
 
   // Se não há usuário, mostrar loading
   if (!currentUser) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-100">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-        <p className="mt-4 text-gray-600">Carregando sessão...</p>
+        <p className="mt-4 text-gray-600">{t("openMode.session.loading")}</p>
       </div>
     );
   }
@@ -80,8 +117,11 @@ export default function OpenModeSessionPage() {
   }
 
   const canVote = !sessionData.isRevealed && !!currentUser;
-  const canManageTickets = Boolean(currentUser && sessionData.participants.some(p => p.id === currentUser.id));
-
+  
+  // Debug temporário
+  console.log('🎯 Page: currentTicket =', currentTicket);
+  console.log('🎯 Page: sessionData.currentTicketId =', sessionData.currentTicketId);
+  
   // Calcular estatísticas de votação
   const votingStats = {
     totalParticipants: sessionData.participants.length,
@@ -113,12 +153,6 @@ export default function OpenModeSessionPage() {
         connectionStatus={connectionStatus}
       />
 
-      {/* Notificação de participante */}
-      <ParticipantNotification 
-        notification={participantNotification}
-        onClose={() => setParticipantNotification(null)}
-      />
-
       {/* Menu Mobile */}
       <MobileMenu 
         isOpen={mobileMenuOpen}
@@ -146,6 +180,7 @@ export default function OpenModeSessionPage() {
               onFinishVoting={canManageTickets && currentTicket ? () => finishVoting() : undefined}
               canFinishVoting={canManageTickets && !!currentTicket}
               hasSelectedTicket={!!currentTicket}
+              isCreator={canManageTickets}
             />
 
             {/* Resumo de votos ou barra de votação */}
@@ -170,21 +205,16 @@ export default function OpenModeSessionPage() {
 
         {/* Sidebar direita - Gerenciador de tickets */}
         <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
-          {sessionData.sessionId && (
+          {sessionData.sessionId && connectionStatus === 'connected' && socketRef.current && (
             <OpenModeTicketManager
               sessionId={sessionData.sessionId}
               isCreator={canManageTickets}
-              currentTicketId={currentTicket?.id || null}
+              currentTicketId={sessionData.currentTicketId}
               votingMode={sessionData.votingMode}
               onTicketSelect={handleTicketSelect}
               onOpenFinalEstimateModal={() => setShowFinalEstimateModal(true)}
-              registerTicketUpdateCallback={() => {}}
-              emitTicketSelected={() => {}}
-              emitTicketCreated={() => {}}
-              emitTicketUpdated={() => {}}
-              emitTicketDeleted={() => {}}
-              reloadCurrentTicket={async () => {}}
-              selectTicketDirectly={() => {}}
+              emitTicketSelected={(ticketId) => handleTicketSelect(ticketId || '')}
+              socket={socketRef.current}
             />
           )}
         </div>
