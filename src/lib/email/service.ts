@@ -1,4 +1,5 @@
 import { createTransporter, isEmailConfigured, emailConfig, emailRateLimit } from './config';
+import { APP_CONFIG } from '@/lib/config';
 
 // Cache para rate limiting
 const emailCache = new Map<string, { count: number; lastSent: number }>();
@@ -106,7 +107,7 @@ export class EmailService {
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
     
     const template: EmailTemplate = {
-      subject: 'Reset de Senha - Poker Planning',
+      subject: `Reset de Senha - ${APP_CONFIG.APP_NAME}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -127,7 +128,7 @@ export class EmailService {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🃏 Poker Planning</h1>
+              <h1>🃏 ${APP_CONFIG.APP_NAME}</h1>
               <p>Reset de Senha</p>
             </div>
             <div class="content">
@@ -153,14 +154,14 @@ export class EmailService {
             </div>
             <div class="footer">
               <p>Este email foi enviado automaticamente. Não responda a este email.</p>
-              <p>© 2024 Poker Planning. Todos os direitos reservados.</p>
+              <p>© 2024 ${APP_CONFIG.APP_NAME}. Todos os direitos reservados.</p>
             </div>
           </div>
         </body>
         </html>
       `,
       text: `
-Reset de Senha - Poker Planning
+Reset de Senha - ${APP_CONFIG.APP_NAME}
 
 Olá, ${userName}!
 
@@ -179,7 +180,7 @@ ${resetUrl}
 
 Este email foi enviado automaticamente. Não responda a este email.
 
-© 2024 Poker Planning. Todos os direitos reservados.
+© 2024 ${APP_CONFIG.APP_NAME}. Todos os direitos reservados.
       `,
     };
 
@@ -199,7 +200,7 @@ Este email foi enviado automaticamente. Não responda a este email.
     const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${inviteToken}&type=invite`;
     
     const template: EmailTemplate = {
-      subject: `Convite para ${organizationName} - Poker Planning 🃏`,
+      subject: `Convite para ${organizationName} - ${APP_CONFIG.APP_NAME} 🃏`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -221,15 +222,15 @@ Este email foi enviado automaticamente. Não responda a este email.
         <body>
           <div class="container">
             <div class="header">
-              <h1>🃏 Poker Planning</h1>
+              <h1>🃏 ${APP_CONFIG.APP_NAME}</h1>
               <p>Você foi convidado!</p>
             </div>
             <div class="content">
               <h2>Olá, ${userName}! 👋</h2>
-              <p><strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong> no Poker Planning.</p>
+              <p><strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong> no ${APP_CONFIG.APP_NAME}.</p>
               
               <div class="highlight">
-                <h3>🎯 O que é o Poker Planning?</h3>
+                <h3>🎯 O que é o ${APP_CONFIG.APP_NAME}?</h3>
                 <p>Uma ferramenta colaborativa para estimativa ágil de projetos usando cartas do planning poker. Ajude sua equipe a estimar tarefas de forma mais precisa e consensual.</p>
               </div>
               
@@ -261,20 +262,20 @@ Este email foi enviado automaticamente. Não responda a este email.
             </div>
             <div class="footer">
               <p>Este email foi enviado automaticamente. Não responda a este email.</p>
-              <p>© 2024 Poker Planning. Todos os direitos reservados.</p>
+              <p>© 2024 ${APP_CONFIG.APP_NAME}. Todos os direitos reservados.</p>
             </div>
           </div>
         </body>
         </html>
       `,
       text: `
-Convite para ${organizationName} - Poker Planning 🃏
+Convite para ${organizationName} - ${APP_CONFIG.APP_NAME} 🃏
 
 Olá, ${userName}! 👋
 
-${inviterName} convidou você para fazer parte da organização ${organizationName} no Poker Planning.
+${inviterName} convidou você para fazer parte da organização ${organizationName} no ${APP_CONFIG.APP_NAME}.
 
-🎯 O que é o Poker Planning?
+🎯 O que é o ${APP_CONFIG.APP_NAME}?
 Uma ferramenta colaborativa para estimativa ágil de projetos usando cartas do planning poker. Ajude sua equipe a estimar tarefas de forma mais precisa e consensual.
 
 Para aceitar o convite e definir sua senha, acesse:
@@ -296,7 +297,7 @@ ${inviteUrl}
 
 Este email foi enviado automaticamente. Não responda a este email.
 
-© 2024 Poker Planning. Todos os direitos reservados.
+© 2024 ${APP_CONFIG.APP_NAME}. Todos os direitos reservados.
       `,
     };
 
@@ -310,14 +311,14 @@ Este email foi enviado automaticamente. Não responda a este email.
     const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login`;
     
     const template: EmailTemplate = {
-      subject: 'Bem-vindo ao Poker Planning! 🃏',
+      subject: `Bem-vindo ao ${APP_CONFIG.APP_NAME}! 🃏`,
       html: `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Bem-vindo ao Poker Planning</title>
+          <title>Bem-vindo ao ${APP_CONFIG.APP_NAME}</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -332,12 +333,12 @@ Este email foi enviado automaticamente. Não responda a este email.
         <body>
           <div class="container">
             <div class="header">
-              <h1>🃏 Poker Planning</h1>
+              <h1>🃏 ${APP_CONFIG.APP_NAME}</h1>
               <p>Bem-vindo à sua nova ferramenta de estimativas!</p>
             </div>
             <div class="content">
               <h2>Olá, ${userName}! 👋</h2>
-              <p>Seja bem-vindo ao Poker Planning! Sua conta foi criada com sucesso.</p>
+              <p>Seja bem-vindo ao ${APP_CONFIG.APP_NAME}! Sua conta foi criada com sucesso.</p>
               
               <div class="features">
                 <h3>🎯 O que você pode fazer:</h3>
@@ -369,18 +370,18 @@ Este email foi enviado automaticamente. Não responda a este email.
             </div>
             <div class="footer">
               <p>Precisa de ajuda? Entre em contato conosco.</p>
-              <p>© 2024 Poker Planning. Todos os direitos reservados.</p>
+              <p>© 2024 ${APP_CONFIG.APP_NAME}. Todos os direitos reservados.</p>
             </div>
           </div>
         </body>
         </html>
       `,
       text: `
-Bem-vindo ao Poker Planning! 🃏
+Bem-vindo ao ${APP_CONFIG.APP_NAME}! 🃏
 
 Olá, ${userName}! 👋
 
-Seja bem-vindo ao Poker Planning! Sua conta foi criada com sucesso.
+Seja bem-vindo ao ${APP_CONFIG.APP_NAME}! Sua conta foi criada com sucesso.
 
 🎯 O que você pode fazer:
 📊 Estimativas Ágeis: Use cartas do planning poker para estimar tarefas
@@ -398,7 +399,7 @@ Próximos passos:
 
 Precisa de ajuda? Entre em contato conosco.
 
-© 2024 Poker Planning. Todos os direitos reservados.
+© 2024 ${APP_CONFIG.APP_NAME}. Todos os direitos reservados.
       `,
     };
 

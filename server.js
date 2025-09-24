@@ -483,7 +483,7 @@ io.on("connection", (socket) => {
 
             sessions[sessionId] = {
               sessionId: dbSession.id,
-              sessionName: dbSession.name || "Sessão Poker Planning",
+              sessionName: dbSession.name || `Sessão ${process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || 'Poker Planning'}`,
               organizationId: null, // Modo aberto não tem organização
               participants: participants,
               isRevealed: dbSession.isRevealed || false, // Preservar estado do banco
@@ -496,7 +496,7 @@ io.on("connection", (socket) => {
             // Criar nova sessão aberta se não existir no banco
             sessions[sessionId] = {
               sessionId,
-              sessionName: sessionName || "Sessão Poker Planning",
+              sessionName: sessionName || `Sessão ${process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || 'Poker Planning'}`,
               organizationId: null, // Modo aberto não tem organização
               participants: [],
               isRevealed: false,
@@ -511,7 +511,7 @@ io.on("connection", (socket) => {
           // Fallback para nova sessão em caso de erro
           sessions[sessionId] = {
             sessionId,
-            sessionName: sessionName || "Sessão Poker Planning",
+            sessionName: sessionName || `Sessão ${process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || 'Poker Planning'}`,
             organizationId: null, // Modo aberto não tem organização
             participants: [],
             isRevealed: false,
@@ -538,7 +538,7 @@ io.on("connection", (socket) => {
 
           sessions[sessionId] = {
             sessionId: dbSession.id,
-            sessionName: dbSession.name || sessionName || "Sessão Poker Planning",
+            sessionName: dbSession.name || sessionName || `Sessão ${process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || 'Poker Planning'}`,
             organizationId: dbSession.organizationId || organizationId,
             participants: participants,
             isRevealed: dbSession.isRevealed || false, // Preservar estado do banco
@@ -551,7 +551,7 @@ io.on("connection", (socket) => {
           // Fallback para sessão não encontrada no banco
           sessions[sessionId] = {
             sessionId,
-            sessionName: sessionName || "Sessão Poker Planning",
+            sessionName: sessionName || `Sessão ${process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || 'Poker Planning'}`,
             organizationId,
             participants: [],
             isRevealed: false,
@@ -565,7 +565,7 @@ io.on("connection", (socket) => {
         // Fallback em caso de erro
         sessions[sessionId] = {
           sessionId,
-          sessionName: sessionName || "Sessão Poker Planning",
+          sessionName: sessionName || `Sessão ${process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || 'Poker Planning'}`,
           organizationId,
           participants: [],
           isRevealed: false,

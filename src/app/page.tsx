@@ -4,12 +4,10 @@ import "@/i18n/index";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { usePlans } from "@/lib/hooks/usePlans";
 import { APP_CONFIG } from "@/lib/config";
 // import { OpenModeLandingPage } from "@/components/OpenModeLandingPage";
 import {
   ArrowRight,
-  Check,
   Star,
   Users,
   Zap,
@@ -89,7 +87,7 @@ function OpenModeLandingPageContent() {
       // Definir redirecionamento para ser executado no useEffect
       console.log('Definindo redirecionamento para:', `/open/${result.sessionId}`);
       router.replace(`/open/${result.sessionId}`);
-      
+    
     } catch (err) {
       console.error('Erro ao criar sessão:', err);
       setError(`Erro ao criar sessão: ${err instanceof Error ? err.message : 'Erro desconhecido'}`);
@@ -367,7 +365,7 @@ export default function LandingPage() {
   const { t } = useTranslation("common");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
-  const { plans, loading: plansLoading, error: plansError } = usePlans();
+  // Removed plans/pricing from closed landing
 
   // Prevent hydration mismatch by only rendering after mount
   useEffect(() => {
@@ -383,10 +381,7 @@ export default function LandingPage() {
     router.push("/register");
   };
 
-  const handleWatchDemo = () => {
-    // Implementar modal de demonstração
-    console.log("Watch demo clicked");
-  };
+  // Demo removed
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -460,12 +455,6 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={handleWatchDemo}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                {t("landing.hero.ctaSecondary")}
-              </button>
-              <button
                 onClick={() => router.push("/login")}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
@@ -502,12 +491,6 @@ export default function LandingPage() {
               >
                 {t("landing.hero.ctaPrimary")}
                 <ArrowRight className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleWatchDemo}
-                className="border border-gray-300 text-gray-700 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors"
-              >
-                {t("landing.hero.ctaSecondary")}
               </button>
             </div>
             <p className="text-sm text-gray-500 mt-8">
@@ -546,95 +529,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {t("landing.pricing.title")}
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              {t("landing.pricing.subtitle")}
-            </p>
-          </div>
-
-          {!mounted ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">{t("landing.loading.plans")}</span>
-            </div>
-          ) : plansLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">{t("landing.loading.plans")}</span>
-            </div>
-          ) : plansError ? (
-            <div className="text-center py-12">
-              <p className="text-red-600 mb-4">{t("landing.loading.error")}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              >
-                {t("landing.loading.retry")}
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {plans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`bg-white p-8 rounded-xl shadow-sm border ${plan.popular ? 'shadow-lg border-2 border-blue-500 relative' : ''
-                    }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                        {t("landing.pricing.pro.popular")}
-                      </span>
-                    </div>
-                  )}
-
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    {t(`landing.pricing.${plan.id}.name`)}
-                  </h3>
-
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold text-gray-900">
-                      {plan.id === 'free' ? t('landing.pricing.free.price') : plan.id === 'enterprise' ? t('landing.pricing.enterprise.price') : `R$ ${plan.price}`}
-                    </span>
-                    <span className="text-gray-600">
-                      {plan.id === 'enterprise' ? '' : plan.id === 'free' ? t('landing.pricing.free.period') : t('landing.pricing.pro.period')}
-                    </span>
-                  </div>
-
-                  <p className="text-gray-600 mb-8">
-                    {t(`landing.pricing.${plan.id}.description`)}
-                  </p>
-
-                  <ul className="space-y-4 mb-8">
-                    {(t(`landing.pricing.${plan.id}.features`, { returnObjects: true }) as string[]).map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <Check className="w-5 h-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={plan.id === 'enterprise' ? handleWatchDemo : handleGetStarted}
-                    className={`w-full py-3 rounded-lg font-semibold transition-colors ${plan.popular
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-900 text-white hover:bg-gray-800'
-                      }`}
-                  >
-                    {t(`landing.pricing.${plan.id}.cta`)}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Pricing Section removed */}
 
       {/* Testimonials Section */}
       <section className="py-20 bg-white">

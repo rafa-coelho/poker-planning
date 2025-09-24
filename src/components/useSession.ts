@@ -590,26 +590,32 @@ export function useSession () {
 
     /** 🔹 Atualiza os dados da sessão */
   function updateSessionData(data: SessionState, storedUserId: string) {
-    // Marcar o usuário atual em cada participante
-    const participantsWithCurrentUser = data.participants.map(p => ({
-      ...p,
-      isCurrentUser: p.userId === storedUserId
-    }));
-    
+    // Normalizar estrutura de participantes (server pode enviar id/name)
+    const participantsWithCurrentUser: Participant[] = (data.participants || []).map((raw: any) => {
+      const normalizedUserId = raw.userId ?? raw.id;
+      const normalizedUserName = raw.userName ?? raw.name;
+      return {
+        userId: normalizedUserId,
+        userName: normalizedUserName,
+        selectedCard: raw.selectedCard ?? null,
+        isCurrentUser: normalizedUserId === storedUserId,
+      };
+    });
+
     setSessionData(prev => {
       return {
         ...prev,
         ...data,
-        participants: participantsWithCurrentUser
+        participants: participantsWithCurrentUser,
       };
     });
-    
+
     // Atualizar dados do usuário atual
     const currentUser = participantsWithCurrentUser.find((p) => p.userId === storedUserId);
     if (currentUser) {
       setSelectedCard(currentUser.selectedCard);
     }
-    
+
     // Sincronização do ticket atual via session_update
     // IMPORTANTE: Dar prioridade aos eventos específicos de ticket_selected
     // session_update só deve sincronizar quando não há eventos específicos pendentes

@@ -23,7 +23,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Poker Planning
+              {APP_CONFIG.APP_NAME}
             </h1>
             <p className="text-gray-600 text-sm">
               {t('welcomeDescription')}

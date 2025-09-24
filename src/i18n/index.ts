@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { APP_CONFIG } from '@/lib/config';
 import enCommon from './locales/en/common.json';
 import ptCommon from './locales/pt/common.json';
 import enDashboard from './locales/en/dashboard.json';
@@ -19,7 +20,16 @@ i18n
       },
     },
     fallbackLng: 'en',
-    interpolation: { escapeValue: false },
+    interpolation: { 
+      escapeValue: false,
+      defaultVariables: {
+        appName: APP_CONFIG.APP_NAME,
+        year: (() => {
+          const currentYear = new Date().getFullYear();
+          return `2025${currentYear > 2025 ? '-' + currentYear : ''}`;
+        })(),
+      }
+    },
     react: {
       useSuspense: false, // Importante para Next.js
     },

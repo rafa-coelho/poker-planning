@@ -1,7 +1,7 @@
 {
   "title": "Dashboard",
   "description": "Manage your planning poker sessions",
-  "welcome": "Welcome to Poker Planning",
+  "welcome": "Welcome to {{appName}}",
   "hello": "Hello, {{name}}",
   "logout": "Logout",
   "navigation": {

@@ -73,9 +73,9 @@ export default function SessionPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
-      <HeaderBar 
-        sessionData={sessionData} 
-        userName={user.userName} 
+      <HeaderBar
+        sessionData={sessionData}
+        userName={user.userName}
         isCreator={canManageTickets}
         onInviteOpen={() => {
           generateInviteLink();
@@ -89,7 +89,7 @@ export default function SessionPage() {
       />
 
       {/* Notificação de participante */}
-      <ParticipantNotification 
+      <ParticipantNotification
         notification={participantNotification}
         onClose={() => setParticipantNotification(null)}
       />
@@ -97,7 +97,7 @@ export default function SessionPage() {
 
 
       {/* Menu Mobile */}
-      <MobileMenu 
+      <MobileMenu
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />
@@ -118,18 +118,19 @@ export default function SessionPage() {
               onFinishVoting={canManageTickets && currentTicket ? () => finishVoting() : undefined}
               canFinishVoting={canManageTickets && !!currentTicket}
               hasSelectedTicket={!!currentTicket}
+              isCreator={canManageTickets}
             />
 
             {/* Resumo de votos ou barra de votação */}
-                         {sessionData.isRevealed ? (
-               <VoteSummary 
-                 votes={sessionData.participants.map(p => p.selectedCard).filter(card => card !== null && card !== undefined && card.trim() !== "") as string[]}
-                 average={averageVote || ""}
-                 totalParticipants={votingStats.totalParticipants}
-                 votedCount={votingStats.votedCount}
-                 votingMode={sessionData.votingMode}
-               />
-             ) : (
+            {sessionData.isRevealed ? (
+              <VoteSummary
+                votes={sessionData.participants.map(p => p.selectedCard).filter(card => card !== null && card !== undefined && card.trim() !== "") as string[]}
+                average={averageVote || ""}
+                totalParticipants={votingStats.totalParticipants}
+                votedCount={votingStats.votedCount}
+                votingMode={sessionData.votingMode}
+              />
+            ) : (
               <VoteBar
                 votingMode={sessionData.votingMode || 'FIBONACCI'}
                 onVote={handleSelectCard}
@@ -162,14 +163,14 @@ export default function SessionPage() {
         </div>
       </main>
 
-                      {/* Modal de convite */}
-                {inviteOpen && (
-                  <InviteModal 
-                    inviteLink={inviteLink} 
-                    onClose={() => setInviteOpen(false)}
-                    sessionId={sessionId}
-                  />
-                )}
+      {/* Modal de convite */}
+      {inviteOpen && (
+        <InviteModal
+          inviteLink={inviteLink}
+          onClose={() => setInviteOpen(false)}
+          sessionId={sessionId}
+        />
+      )}
 
       {/* Modal de estimativa final */}
       {showFinalEstimateModal && currentTicket && (

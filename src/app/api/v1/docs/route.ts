@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
+import { APP_CONFIG } from '@/lib/config'
 
 export async function GET() {
   const openApiSpec = {
     openapi: '3.0.0',
     info: {
-      title: 'Poker Planning API',
-      description: 'API para integração com o sistema de Poker Planning Empresarial',
+      title: `${APP_CONFIG.APP_NAME} API`,
+      description: `API para integração com o sistema de ${APP_CONFIG.APP_NAME} Empresarial`,
       version: '1.0.0',
       contact: {
         name: 'API Support',

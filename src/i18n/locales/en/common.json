@@ -33,7 +33,7 @@
   "votes": "Votes",
   "average": "Average",
   "agreement": "Agreement",
-  "welcomeTitle": "Welcome to Poker Planning",
+  "welcomeTitle": "Welcome to {{appName}}",
   "welcomeDescription": "Create a session and invite your team to estimate tasks easily!",
   "sessionPlaceholder": "Type a name for the session...",
   "createGame": "Create Session",
@@ -101,7 +101,7 @@
     },
   "landing": {
     "hero": {
-      "title": "Enterprise Poker Planning",
+      "title": "Enterprise {{appName}}",
       "subtitle": "Accurate and collaborative estimates for agile teams",
       "description": "Transform your estimation meetings with a modern, intuitive tool designed for companies that value efficiency and precision.",
       "ctaPrimary": "Start Free",
@@ -109,7 +109,7 @@
       "trustedBy": "Trusted by 500+ teams"
     },
     "features": {
-      "title": "Why choose our Poker Planning?",
+      "title": "Why choose our {{appName}}?",
       "subtitle": "Everything you need for efficient estimates",
       "realTime": {
         "title": "Real-time Voting",
@@ -264,7 +264,7 @@
       "blog": "Blog",
       "careers": "Careers",
       "privacy": "Privacy",
-      "copyright": "© 2024 Poker Planning. All rights reserved."
+      "copyright": "© {{year}} {{appName}}. All rights reserved."
     }
   },
   "auth": {
@@ -492,12 +492,12 @@
     },
     "ended": {
       "title": "Session Ended",
-      "message": "This Poker Planning session has been ended by the creator. Thank you for participating!",
+      "message": "This {{appName}} session has been ended by the creator. Thank you for participating!",
       "sessionId": "Session ID",
       "closeTab": "Close Tab",
       "goHome": "Go Home"
     },
-    "defaultName": "Poker Planning Session",
+    "defaultName": "{{appName}} Session",
     "anonymous": "Anonymous",
     "revoting": "Re-voting",
     "units": {
@@ -601,10 +601,10 @@
   },
   "openMode": {
     "landing": {
-      "title": "Poker Planning",
+      "title": "{{appName}}",
       "subtitle": "Open Mode",
       "hero": {
-        "title": "Free Poker Planning",
+        "title": "Free {{appName}}",
         "subtitle": "Create and join estimation sessions without registration",
         "description": "Perfect for quick meetings, workshops and testing. No persistence, no complications.",
         "createSession": "Create Session"
@@ -635,7 +635,7 @@
         "button": "Create Session Now"
       },
       "footer": {
-        "title": "Poker Planning - Open Mode | Free version for temporary use",
+        "title": "{{appName}} - Open Mode | Free version for temporary use",
         "subtitle": "For enterprise use with persistence and advanced features, access the full version"
       }
     },

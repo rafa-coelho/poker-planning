@@ -33,7 +33,7 @@
   "votes": "Votos",
   "average": "Média",
   "agreement": "Concordância",
-  "welcomeTitle": "Bem-vindo ao Poker Planning",
+  "welcomeTitle": "Bem-vindo ao {{appName}}",
   "welcomeDescription": "Crie uma sessão e convide seu time para estimar tarefas de forma fácil!",
   "sessionPlaceholder": "Digite um nome para a sessão...",
   "createGame": "Criar Sessão",
@@ -330,12 +330,12 @@
     },
     "ended": {
       "title": "Sessão Encerrada",
-      "message": "Esta sessão de Poker Planning foi encerrada pelo criador. Obrigado por participar!",
+      "message": "Esta sessão de {{appName}} foi encerrada pelo criador. Obrigado por participar!",
       "sessionId": "ID da Sessão",
       "closeTab": "Fechar Aba",
       "goHome": "Ir para o Início"
     },
-    "defaultName": "Sessão Poker Planning",
+    "defaultName": "Sessão {{appName}}",
     "anonymous": "Anônimo",
     "revoting": "Re-votação",
     "units": {
@@ -416,7 +416,7 @@
   },
   "landing": {
     "hero": {
-      "title": "Poker Planning Empresarial",
+      "title": "{{appName}} Empresarial",
       "subtitle": "Estimativas precisas e colaborativas para times ágeis",
       "description": "Transforme suas reuniões de estimativa com uma ferramenta moderna, intuitiva e projetada para empresas que valorizam eficiência e precisão.",
       "ctaPrimary": "Começar Gratuitamente",
@@ -424,7 +424,7 @@
       "trustedBy": "Confiado por mais de 500+ times"
     },
     "features": {
-      "title": "Por que escolher nosso Poker Planning?",
+      "title": "Por que escolher nosso {{appName}}?",
       "subtitle": "Tudo que você precisa para estimativas eficientes",
       "realTime": {
         "title": "Votação em Tempo Real",
@@ -579,7 +579,7 @@
       "blog": "Blog",
       "careers": "Carreiras",
       "privacy": "Privacidade",
-      "copyright": "© 2024 Poker Planning. Todos os direitos reservados."
+      "copyright": "© {{year}} {{appName}}. Todos os direitos reservados."
     }
   },
   "common": {
@@ -607,10 +607,10 @@
   },
   "openMode": {
     "landing": {
-      "title": "Poker Planning",
+      "title": "{{appName}}",
       "subtitle": "Modo Aberto",
       "hero": {
-        "title": "Poker Planning Gratuito",
+        "title": "{{appName}} Gratuito",
         "subtitle": "Crie e participe de sessões de estimativa sem cadastro",
         "description": "Ideal para reuniões rápidas, workshops e testes. Sem persistência, sem complicação.",
         "createSession": "Criar Sessão"
@@ -641,7 +641,7 @@
         "button": "Criar Sessão Agora"
       },
       "footer": {
-        "title": "Poker Planning - Modo Aberto | Versão gratuita para uso temporário",
+        "title": "{{appName}} - Modo Aberto | Versão gratuita para uso temporário",
         "subtitle": "Para uso empresarial com persistência e recursos avançados, acesse a versão completa"
       }
     },
