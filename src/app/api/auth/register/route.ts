@@ -147,7 +147,9 @@ export async function POST(req: NextRequest) {
     // Enviar email de boas-vindas (não bloquear se falhar)
     if (emailService.isConfigured()) {
       try {
-        await emailService.sendWelcomeEmail(result.user.email, result.user.name)
+        const localeHeader = req.headers.get('accept-language') || undefined
+        const locale = (localeHeader || '').toLowerCase().startsWith('en') ? 'en' : 'pt'
+        await emailService.sendWelcomeEmail(result.user.email, result.user.name, locale)
         console.log('Welcome email sent to:', result.user.email)
       } catch (error) {
         console.error('Failed to send welcome email:', error)

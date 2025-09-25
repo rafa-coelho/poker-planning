@@ -178,12 +178,15 @@ export const POST = withTenantIsolation(async (req, context) => {
 
     // Enviar email de convite
     if (emailService.isConfigured()) {
+      const localeHeader = req.headers.get('accept-language') || undefined
+      const locale = (localeHeader || '').toLowerCase().startsWith('en') ? 'en' : 'pt'
       const emailResult = await emailService.sendInviteEmail(
         email,
         name,
         inviteToken,
         organization.name,
-        inviterUser.name
+        inviterUser.name,
+        locale
       );
 
       if (!emailResult.success) {

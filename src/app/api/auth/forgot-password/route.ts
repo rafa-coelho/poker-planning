@@ -80,10 +80,14 @@ export async function POST(request: NextRequest) {
     });
 
     // Enviar email de reset
+    const localeHeader = request.headers.get('accept-language') || undefined;
+    const locale = (localeHeader || '').toLowerCase().startsWith('en') ? 'en' : 'pt';
+
     const emailResult = await emailService.sendPasswordResetEmail(
       user.email,
       resetToken,
-      user.name
+      user.name,
+      locale
     );
 
     if (!emailResult.success) {

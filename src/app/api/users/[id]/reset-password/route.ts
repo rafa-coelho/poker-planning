@@ -48,7 +48,9 @@ export const POST = withTenantIsolation(async (req: NextRequest, context) => {
     })
 
     // Enviar email
-    const emailResult = await emailService.sendPasswordResetEmail(user.email, token, user.name)
+    const localeHeader = req.headers.get('accept-language') || undefined
+    const locale = (localeHeader || '').toLowerCase().startsWith('en') ? 'en' : 'pt'
+    const emailResult = await emailService.sendPasswordResetEmail(user.email, token, user.name, locale)
     if (!emailResult.success) {
       return NextResponse.json({ error: 'Erro ao enviar email de reset' }, { status: 500 })
     }
