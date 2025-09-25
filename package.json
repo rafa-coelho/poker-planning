@@ -26,6 +26,9 @@
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f postgres"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.13.0",
@@ -73,6 +76,7 @@
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "ts-jest": "^29.4.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ts-node": "^10.9.2"
   }
 }
