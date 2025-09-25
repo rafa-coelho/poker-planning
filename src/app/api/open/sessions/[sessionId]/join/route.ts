@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  context: { params: Promise<{ sessionId: string }> }
 ) {
   // Verificar se o modo aberto está habilitado
   if (!APP_CONFIG.OPEN_MODE) {
@@ -16,7 +16,7 @@ export async function POST(
   }
 
   try {
-    const { sessionId } = params;
+    const { sessionId } = await context.params;
     const body = await req.json();
     const { name } = body;
 
@@ -70,7 +70,7 @@ export async function POST(
         id: uuidv4(),
         sessionId,
         name: name.trim(),
-        ipAddress: req.headers.get('x-forwarded-for') || req.ip || 'unknown',
+        ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown',
         userAgent: req.headers.get('user-agent') || 'unknown',
       },
     });

@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  context: { params: Promise<{ sessionId: string }> }
 ) {
   // Verificar se o modo aberto está habilitado
   if (!APP_CONFIG.OPEN_MODE) {
@@ -16,7 +16,7 @@ export async function POST(
   }
 
   try {
-    const { sessionId } = params;
+    const { sessionId } = await context.params;
     const body = await req.json();
     const { ticketId, participantId, card } = body;
 
@@ -136,7 +136,7 @@ export async function POST(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  context: { params: Promise<{ sessionId: string }> }
 ) {
   // Verificar se o modo aberto está habilitado
   if (!APP_CONFIG.OPEN_MODE) {
@@ -147,7 +147,7 @@ export async function GET(
   }
 
   try {
-    const { sessionId } = params;
+    const { sessionId } = await context.params;
     const { searchParams } = new URL(req.url);
     const ticketId = searchParams.get('ticketId');
 

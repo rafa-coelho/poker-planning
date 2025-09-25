@@ -4,7 +4,7 @@ import { APP_CONFIG } from '@/lib/config';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { sessionId: string; ticketId: string } }
+  context: { params: Promise<{ sessionId: string; ticketId: string }> }
 ) {
   // Verificar se o modo aberto está habilitado
   if (!APP_CONFIG.OPEN_MODE) {
@@ -15,7 +15,7 @@ export async function GET(
   }
 
   try {
-    const { sessionId, ticketId } = params;
+    const { sessionId, ticketId } = await context.params;
 
     // Verificar se a sessão existe e não expirou
     const session = await prisma.openSession.findUnique({
@@ -74,7 +74,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { sessionId: string; ticketId: string } }
+  context: { params: Promise<{ sessionId: string; ticketId: string }> }
 ) {
   // Verificar se o modo aberto está habilitado
   if (!APP_CONFIG.OPEN_MODE) {
@@ -85,7 +85,7 @@ export async function PATCH(
   }
 
   try {
-    const { sessionId, ticketId } = params;
+    const { sessionId, ticketId } = await context.params;
     const body = await req.json();
     const { title, description, finalEstimate, averageVote } = body;
 
@@ -178,7 +178,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { sessionId: string; ticketId: string } }
+  context: { params: Promise<{ sessionId: string; ticketId: string }> }
 ) {
   // Verificar se o modo aberto está habilitado
   if (!APP_CONFIG.OPEN_MODE) {
@@ -189,7 +189,7 @@ export async function DELETE(
   }
 
   try {
-    const { sessionId, ticketId } = params;
+    const { sessionId, ticketId } = await context.params;
 
     // Verificar se a sessão existe e não expirou
     const session = await prisma.openSession.findUnique({
