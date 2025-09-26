@@ -56,9 +56,10 @@ Status atual:
 - [x] Criar `/packages/auth` reexportando utils e middlewares atuais.
 - [x] Criar `/packages/config` reexportando config central.
 - [x] Habilitar workspaces no `package.json`.
-- [ ] Atualizar Poker Planning para consumir dos pacotes (troca de imports) sem alterar rotas públicas.
-- [ ] Testar Poker Planning → sistema deve rodar igual antes.
+- [x] Atualizar Poker Planning para consumir dos pacotes (troca de imports) sem alterar rotas públicas.
+- [x] Testar Poker Planning → sistema deve rodar igual antes (build OK).
 - [x] Commit: "refactor: bootstrap internal packages (auth, domain, config) and enable workspaces".
+- [x] Commit: "refactor(phase-1): route imports to @nyx/auth & @nyx/config, add workspaces and aliases".
 - [ ] Documentar mudanças e checklist.
 
 ---
