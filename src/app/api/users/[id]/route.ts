@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { withTenantIsolation } from '@/lib/middleware/tenant'
-import { requirePermission } from '@/lib/middleware/authorization'
+import { withTenantIsolation, requirePermission } from '@nyx/auth'
 import { UserRole, canManageUser } from '@/lib/auth/roles'
 
 // GET /api/users/[id] - Detalhe do usuário

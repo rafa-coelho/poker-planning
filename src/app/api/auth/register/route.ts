@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { hashPassword, validatePassword } from '@/lib/auth/password'
-import { generateAccessToken, generateRefreshToken, generateTokenId } from '@/lib/auth/jwt'
+import { generateAccessToken, generateRefreshToken, generateTokenId } from '@nyx/auth'
 import { RegisterRequest, RegisterResponse, AUTH_ERRORS } from '@/types/auth'
 import { Plan, UserRole } from '@prisma/client'
 import { emailService } from '@/lib/email/service'

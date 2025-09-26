@@ -20,7 +20,10 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@nyx/auth": ["./packages/auth/src/index.ts"],
+      "@nyx/config": ["./packages/config/src/index.ts"],
+      "@nyx/domain": ["./packages/domain/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

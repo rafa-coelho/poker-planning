@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { withTenantIsolation } from '@/lib/middleware/tenant'
+import { withTenantIsolation } from '@nyx/auth'
 
 // GET /api/tickets - Lista tickets da organização do usuário autenticado
 export const GET = withTenantIsolation(async (req, context) => {

@@ -1,6 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@nyx/config';
 import enCommon from './locales/en/common.json';
 import ptCommon from './locales/pt/common.json';
 import enDashboard from './locales/en/dashboard.json';

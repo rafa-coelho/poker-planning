@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import jwt from 'jsonwebtoken'
 import { JWTPayload } from '@/types/auth'
-import { APP_CONFIG } from '@/lib/config'
+import { APP_CONFIG } from '@nyx/config'
 import { ensureSystemHealth } from '@/lib/utils/healthCheck'
 
 export interface TenantContext {

@@ -52,11 +52,13 @@ Status atual:
 
 ### Fase 1 — Refatoração mínima e pacotes internos (branch: migration/phase-1)
 
-- [ ] Criar `/packages/domain` e mover tipos/contratos centrais (Organization, User, Team, Project) e DTOs.
-- [ ] Criar `/packages/auth` com JWT utils e middlewares compartilhados (auth, authorization, withTenantIsolation).
-- [ ] Atualizar Poker Planning para consumir dos pacotes, sem alterar rotas públicas.
+- [x] Criar `/packages/domain` (placeholder inicial) e preparar contratos centrais.
+- [x] Criar `/packages/auth` reexportando utils e middlewares atuais.
+- [x] Criar `/packages/config` reexportando config central.
+- [x] Habilitar workspaces no `package.json`.
+- [ ] Atualizar Poker Planning para consumir dos pacotes (troca de imports) sem alterar rotas públicas.
 - [ ] Testar Poker Planning → sistema deve rodar igual antes.
-- [ ] Commit: "refactor: move domínio e auth para pacotes internos".
+- [x] Commit: "refactor: bootstrap internal packages (auth, domain, config) and enable workspaces".
 - [ ] Documentar mudanças e checklist.
 
 ---

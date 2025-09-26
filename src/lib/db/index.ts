@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { APP_CONFIG } from '@/lib/config'
+import { APP_CONFIG } from '@nyx/config'
 
 /**
  * Instância global do Prisma Client

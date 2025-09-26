@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { JWTPayload, RefreshTokenPayload } from '@/types/auth'
 import { User, Organization } from '@prisma/client'
-import { APP_CONFIG } from '@/lib/config'
+import { APP_CONFIG } from '@nyx/config'
 import { planService } from '@/lib/services/planService'
 
 /**

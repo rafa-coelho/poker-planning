@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAccessToken, extractTokenFromHeader } from '@/lib/auth/jwt'
+import { verifyAccessToken, extractTokenFromHeader } from '@nyx/auth'
 import { JWTPayload, AUTH_ERRORS } from '@/types/auth'
 
 /**

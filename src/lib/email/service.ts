@@ -1,5 +1,5 @@
 import { createTransporter, isEmailConfigured, emailConfig, emailRateLimit } from './config';
-import { APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@nyx/config';
 
 // Cache para rate limiting
 const emailCache = new Map<string, { count: number; lastSent: number }>();

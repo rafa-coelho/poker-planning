@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { withTenantIsolation } from '@/lib/middleware/tenant'
-import { requirePermission } from '@/lib/middleware/authorization'
+import { withTenantIsolation, requirePermission } from '@nyx/auth'
 
 // GET /api/teams - Lista times da organização
 export const GET = withTenantIsolation(async (req, context) => {

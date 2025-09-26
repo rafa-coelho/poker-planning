@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { withTenantIsolation } from '@/lib/middleware/tenant'
+import { withTenantIsolation } from '@nyx/auth'
 import { requirePermission } from '@/lib/middleware/authorization'
 import { UserRole } from '@/lib/auth/roles'
 import { generateSecureToken } from '@/lib/auth/jwt'

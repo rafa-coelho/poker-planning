@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { verifyPassword } from '@/lib/auth/password'
-import { generateAccessToken, generateRefreshToken, generateTokenId } from '@/lib/auth/jwt'
+import { generateAccessToken, generateRefreshToken, generateTokenId } from '@nyx/auth'
 import { LoginRequest, LoginResponse, AUTH_ERRORS } from '@/types/auth'
 
 /**

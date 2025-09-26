@@ -1,8 +1,5 @@
-// Phase 1 minimal: centralize domain types and enums via re-exports
-export * from '../../../prisma/schema.prisma'
-// Note: Prisma schema is not directly importable as TS; in Phase 1 we avoid
-// moving code and instead will define shared TypeScript interfaces here in Phase 1.1
-// For now, this package acts as a placeholder to establish the package boundary.
+// Phase 1 minimal: placeholder for domain shared types
+// Intentionally avoids importing Prisma schema. Will be expanded in Phase 1.1.
 
 export interface OrganizationIdRef {
   organizationId: string
@@ -13,5 +10,7 @@ export interface EntityBase {
   createdAt?: Date
   updatedAt?: Date
 }
+
+export type BrandId<T extends string> = string & { __brand: T }
 
 

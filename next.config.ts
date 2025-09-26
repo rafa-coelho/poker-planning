@@ -71,6 +71,14 @@ const nextConfig: NextConfig = {
   
   // Otimização de webpack
   webpack: (config, { dev, isServer }) => {
+    // Resolve internal workspace aliases for runtime bundling
+    config.resolve = config.resolve || {}
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      '@nyx/auth': require('path').resolve(__dirname, 'packages/auth/src/index.ts'),
+      '@nyx/config': require('path').resolve(__dirname, 'packages/config/src/index.ts'),
+      '@nyx/domain': require('path').resolve(__dirname, 'packages/domain/src/index.ts'),
+    }
     // Otimizações apenas para produção
     if (!dev && !isServer) {
       // Habilitar tree shaking mais agressivo

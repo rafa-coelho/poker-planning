@@ -3,8 +3,7 @@
 // ========================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAccessToken } from '../auth/jwt';
-import { hasPermission, UserRole, Permission } from '../auth/roles';
+import { verifyAccessToken, hasPermission, UserRole, Permission } from '@nyx/auth';
 import { prisma } from '../db';
 
 // ========================================
