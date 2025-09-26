@@ -76,8 +76,8 @@ Status atual:
 
 ### Fase 3 — Introdução do IdP (ao lado) (branch: migration/phase-3)
 
-- [ ] Criar app `apps/idp` (Next.js App Router).
-- [ ] Implementar rotas: `/login`, `/register`, `/api/oidc/token`, `/api/oidc/userinfo`, `/api/oidc/.well-known/*`.
+- [x] Criar app `apps/idp` (Next.js App Router) com esqueleto.
+- [x] Implementar endpoints: `/api/oidc/token`, `/api/oidc/userinfo`, `/api/oidc/.well-known/openid-configuration` (scaffold HS256 dev).
 - [ ] Banco do IdP: `users`, `organizations`, `memberships` (com `organizationId` em todas as entidades).
 - [ ] JWT do IdP conter: `sub`, `tenantId`, `roles`, `features`.
 - [ ] Poker governado por feature flag `USE_EXTERNAL_IDP` para aceitar tokens do IdP ou login interno.
