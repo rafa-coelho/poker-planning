@@ -3,7 +3,7 @@
  */
 
 import { prisma } from '@/lib/db'
-import { APP_CONFIG } from '@/lib/config'
+import { APP_CONFIG } from '@nyx/config'
 
 export interface HealthStatus {
   healthy: boolean
