@@ -4,7 +4,7 @@ import "@/i18n/index";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { APP_CONFIG } from "@/lib/config";
+import { APP_CONFIG } from "@nyx/config";
 // import { OpenModeLandingPage } from "@/components/OpenModeLandingPage";
 import {
   ArrowRight,

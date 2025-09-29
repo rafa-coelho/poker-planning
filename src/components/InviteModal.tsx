@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { FiCopy, FiXCircle, FiUsers, FiLink } from "react-icons/fi";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { APP_CONFIG } from "@/lib/config";
+import { APP_CONFIG } from "@nyx/config";
 
 interface InviteModalProps {
   inviteLink: string;

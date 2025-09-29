@@ -3,7 +3,7 @@
 import "@/i18n/index";
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@nyx/config';
 
 interface AuthLayoutProps {
   children: ReactNode;

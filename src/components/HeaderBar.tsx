@@ -6,7 +6,7 @@ import { FaRegHandSpock } from "react-icons/fa";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import { SessionState } from "./useSession";
-import { APP_CONFIG } from "@/lib/config";
+import { APP_CONFIG } from "@nyx/config";
 
 interface HeaderBarProps {
   sessionData: SessionState;
