@@ -33,15 +33,15 @@ Regras fundamentais:
 ### Fase 0 — Diagnóstico e Preparação (branch: migration/phase-0)
 
 - [x] Criar `MIGRATION_PLAN.md` no repositório com introdução e fases listadas.
-- [ ] Rodar Poker Planning local e confirmar funcionamento atual.
+- [x] Rodar Poker Planning local e confirmar funcionamento atual (build OK; app compila e páginas geradas).
 - [x] Inventariar dependências críticas (DB, Redis, Auth, WS).
   - DB: PostgreSQL via Prisma (`DATABASE_URL`).
   - Auth: JWT interno (`src/lib/auth/jwt.ts`).
   - WS: Socket.io em `server.js` (porta `WS_PORT`).
   - Cache/Redis: planejado (não obrigatório atualmente).
 - [x] Adicionar feature flag `USE_EXTERNAL_IDP=false` em `config.ts` (controlada por env).
-- [ ] Commit: "chore: inicializa plano de migração com flags".
-- [ ] Documentar status (testes locais) abaixo.
+- [x] Commit: "chore: inicializa plano de migração com flags".
+- [x] Documentar status (testes locais) abaixo.
 
 Status atual:
 - Flag `USE_EXTERNAL_IDP` criada em `src/lib/config.ts` (default false por env).
@@ -60,7 +60,7 @@ Status atual:
 - [x] Testar Poker Planning → sistema deve rodar igual antes (build OK).
 - [x] Commit: "refactor: bootstrap internal packages (auth, domain, config) and enable workspaces".
 - [x] Commit: "refactor(phase-1): route imports to @nyx/auth & @nyx/config, add workspaces and aliases".
-- [ ] Documentar mudanças e checklist.
+- [x] Documentar mudanças e checklist.
 
 ---
 
@@ -79,16 +79,17 @@ Status atual:
 - [x] Criar app `apps/idp` (Next.js App Router) com esqueleto.
 - [x] Implementar endpoints: `/api/oidc/token`, `/api/oidc/userinfo`, `/api/oidc/.well-known/openid-configuration` (scaffold HS256 dev).
 - [ ] Banco do IdP: `users`, `organizations`, `memberships` (com `organizationId` em todas as entidades).
-- [ ] JWT do IdP conter: `sub`, `tenantId`, `roles`, `features`.
-- [ ] Poker governado por feature flag `USE_EXTERNAL_IDP` para aceitar tokens do IdP ou login interno.
-- [ ] Commit: "feat(idp): adiciona idp inicial com fluxo oidc".
+- [x] JWT do IdP conter: `sub`, `tenantId`, `roles`, `features`.
+- [x] Poker governado por feature flag `USE_EXTERNAL_IDP` para aceitar tokens do IdP ou login interno.
+- [x] Commit: "feat(idp): adiciona idp inicial com fluxo oidc".
 - [ ] Documentar endpoints e configuração.
+- [ ] Páginas do IdP: `/login` e `/register` (UI mínima para emissão de tokens dev).
 
 ---
 
 ### Fase 4 — Dual-auth no Poker (branch: migration/phase-4)
 
-- [ ] Atualizar middleware de auth no Poker para aceitar `iss=poker-app` (interno) e `iss=idp-app` (IdP).
+- [x] Atualizar middleware de auth no Poker para aceitar `iss=poker-app` (interno) e `iss=idp-app` (IdP).
 - [ ] Implementar account linking via `externalId`/`externalSource`.
 - [ ] Testar login local e via IdP (ambos funcionam).
 - [ ] Commit: "feat(auth): poker aceita login do idp ou interno".
@@ -119,6 +120,7 @@ Status atual:
 - Definir ferramenta do monorepo (Turborepo recomendado; Nx como alternativa).
 - Diagramas ER e de fluxo OIDC – adicionar ao `docs/` conforme avançar.
 - Estratégia de migração de dados (users/orgs) e backfill de `externalId`.
+- Endurecer IdP para RS256 (JWKS com chave pública) em vez de HS256 dev.
 
 ## Histórico de Atualizações
 - Phase 0 inicializada em `migration/phase-0`.
