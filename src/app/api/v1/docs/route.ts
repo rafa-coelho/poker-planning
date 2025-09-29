@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { APP_CONFIG } from '@/lib/config'
+import { APP_CONFIG } from '@nyx/config'
 
 export async function GET() {
   const openApiSpec = {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@nyx/config';
 
 export async function GET(
   req: NextRequest,

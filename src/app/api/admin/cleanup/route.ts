@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CleanupService } from '@/lib/services/cleanupService'
-import { APP_CONFIG } from '@/lib/config'
+import { APP_CONFIG } from '@nyx/config'
 
 /**
  * POST /api/admin/cleanup - Executa limpeza manual (apenas em desenvolvimento)

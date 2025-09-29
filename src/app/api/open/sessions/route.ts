@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@nyx/config';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: NextRequest) {
