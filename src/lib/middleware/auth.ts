@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAccessToken, extractTokenFromHeader } from '@nyx/auth'
+import jwt from 'jsonwebtoken'
+import { APP_CONFIG } from '@nyx/config'
 import { JWTPayload, AUTH_ERRORS } from '@/types/auth'
 
 /**
@@ -49,13 +51,40 @@ export function authenticateRequest(req: NextRequest): JWTPayload | NextResponse
     )
   }
   
-  const payload = verifyAccessToken(token)
+  let payload = verifyAccessToken(token)
   
   if (!payload) {
-    return createAuthErrorResponse(
-      AUTH_ERRORS.TOKEN_EXPIRED,
-      'Token inválido ou expirado'
-    )
+    // Dual-auth: tentar validar como token emitido pelo IdP externo (HS256 dev)
+    if (APP_CONFIG.USE_EXTERNAL_IDP && APP_CONFIG.EXTERNAL_IDP_JWT_SECRET) {
+      try {
+        const ext = jwt.verify(token, APP_CONFIG.EXTERNAL_IDP_JWT_SECRET, {
+          issuer: APP_CONFIG.EXTERNAL_IDP_ISSUER || undefined
+        }) as any
+        // Mapear claims do IdP para nosso JWTPayload mínimo
+        payload = {
+          userId: ext.sub || ext.userId || 'external-user',
+          email: ext.email || 'external@idp',
+          name: ext.name || 'External User',
+          role: ext.roles?.[0] || 'MEMBER',
+          organizationId: ext.tenantId || ext.organizationId || 'external-tenant',
+          organizationSlug: ext.tenantSlug || 'external',
+          features: ext.features || { hasAPI: true, hasPublicSessions: true } as any,
+          iat: ext.iat,
+          exp: ext.exp,
+          iss: ext.iss
+        } as any
+      } catch {
+        return createAuthErrorResponse(
+          AUTH_ERRORS.TOKEN_EXPIRED,
+          'Token inválido ou expirado'
+        )
+      }
+    } else {
+      return createAuthErrorResponse(
+        AUTH_ERRORS.TOKEN_EXPIRED,
+        'Token inválido ou expirado'
+      )
+    }
   }
   
   // Verificar se o usuário está ativo
