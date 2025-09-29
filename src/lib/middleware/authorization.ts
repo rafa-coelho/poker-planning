@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAccessToken, hasPermission, UserRole, Permission } from '@nyx/auth';
+import { authenticateRequest } from './auth';
 import { prisma } from '../db';
 
 // ========================================
@@ -40,15 +41,10 @@ export function requirePermission(permission: Permission) {
         );
       }
 
-      // Verificar e decodificar token
-      const decoded = verifyAccessToken(token);
-      
-      if (!decoded) {
-        return NextResponse.json(
-          { error: 'Token inválido' },
-          { status: 401 }
-        );
-      }
+      // Verificar e decodificar token (dual-auth)
+      const authResult = authenticateRequest(request);
+      if (authResult instanceof NextResponse) return authResult;
+      const decoded = authResult as any;
 
       // Buscar usuário no banco para obter role atualizada
       const user = await prisma.user.findUnique({
@@ -112,15 +108,10 @@ export function requireRole(requiredRole: UserRole) {
         );
       }
 
-      // Verificar e decodificar token
-      const decoded = verifyAccessToken(token);
-      
-      if (!decoded) {
-        return NextResponse.json(
-          { error: 'Token inválido' },
-          { status: 401 }
-        );
-      }
+      // Verificar e decodificar token (dual-auth)
+      const authResult = authenticateRequest(request);
+      if (authResult instanceof NextResponse) return authResult;
+      const decoded = authResult as any;
 
       // Buscar usuário no banco
       const user = await prisma.user.findUnique({
@@ -184,15 +175,10 @@ export function requireAuth() {
         );
       }
 
-      // Verificar e decodificar token
-      const decoded = verifyAccessToken(token);
-      
-      if (!decoded) {
-        return NextResponse.json(
-          { error: 'Token inválido' },
-          { status: 401 }
-        );
-      }
+      // Verificar e decodificar token (dual-auth)
+      const authResult = authenticateRequest(request);
+      if (authResult instanceof NextResponse) return authResult;
+      const decoded = authResult as any;
 
       // Buscar usuário no banco
       const user = await prisma.user.findUnique({
