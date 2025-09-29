@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@nyx/config';
 
 export interface PublicParticipantToken {
   participantId: string;
