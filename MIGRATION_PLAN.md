@@ -78,12 +78,12 @@ Status atual:
 
 - [x] Criar app `apps/idp` (Next.js App Router) com esqueleto.
 - [x] Implementar endpoints: `/api/oidc/token`, `/api/oidc/userinfo`, `/api/oidc/.well-known/openid-configuration` (scaffold HS256 dev).
-- [ ] Banco do IdP: `users`, `organizations`, `memberships` (com `organizationId` em todas as entidades).
+- [x] Banco do IdP: `users`, `organizations`, `memberships` (com `organizationId` em todas as entidades).
 - [x] JWT do IdP conter: `sub`, `tenantId`, `roles`, `features`.
 - [x] Poker governado por feature flag `USE_EXTERNAL_IDP` para aceitar tokens do IdP ou login interno.
 - [x] Commit: "feat(idp): adiciona idp inicial com fluxo oidc".
-- [ ] Documentar endpoints e configuração.
-- [ ] Páginas do IdP: `/login` e `/register` (UI mínima para emissão de tokens dev).
+- [x] Documentar endpoints e configuração.
+- [x] Páginas do IdP: `/login` e `/register` (UI mínima para emissão de tokens dev).
 
 ---
 

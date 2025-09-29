@@ -118,6 +118,26 @@ HOST="localhost"
 PORT="3000"
 ```
 
+## IdP (Identity Provider)
+
+### `IDP_ISSUER`
+**Opcional** - Emissor OIDC do IdP (padrão: `http://localhost:3100`)
+```
+IDP_ISSUER="http://localhost:3100"
+```
+
+### `IDP_JWT_SECRET`
+**Obrigatório (dev)** - Segredo HS256 para assinatura dos tokens emitidos pelo IdP
+```
+IDP_JWT_SECRET="idp-dev-secret"
+```
+
+### `IDP_DATABASE_URL`
+**Opcional** - URL de conexão do banco do IdP (separado do app principal)
+```
+IDP_DATABASE_URL="postgresql://username:password@localhost:5432/poker_planning"
+```
+
 ### `WS_PORT`
 **Opcional** - Porta do servidor WebSocket (padrão: 3001)
 ```

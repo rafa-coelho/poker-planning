@@ -5,6 +5,29 @@
 Esta documentação define todos os endpoints da API RESTful usando Next.js API Routes, seguindo padrões empresariais de autenticação, autorização e multi-tenancy.
 
 ## 🔐 Autenticação
+### IdP (OpenID Connect - Dev)
+
+Endpoints do IdP de desenvolvimento (rodando em `http://localhost:3100`):
+
+```
+GET  /api/oidc/.well-known/openid-configuration
+POST /api/oidc/token            # password grant (dev only)
+GET  /api/oidc/userinfo
+```
+
+Payload do token (dev):
+
+```json
+{
+  "sub": "user:john",
+  "tenantId": "tenant_dev",
+  "roles": ["ADMIN"],
+  "features": { "hasAPI": true, "hasPublicSessions": true },
+  "iss": "http://localhost:3100",
+  "exp": 1699999999
+}
+```
+
 
 ### Base Headers
 ```typescript
