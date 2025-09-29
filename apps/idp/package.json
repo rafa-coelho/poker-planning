@@ -5,13 +5,22 @@
   "scripts": {
     "dev": "next dev -p 3100",
     "build": "next build",
-    "start": "next start -p 3100"
+    "start": "next start -p 3100",
+    "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate dev --schema=./prisma/schema.prisma",
+    "prisma:studio": "npx prisma studio --schema=./prisma/schema.prisma --port 5556"
   },
   "dependencies": {
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "@prisma/client": "^6.13.0",
+    "i18next": "^23.15.1",
+    "react-i18next": "^15.4.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.13.0"
   }
 }
 

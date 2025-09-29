@@ -1,0 +1,40 @@
+{
+  "home": {
+    "title": "IdP - Nyx Suite",
+    "endpoints": "Endpoints OIDC:",
+    "login": "Entrar",
+    "register": "Registrar"
+  },
+  "login": {
+    "title": "Login (IdP Dev)",
+    "subtitle": "Envie credenciais para receber um token de desenvolvimento.",
+    "username": "Usuário",
+    "password": "Senha",
+    "usernamePlaceholder": "joao.silva",
+    "passwordPlaceholder": "Sua senha",
+    "submit": "Obter Token",
+    "loading": "Carregando...",
+    "noAccount": "Sem conta?",
+    "register": "Registrar",
+    "result": "Resultado"
+  },
+  "register": {
+    "title": "Registrar (Dev)",
+    "subtitle": "Formulário de registro para desenvolvimento. Emite um token para testes.",
+    "name": "Nome",
+    "email": "Email",
+    "password": "Senha",
+    "namePlaceholder": "João Silva",
+    "emailPlaceholder": "joao.silva@exemplo.com",
+    "passwordPlaceholder": "Sua senha",
+    "submit": "Criar & Obter Token",
+    "hasAccount": "Já possui conta?",
+    "login": "Entrar",
+    "result": "Resultado"
+  },
+  "errors": {
+    "unexpected": "Erro inesperado"
+  }
+}
+
+
