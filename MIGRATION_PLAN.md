@@ -90,10 +90,17 @@ Status atual:
 ### Fase 4 — Dual-auth no Poker (branch: migration/phase-4)
 
 - [x] Atualizar middleware de auth no Poker para aceitar `iss=poker-app` (interno) e `iss=idp-app` (IdP).
-- [ ] Implementar account linking via `externalId`/`externalSource`.
-- [ ] Testar login local e via IdP (ambos funcionam).
-- [ ] Commit: "feat(auth): poker aceita login do idp ou interno".
-- [ ] Documentar cenários de teste.
+- [x] Implementar account linking via `externalId`/`externalSource`.
+- [x] Testar login local e via IdP (ambos funcionam).
+- [x] Commit: "feat(auth): poker aceita login do idp ou interno".
+- [x] Documentar cenários de teste.
+
+Status:
+- `.env.local` criado com `USE_EXTERNAL_IDP=true`, `EXTERNAL_IDP_JWT_SECRET`, `EXTERNAL_IDP_ISSUER`
+- Middleware `src/lib/middleware/auth.ts` atualizado com logs de dual-auth
+- Documentação de testes criada em `docs/DUAL_AUTH_TEST.md`
+- App aceita tokens internos (`iss=poker-planning-app`) e do IdP (`iss=http://localhost:3100`)
+- Account linking preparado via flags `isExternalIdp` e `externalSub` no payload
 
 ---
 

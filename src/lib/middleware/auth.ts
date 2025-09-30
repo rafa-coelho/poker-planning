@@ -60,9 +60,14 @@ export function authenticateRequest(req: NextRequest): JWTPayload | NextResponse
         const ext = jwt.verify(token, APP_CONFIG.EXTERNAL_IDP_JWT_SECRET, {
           issuer: APP_CONFIG.EXTERNAL_IDP_ISSUER || undefined
         }) as any
-        // Mapear claims do IdP para nosso JWTPayload mínimo
+        
+        // Account Linking: buscar usuário por externalId
+        const externalSub = ext.sub || ext.userId || 'external-user'
+        console.log('[Dual-Auth] Token IdP aceito:', { sub: externalSub, iss: ext.iss })
+        
+        // Mapear claims do IdP para nosso JWTPayload
         payload = {
-          userId: ext.sub || ext.userId || 'external-user',
+          userId: externalSub,  // será mapeado para user real se existir externalId
           email: ext.email || 'external@idp',
           name: ext.name || 'External User',
           role: ext.roles?.[0] || 'MEMBER',
@@ -71,9 +76,13 @@ export function authenticateRequest(req: NextRequest): JWTPayload | NextResponse
           features: ext.features || { hasAPI: true, hasPublicSessions: true } as any,
           iat: ext.iat,
           exp: ext.exp,
-          iss: ext.iss
+          iss: ext.iss,
+          // Flag para identificar origem IdP
+          isExternalIdp: true,
+          externalSub
         } as any
-      } catch {
+      } catch (err) {
+        console.error('[Dual-Auth] Token IdP inválido:', err)
         return createAuthErrorResponse(
           AUTH_ERRORS.TOKEN_EXPIRED,
           'Token inválido ou expirado'
@@ -87,8 +96,8 @@ export function authenticateRequest(req: NextRequest): JWTPayload | NextResponse
     }
   }
   
-  // Verificar se o usuário está ativo
-  if (!payload.userId) {
+  // Verificar se o payload foi validado
+  if (!payload || !payload.userId) {
     return createAuthErrorResponse(
       AUTH_ERRORS.USER_NOT_FOUND,
       'Usuário não encontrado'
