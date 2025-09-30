@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAccessToken, hasPermission, UserRole, Permission } from '@nyx/auth';
 import { authenticateRequest } from './auth';
 import { prisma } from '../db';
+import { findUserByTokenPayload } from './userLookup';
 
 // ========================================
 // 📋 TIPOS
@@ -46,18 +47,8 @@ export function requirePermission(permission: Permission) {
       if (authResult instanceof NextResponse) return authResult;
       const decoded = authResult as any;
 
-      // Buscar usuário no banco para obter role atualizada
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          role: true,
-          organizationId: true,
-          isActive: true
-        }
-      });
+      // Buscar usuário no banco (com suporte a account linking)
+      const user = await findUserByTokenPayload(decoded);
 
       if (!user || !user.isActive) {
         return NextResponse.json(
@@ -113,18 +104,8 @@ export function requireRole(requiredRole: UserRole) {
       if (authResult instanceof NextResponse) return authResult;
       const decoded = authResult as any;
 
-      // Buscar usuário no banco
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          role: true,
-          organizationId: true,
-          isActive: true
-        }
-      });
+      // Buscar usuário no banco (com suporte a account linking)
+      const user = await findUserByTokenPayload(decoded);
 
       if (!user || !user.isActive) {
         return NextResponse.json(
@@ -180,18 +161,8 @@ export function requireAuth() {
       if (authResult instanceof NextResponse) return authResult;
       const decoded = authResult as any;
 
-      // Buscar usuário no banco
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          role: true,
-          organizationId: true,
-          isActive: true
-        }
-      });
+      // Buscar usuário no banco (com suporte a account linking)
+      const user = await findUserByTokenPayload(decoded);
 
       if (!user || !user.isActive) {
         return NextResponse.json(
