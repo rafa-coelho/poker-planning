@@ -78,12 +78,18 @@ Status atual:
 
 - [x] Criar app `apps/idp` (Next.js App Router) com esqueleto.
 - [x] Implementar endpoints: `/api/oidc/token`, `/api/oidc/userinfo`, `/api/oidc/.well-known/openid-configuration` (scaffold HS256 dev).
-- [x] Banco do IdP: `users`, `organizations`, `memberships` (com `organizationId` em todas as entidades).
+- [x] Banco do IdP: `users`, `organizations`, `memberships` (Prisma schema criado, ainda não integrado).
 - [x] JWT do IdP conter: `sub`, `tenantId`, `roles`, `features`.
 - [x] Poker governado por feature flag `USE_EXTERNAL_IDP` para aceitar tokens do IdP ou login interno.
 - [x] Commit: "feat(idp): adiciona idp inicial com fluxo oidc".
 - [x] Documentar endpoints e configuração.
 - [x] Páginas do IdP: `/login` e `/register` (UI mínima para emissão de tokens dev).
+
+**IMPORTANTE**: Nesta fase, o IdP está **MOCKADO** para desenvolvimento:
+- `/api/oidc/token` aceita qualquer username/password e retorna token hardcoded
+- Não há validação real de credenciais
+- Não há integração com banco de dados ainda
+- Objetivo: testar dual-auth e account linking no app Poker
 
 ---
 
@@ -114,20 +120,63 @@ Status:
 
 ---
 
-### Fase 6 — Endurecimento e preparação futura (branch: migration/phase-6)
+### Fase 6 — IdP Real (Banco de Dados e Auth) (branch: migration/phase-6)
 
-- [ ] Adicionar `features[]` e planos no token e enforcement no app.
-- [ ] Consolidar `organizationId` e auditoria no IdP.
-- [ ] Documentar estrutura e operação.
-- [ ] Confirmar Poker apenas com IdP ativo.
+- [ ] **Integrar Prisma no IdP**: conectar `apps/idp/prisma/schema.prisma` ao banco
+- [ ] **Implementar auth real no IdP**:
+  - `/api/auth/register`: criar usuário no banco do IdP
+  - `/api/auth/login`: validar credenciais e emitir token
+  - Bcrypt para hash de senhas
+  - Validação de email/password
+- [ ] **CRUD de Organizations** no IdP
+- [ ] **Gerenciamento de Memberships** (users ↔ orgs)
+- [ ] **Sincronização**: script para migrar users do Poker para IdP
+- [ ] **UI funcional**: login/register pages com forms reais
+- [ ] Commit: "feat(idp): implement real database auth and user management"
+
+---
+
+### Fase 7 — Endurecimento e Features Avançadas (branch: migration/phase-7)
+
+- [ ] **RS256 com JWKS**: substituir HS256 dev por chaves públicas/privadas
+- [ ] **Refresh tokens** no IdP
+- [ ] **Claims customizados**: `features[]`, `plan`, `permissions[]`
+- [ ] **Auditoria completa**: logs de login, token refresh, etc
+- [ ] **Rate limiting** no IdP
+- [ ] **OAuth2 flows**: authorization_code, client_credentials
+- [ ] Commit: "feat(idp): harden security with RS256, refresh tokens, and oauth2"
 
 ---
 
 ## Pendências Gerais
-- Definir ferramenta do monorepo (Turborepo recomendado; Nx como alternativa).
-- Diagramas ER e de fluxo OIDC – adicionar ao `docs/` conforme avançar.
-- Estratégia de migração de dados (users/orgs) e backfill de `externalId`.
-- Endurecer IdP para RS256 (JWKS com chave pública) em vez de HS256 dev.
+- Definir ferramenta do monorepo (Turborepo recomendado; Nx como alternativa). → **Fase 2**
+- Diagramas ER e de fluxo OIDC – adicionar ao `docs/` conforme avançar. → **Fase 6**
+- Estratégia de migração de dados (users/orgs) e backfill de `externalId`. → **Fase 6**
+- Endurecer IdP para RS256 (JWKS com chave pública) em vez de HS256 dev. → **Fase 7**
+
+## Estado Atual do IdP (Fase 3)
+
+**O que ESTÁ funcionando:**
+✅ Estrutura do app `apps/idp` criada
+✅ Endpoints OIDC mockados (`/api/oidc/token`, `/api/oidc/userinfo`, `/.well-known/openid-configuration`)
+✅ Prisma schema definido (`Organization`, `User`, `Membership`)
+✅ UI mínima (`/login`, `/register`) para dev
+✅ Poker app aceita tokens do IdP via dual-auth
+✅ Account linking preparado
+
+**O que NÃO ESTÁ funcionando (será implementado na Fase 6):**
+❌ Validação real de credenciais (aceita qualquer user/pass)
+❌ Integração com banco de dados (Prisma não conectado)
+❌ CRUD de usuários e organizações
+❌ Hash de senhas
+❌ Refresh tokens
+❌ Migrations do Prisma executadas
+❌ Sincronização de dados entre Poker e IdP
+
+**Por que está mockado?**
+- Foco atual: validar dual-auth e account linking no Poker
+- IdP real requer banco separado, migrations, e lógica complexa
+- Implementação incremental: primeiro conexão, depois features
 
 ## Histórico de Atualizações
 - Phase 0 inicializada em `migration/phase-0`.
