@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { PublicRoute } from '@/lib/middleware/routeProtection';
+import { APP_CONFIG } from '@nyx/config';
+import RegisterRedirect from './redirect';
 
 interface RegisterForm {
   name: string;
@@ -26,6 +28,12 @@ interface RegisterErrors {
 }
 
 export default function RegisterPage() {
+  // Fase 5: Se USE_EXTERNAL_IDP está ativo, redirecionar para IdP
+  if (APP_CONFIG.USE_EXTERNAL_IDP) {
+    return <RegisterRedirect />
+  }
+
+  // Caso contrário, usar registro interno (legacy)
   const { t } = useTranslation("common");
   const router = useRouter();
   const { register } = useAuth();

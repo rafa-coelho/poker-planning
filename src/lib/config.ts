@@ -53,8 +53,8 @@ export const APP_CONFIG = {
   ENABLE_REGISTRATION: process.env.ENABLE_REGISTRATION !== 'false', // true por padrão
   ENABLE_PASSWORD_RESET: process.env.ENABLE_PASSWORD_RESET !== 'false', // true por padrão
   ENABLE_EMAIL_VERIFICATION: process.env.ENABLE_EMAIL_VERIFICATION === 'true', // false por padrão
-  // Migração para IdP externo (faseada)
-  USE_EXTERNAL_IDP: process.env.USE_EXTERNAL_IDP === 'true',
+  // Migração para IdP externo (FASE 5: default true)
+  USE_EXTERNAL_IDP: process.env.USE_EXTERNAL_IDP !== 'false',
   
   // Multi-tenancy
   DEFAULT_ORGANIZATION_PLAN: process.env.DEFAULT_ORGANIZATION_PLAN || 'FREE',

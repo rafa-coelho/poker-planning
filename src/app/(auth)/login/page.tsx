@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { PublicRoute } from '@/lib/middleware/routeProtection';
+import { APP_CONFIG } from '@nyx/config';
+import LoginRedirect from './redirect';
 
 interface LoginForm {
   email: string;
@@ -202,6 +204,12 @@ function LoginContent() {
 }
 
 export default function LoginPage() {
+  // Fase 5: Se USE_EXTERNAL_IDP está ativo, redirecionar para IdP
+  if (APP_CONFIG.USE_EXTERNAL_IDP) {
+    return <LoginRedirect />
+  }
+
+  // Caso contrário, usar login interno (legacy)
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <LoginContent />

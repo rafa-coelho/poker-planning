@@ -112,11 +112,18 @@ Status:
 
 ### Fase 5 — Migração completa para IdP (branch: migration/phase-5)
 
-- [ ] Marcar `USE_EXTERNAL_IDP=true` como default.
-- [ ] Desativar rotas internas de login/registro no Poker.
-- [ ] Poker só aceita tokens emitidos pelo IdP.
-- [ ] Commit: "refactor(auth): poker depende exclusivamente do idp".
-- [ ] Documentar conclusão.
+- [x] Marcar `USE_EXTERNAL_IDP=true` como default.
+- [x] Desativar rotas internas de login/registro no Poker.
+- [x] Poker só aceita tokens emitidos pelo IdP.
+- [x] Commit: "refactor(auth): poker depende exclusivamente do idp".
+- [x] Documentar conclusão.
+
+Status:
+- `USE_EXTERNAL_IDP` agora é `true` por padrão (pode ser desabilitado com `USE_EXTERNAL_IDP=false`)
+- Rotas `/login` e `/register` redirecionam para IdP quando `USE_EXTERNAL_IDP=true`
+- Componentes `LoginRedirect` e `RegisterRedirect` criados
+- Auth interno permanece funcional para rollback (basta setar `USE_EXTERNAL_IDP=false`)
+- Poker aceita tokens internos E do IdP via dual-auth
 
 ---
 
