@@ -8,25 +8,27 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
+  const [organizationName, setOrganizationName] = useState('')
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  // Dev-only: simulate register by issuing token directly
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
     setResult(null)
     try {
-      const formData = new FormData()
-      formData.set('grant_type', 'password')
-      formData.set('username', email || name)
-      formData.set('password', password)
-      const res = await fetch('/api/oidc/token', { method: 'POST', body: formData })
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, organizationName })
+      })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'error')
       setResult(json)
+      // TODO: Redirecionar para app com token
+      console.log('[IdP Register] Success:', json)
     } catch (err: any) {
       setError(err?.message || t('errors.unexpected'))
     } finally {
@@ -55,6 +57,17 @@ export default function RegisterPage() {
             onChange={e => setEmail(e.target.value)}
             type="email"
             placeholder={t('register.emailPlaceholder')}
+            required
+            style={{ border: '1px solid #ccc', padding: 8, width: '100%' }}
+          />
+        </label>
+        <label>
+          <div>Organization Name</div>
+          <input
+            value={organizationName}
+            onChange={e => setOrganizationName(e.target.value)}
+            placeholder="Ex: My Company"
+            required
             style={{ border: '1px solid #ccc', padding: 8, width: '100%' }}
           />
         </label>

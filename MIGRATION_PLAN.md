@@ -129,17 +129,25 @@ Status:
 
 ### Fase 6 — IdP Real (Banco de Dados e Auth) (branch: migration/phase-6)
 
-- [ ] **Integrar Prisma no IdP**: conectar `apps/idp/prisma/schema.prisma` ao banco
-- [ ] **Implementar auth real no IdP**:
+- [x] **Integrar Prisma no IdP**: conectar `apps/idp/prisma/schema.prisma` ao banco
+- [x] **Implementar auth real no IdP**:
   - `/api/auth/register`: criar usuário no banco do IdP
   - `/api/auth/login`: validar credenciais e emitir token
   - Bcrypt para hash de senhas
   - Validação de email/password
-- [ ] **CRUD de Organizations** no IdP
-- [ ] **Gerenciamento de Memberships** (users ↔ orgs)
+- [x] **CRUD de Organizations** no IdP (criado automaticamente no register)
+- [x] **Gerenciamento de Memberships** (users ↔ orgs) (criado automaticamente no register)
 - [ ] **Sincronização**: script para migrar users do Poker para IdP
-- [ ] **UI funcional**: login/register pages com forms reais
-- [ ] Commit: "feat(idp): implement real database auth and user management"
+- [x] **UI funcional**: login/register pages com forms reais
+- [x] Commit: "feat(idp): implement real database auth and user management"
+
+Status:
+- Prisma client configurado com schema separado (`idp`)
+- `/api/auth/register` funcional: cria User, Organization e Membership
+- `/api/auth/login` funcional: valida credenciais com bcrypt
+- UI de login/register atualizada para usar novas APIs
+- Migrations executadas no schema `idp` do PostgreSQL
+- IdP e App rodando em paralelo (3100 e 3000)
 
 ---
 

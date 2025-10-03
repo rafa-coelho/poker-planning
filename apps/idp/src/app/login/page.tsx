@@ -17,14 +17,16 @@ export default function LoginPage() {
     setError(null)
     setResult(null)
     try {
-      const formData = new FormData()
-      formData.set('grant_type', 'password')
-      formData.set('username', username)
-      formData.set('password', password)
-      const res = await fetch('/api/oidc/token', { method: 'POST', body: formData })
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password })
+      })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'error')
       setResult(json)
+      // TODO: Redirecionar para app com token
+      console.log('[IdP Login] Success:', json)
     } catch (err: any) {
       setError(err?.message || t('errors.unexpected'))
     } finally {
@@ -43,6 +45,7 @@ export default function LoginPage() {
             value={username}
             onChange={e => setUsername(e.target.value)}
             placeholder={t('login.usernamePlaceholder')}
+            type="email"
             required
             style={{ border: '1px solid #ccc', padding: 8, width: '100%' }}
           />

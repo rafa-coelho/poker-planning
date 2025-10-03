@@ -17,10 +17,13 @@
     "jsonwebtoken": "^9.0.2",
     "@prisma/client": "^6.13.0",
     "i18next": "^23.15.1",
-    "react-i18next": "^15.4.0"
+    "react-i18next": "^15.4.0",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
-    "prisma": "^6.13.0"
+    "prisma": "^6.13.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }
 
