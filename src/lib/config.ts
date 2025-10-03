@@ -27,7 +27,7 @@ export const APP_CONFIG = {
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret',
   JWT_ISSUER: process.env.JWT_ISSUER || 'poker-planning-app',
   // External IdP (dev HS256)
-  EXTERNAL_IDP_ISSUER: process.env.EXTERNAL_IDP_ISSUER || '',
+  EXTERNAL_IDP_ISSUER: process.env.EXTERNAL_IDP_ISSUER || process.env.NEXT_PUBLIC_IDP_ISSUER || '',
   EXTERNAL_IDP_JWT_SECRET: process.env.EXTERNAL_IDP_JWT_SECRET || '',
   
   // Senhas

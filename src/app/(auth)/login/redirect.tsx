@@ -1,21 +1,18 @@
 'use client'
 
 import { useEffect } from 'react'
-import { APP_CONFIG } from '@nyx/config'
 
 /**
  * Fase 5: Redireciona login interno para IdP externo
  */
 export default function LoginRedirect() {
   useEffect(() => {
-    if (APP_CONFIG.USE_EXTERNAL_IDP && APP_CONFIG.EXTERNAL_IDP_ISSUER) {
-      const idpLoginUrl = `${APP_CONFIG.EXTERNAL_IDP_ISSUER}/login`
-      const currentUrl = window.location.href
-      const returnUrl = encodeURIComponent(currentUrl)
-      
-      // Redirecionar para IdP com return URL
-      window.location.href = `${idpLoginUrl}?return_to=${returnUrl}`
-    }
+    // Redirecionar para IdP
+    const idpUrl = process.env.NEXT_PUBLIC_IDP_ISSUER || 'http://localhost:3100'
+    const idpLoginUrl = `${idpUrl}/login`
+    
+    console.log('[Redirect] Redirecting to IdP:', idpLoginUrl)
+    window.location.href = idpLoginUrl
   }, [])
 
   return (

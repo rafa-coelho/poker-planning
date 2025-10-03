@@ -1,21 +1,18 @@
 'use client'
 
 import { useEffect } from 'react'
-import { APP_CONFIG } from '@nyx/config'
 
 /**
  * Fase 5: Redireciona registro interno para IdP externo
  */
 export default function RegisterRedirect() {
   useEffect(() => {
-    if (APP_CONFIG.USE_EXTERNAL_IDP && APP_CONFIG.EXTERNAL_IDP_ISSUER) {
-      const idpRegisterUrl = `${APP_CONFIG.EXTERNAL_IDP_ISSUER}/register`
-      const currentUrl = window.location.href
-      const returnUrl = encodeURIComponent(currentUrl)
-      
-      // Redirecionar para IdP com return URL
-      window.location.href = `${idpRegisterUrl}?return_to=${returnUrl}`
-    }
+    // Redirecionar para IdP
+    const idpUrl = process.env.NEXT_PUBLIC_IDP_ISSUER || 'http://localhost:3100'
+    const idpRegisterUrl = `${idpUrl}/register`
+    
+    console.log('[Redirect] Redirecting to IdP:', idpRegisterUrl)
+    window.location.href = idpRegisterUrl
   }, [])
 
   return (
