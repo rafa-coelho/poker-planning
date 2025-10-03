@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const { t } = useTranslation('idp')
+  const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [result, setResult] = useState<any>(null)
@@ -25,9 +27,15 @@ export default function LoginPage() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'error')
-      setResult(json)
-      // TODO: Redirecionar para app com token
+      
       console.log('[IdP Login] Success:', json)
+      
+      // Redirecionar para o app principal com o token
+      const token = json.tokens?.access_token || json.accessToken
+      const returnUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      
+      // Redirecionar com token (o app deve estar preparado para receber)
+      window.location.href = `${returnUrl}?token=${token}`
     } catch (err: any) {
       setError(err?.message || t('errors.unexpected'))
     } finally {
@@ -117,19 +125,15 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Success Result */}
-          {result && (
-            <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          {/* Success Message (Redirecting) */}
+          {loading && !error && (
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <div className="flex-1">
-                  <h3 className="text-sm font-medium text-green-800 mb-2">Login successful!</h3>
-                  <pre className="text-xs text-green-700 overflow-x-auto bg-green-100 p-2 rounded">
-                    {JSON.stringify(result, null, 2)}
-                  </pre>
-                </div>
+                <span className="text-blue-800 font-medium">Redirecting...</span>
               </div>
             </div>
           )}
