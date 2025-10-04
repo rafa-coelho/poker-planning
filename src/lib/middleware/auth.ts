@@ -34,7 +34,6 @@ function createAuthErrorResponse(code: string, message: string, status: number =
  */
 export function authenticateRequest(req: NextRequest): JWTPayload | NextResponse {
   const authHeader = req.headers.get('authorization')
-  
   if (!authHeader) {
     return createAuthErrorResponse(
       AUTH_ERRORS.INVALID_TOKEN,
@@ -96,8 +95,19 @@ export function authenticateRequest(req: NextRequest): JWTPayload | NextResponse
     }
   }
   
+  if(!payload) {
+    return createAuthErrorResponse(
+      AUTH_ERRORS.TOKEN_EXPIRED,
+      'Token inválido ou expirado'
+    );
+  }
   // Verificar se o payload foi validado
-  if (!payload || !payload.userId) {
+  // if its an external idp token, we need to check if the user is linked to the system
+  if (APP_CONFIG.USE_EXTERNAL_IDP) {
+    payload.userId = payload.sub!;
+  }
+
+  if (!payload.userId) {
     return createAuthErrorResponse(
       AUTH_ERRORS.USER_NOT_FOUND,
       'Usuário não encontrado'

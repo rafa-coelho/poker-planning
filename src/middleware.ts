@@ -7,6 +7,19 @@ export function middleware(request: NextRequest) {
   // Verificar se o modo aberto está habilitado
   const openMode = process.env.NEXT_PUBLIC_OPEN_MODE == 'true';
   
+  // Rotas públicas que não devem ser redirecionadas
+  const publicRoutes = [
+    '/auth/callback',
+    '/api',
+    '/_next',
+  ];
+  
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
+
   if (openMode) {
     // No modo aberto, redirecionar rotas protegidas para a raiz
     

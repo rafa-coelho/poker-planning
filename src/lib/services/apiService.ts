@@ -563,6 +563,7 @@ class ApiService {
         hasSSO: boolean;
         hasAPI: boolean;
       };
+      
     }>('/api/auth/me');
   }
 

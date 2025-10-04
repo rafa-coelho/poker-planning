@@ -59,7 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         '/register', 
         '/forgot-password', 
         '/reset-password',
-        '/join' // Permitir acesso à página de join sem autenticação
+        '/join', // Permitir acesso à página de join sem autenticação
+        '/auth/callback'
       ];
       
       // Verificar se é uma rota de join de sessão

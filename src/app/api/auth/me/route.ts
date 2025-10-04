@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '@/lib/middleware/auth'
 import { prisma } from '@/lib/db'
 import { UserProfile } from '@/types/auth'
+import { Prisma } from '@prisma/client'
+import { APP_CONFIG } from '@/lib/config'
 
 /**
  * GET /api/auth/me
@@ -10,8 +12,10 @@ import { UserProfile } from '@/types/auth'
 export const GET = withAuth(async (req: NextRequest, user) => {
   try {
     // Buscar dados atualizados do usuário
+    const isExternalIdp = APP_CONFIG.USE_EXTERNAL_IDP;
+    const where: Prisma.UserWhereUniqueInput = isExternalIdp ? { externalId: user.userId } : { id: user.userId };
     const userData = await prisma.user.findUnique({
-      where: { id: user.userId },
+      where,
       include: {
         organization: {
           select: {

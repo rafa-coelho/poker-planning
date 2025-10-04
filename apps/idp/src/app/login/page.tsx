@@ -34,8 +34,8 @@ export default function LoginPage() {
       const token = json.tokens?.access_token || json.accessToken
       const returnUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
       
-      // Redirecionar com token (o app deve estar preparado para receber)
-      window.location.href = `${returnUrl}?token=${token}`
+      // Redirecionar para a página de callback do app
+      window.location.href = `${returnUrl}/auth/callback?token=${token}`
     } catch (err: any) {
       setError(err?.message || t('errors.unexpected'))
     } finally {

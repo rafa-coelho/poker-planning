@@ -2,14 +2,13 @@ import jwt from 'jsonwebtoken'
 import { JWTPayload, RefreshTokenPayload } from '@/types/auth'
 import { User, Organization } from '@prisma/client'
 import { APP_CONFIG } from '@nyx/config'
-import { planService } from '@/lib/services/planService'
 
 /**
  * Configurações JWT
  */
-const JWT_SECRET = APP_CONFIG.JWT_SECRET
-const JWT_REFRESH_SECRET = APP_CONFIG.JWT_REFRESH_SECRET
-const JWT_ISSUER = APP_CONFIG.JWT_ISSUER
+const JWT_SECRET = APP_CONFIG.USE_EXTERNAL_IDP ? APP_CONFIG.EXTERNAL_IDP_JWT_SECRET : APP_CONFIG.JWT_SECRET
+const JWT_REFRESH_SECRET = APP_CONFIG.USE_EXTERNAL_IDP ? APP_CONFIG.EXTERNAL_IDP_JWT_SECRET : APP_CONFIG.JWT_REFRESH_SECRET
+const JWT_ISSUER = APP_CONFIG.USE_EXTERNAL_IDP ? APP_CONFIG.EXTERNAL_IDP_ISSUER : APP_CONFIG.JWT_ISSUER
 
 // Expiration times
 export const TOKEN_EXPIRATION = {
@@ -116,6 +115,8 @@ export function generateRefreshToken(
  */
 export function verifyAccessToken(token: string): JWTPayload | null {
   try {
+    console.log('Verificando access token:', JWT_SECRET)
+    console.log('Verificando access token:', JWT_ISSUER)
     const decoded = jwt.verify(token, JWT_SECRET, {
       issuer: JWT_ISSUER
     }) as JWTPayload
