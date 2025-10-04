@@ -139,7 +139,83 @@ Status:
 - [x] **Gerenciamento de Memberships** (users ↔ orgs) (criado automaticamente no register)
 - [ ] **Sincronização**: script para migrar users do Poker para IdP
 - [x] **UI funcional**: login/register pages com forms reais
+- [x] **Integração completa**: callback, account linking, dual-auth
 - [x] Commit: "feat(idp): implement real database auth and user management"
+- [x] Commit: "feat(auth): implementa integração completa IdP com dual-auth e account linking"
+
+Status: ✅ **CONCLUÍDA** - IdP funcional com auth real, UI moderna, callback automático
+
+---
+
+### Fase 6.5 — IdP como Resource Provider (Multi-App) (branch: migration/phase-6.5)
+
+**Objetivo**: Transformar o IdP em provedor de recursos compartilhados (teams, projects) para múltiplas aplicações.
+
+#### **6.5.1 - Schema Extensions**
+- [ ] Adicionar models ao IdP:
+  - `Application` (apps registrados)
+  - `Invite` (convites cross-app)
+  - `Team` (times da organização)
+  - `TeamMember` (memberships de times)
+  - `Project` (projetos da organização)
+  - `ProjectMember` (memberships de projetos)
+- [ ] Adicionar enums: `OrgRole`, `TeamRole`, `ProjectRole`, `InviteStatus`
+- [ ] Migrar schema: `npx prisma migrate dev --name add-resources`
+
+#### **6.5.2 - IdP APIs (Resource Management)**
+- [ ] **Organizations API**:
+  - `GET /api/organizations/:id` - detalhes
+  - `PATCH /api/organizations/:id` - atualizar
+- [ ] **Teams API**:
+  - `GET /api/teams?organizationId=` - listar
+  - `POST /api/teams` - criar
+  - `GET /api/teams/:id` - detalhes
+  - `PATCH /api/teams/:id` - atualizar
+  - `DELETE /api/teams/:id` - deletar
+  - `GET /api/teams/:id/members` - listar membros
+  - `POST /api/teams/:id/members` - adicionar membro
+  - `DELETE /api/teams/:id/members/:userId` - remover membro
+- [ ] **Projects API**:
+  - `GET /api/projects?organizationId=&teamId=` - listar
+  - `POST /api/projects` - criar
+  - `GET /api/projects/:id` - detalhes
+  - `PATCH /api/projects/:id` - atualizar
+  - `DELETE /api/projects/:id` - deletar
+  - `GET /api/projects/:id/members` - listar membros
+  - `POST /api/projects/:id/members` - adicionar membro
+  - `DELETE /api/projects/:id/members/:userId` - remover membro
+- [ ] **Users API** (read-only para apps):
+  - `GET /api/users?organizationId=` - listar
+
+#### **6.5.3 - Applications & Invites**
+- [ ] **Application Registration API**:
+  - `POST /api/applications` - registrar novo app (admin only)
+  - `GET /api/applications` - listar apps registrados
+- [ ] **Invite API**:
+  - `POST /api/applications/:appId/invites` - criar convite (auth: app credentials)
+  - `GET /api/invites/:token` - validar token de convite (public)
+  - `POST /api/invites/:token/accept` - aceitar convite (auth: user session)
+  - `DELETE /api/invites/:id` - revogar convite
+
+#### **6.5.4 - Poker Planning Refactoring**
+- [ ] Migrar dados existentes:
+  - Script para criar `Application` para Poker Planning no IdP
+  - Marcar users/orgs existentes com referências ao IdP
+- [ ] Refatorar para consumir IdP:
+  - Teams: apenas referências (teamId do IdP)
+  - Projects: apenas referências (projectId do IdP)
+  - Users: apenas externalId
+- [ ] Atualizar convites:
+  - POST `/api/users/invite` → chama IdP `/api/applications/poker/invites`
+  - Callback processa convite e aplica metadata local
+
+#### **6.5.5 - Testing & Documentation**
+- [ ] Testar fluxo completo de convite
+- [ ] Testar criação de teams/projects via IdP
+- [ ] Documentar APIs do IdP
+- [ ] Atualizar `MIGRATION_PLAN.md` com novo fluxo
+
+Commit: "feat(idp): transform into resource provider with teams, projects and invites"
 
 Status:
 - Prisma client configurado com schema separado (`idp`)
