@@ -32,11 +32,14 @@ app.prepare().then(() => {
   }
 
   // 🔹 Adicionar participante a uma sessão
-  function addParticipant (sessionId, userId, userName, socketId) {
+  function addParticipant (sessionId, userId, userName, socketId, team = null) {
     const session = getOrCreateSession(sessionId);
     const existing = session.participants.find((p) => p.userId === userId);
     if (!existing) {
-      session.participants.push({ userId, userName, socketId, selectedCard: null });
+      session.participants.push({ userId, userName, socketId, selectedCard: null, team });
+    } else {
+      existing.team = team;
+      existing.socketId = socketId;
     }
   }
 
@@ -55,19 +58,19 @@ app.prepare().then(() => {
     });
 
     // 👥 Entrar na sala
-    socket.on("join_room", ({ sessionId, sessionName, userId, userName }) => {
-      console.log(`👤 ${userName} (${userId}) entrou na sala ${sessionId}`);
+    socket.on("join_room", ({ sessionId, sessionName, userId, userName, team }) => {
+      console.log(`👤 ${userName} (${userId}) [${team || 'no team'}] entrou na sala ${sessionId}`);
       socket.join(sessionId);
 
       const session = getOrCreateSession(sessionId, sessionName);
       if (
-        ["", null, undefined].includes(session.sessionName) 
+        ["", null, undefined].includes(session.sessionName)
       ) {
         socket.emit("redirect_to_home");
         return;
       }
 
-      addParticipant(sessionId, userId, userName, socket.id);
+      addParticipant(sessionId, userId, userName, socket.id, team);
 
       updateSession(sessionId);
     });

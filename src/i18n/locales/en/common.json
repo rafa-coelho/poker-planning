@@ -25,5 +25,11 @@
   "yourName": "Your Name",
   "namePlaceholder": "Enter your name...",
   "enterSession": "Enter Session",
-  "errorEnterName": "Please enter your name!"
+  "errorEnterName": "Please enter your name!",
+  "yourTeam": "Your Team",
+  "teamPlaceholder": "Select your team...",
+  "teamOrganizer": "Organizer",
+  "teamDev": "Dev",
+  "teamQA": "QA",
+  "teamUX": "UX"
 }
