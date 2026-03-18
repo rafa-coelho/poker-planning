@@ -25,5 +25,11 @@
   "yourName": "Seu Nome",
   "namePlaceholder": "Digite seu nome...",
   "enterSession": "Entrar na Sessão",
-  "errorEnterName": "Por favor, insira seu nome!"
+  "errorEnterName": "Por favor, insira seu nome!",
+  "yourTeam": "Seu Time",
+  "teamPlaceholder": "Selecione seu time...",
+  "teamOrganizer": "Organizador",
+  "teamDev": "Dev",
+  "teamQA": "QA",
+  "teamUX": "UX"
 }

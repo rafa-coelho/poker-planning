@@ -3,9 +3,12 @@ import { useParams, useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { io, Socket } from "socket.io-client";
 
+export type Team = "organizer" | "dev" | "qa" | "ux";
+
 export interface Participant {
   userId: string;
   userName: string;
+  team: Team | null;
   isCurrentUser: boolean;
   selectedCard: string | null;
 }
@@ -45,6 +48,7 @@ export function useSession () {
 
     const storedUserId = getOrCreateUserId();
     const storedUserName = getStoredUserName();
+    const storedUserTeam = getStoredUserTeam();
 
     if (!storedUserName) {
       router.push(`/${sessionId}/join`);
@@ -56,7 +60,7 @@ export function useSession () {
     generateInviteLink();
 
     // Certifique-se de que a função de cleanup é sempre retornada
-    const cleanup = initializeSocketConnection(storedUserId, storedUserName);
+    const cleanup = initializeSocketConnection(storedUserId, storedUserName, storedUserTeam);
     return cleanup || (() => { });
   }, [sessionId, router]);
 
@@ -76,12 +80,17 @@ export function useSession () {
     return localStorage.getItem("pokerUserName");
   }
 
+  /** 🔹 Obtém o time do usuário armazenado */
+  function getStoredUserTeam (): Team | null {
+    return localStorage.getItem("pokerUserTeam") as Team | null;
+  }
+
   /** 🔹 Inicializa a conexão com o WebSocket */
-  function initializeSocketConnection (storedUserId: string, storedUserName: string): () => void {
+  function initializeSocketConnection (storedUserId: string, storedUserName: string, storedUserTeam: Team | null): () => void {
     socketRef.current = io(HOST);
     const socket = socketRef.current;
 
-    socket.emit("join_room", { sessionId, userId: storedUserId, userName: storedUserName });
+    socket.emit("join_room", { sessionId, userId: storedUserId, userName: storedUserName, team: storedUserTeam });
 
     socket.on("session_update", (data: SessionState) => updateSessionData(data, storedUserId));
     socket.on("flip_cards", startCountdownBeforeReveal);

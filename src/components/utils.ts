@@ -5,7 +5,7 @@ export function ensureLocalUser (participants: Participant[], localUserId: strin
   if (!exists && localUserId && localUserName) {
     return [
       ...participants,
-      { userId: localUserId, userName: localUserName, selectedCard: null, isCurrentUser: true },
+      { userId: localUserId, userName: localUserName, selectedCard: null, isCurrentUser: true, team: null },
     ];
   }
   return participants;
